@@ -1,0 +1,34 @@
+__pycache__/
+env/
+*.zip
+k_env/
+setenv.sh
+.idea
+dump.rdb
+/logs/**/*.log*
+.DS_Store
+/contracts/
+**/celerybeat-schedule*
+id_ed25519
+.python-version
+Volumes/
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+report.html
+venv/
+
+# env files
+.env
+tbot/.env
