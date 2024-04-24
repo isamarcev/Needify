@@ -11,6 +11,9 @@ The Open Times is a platform that helps people help each other and exchange thei
 ```sh
 sh run_local.sh
 ```
+- Open your bot 
+- type `/start`
+- enjoy 
 
 ### Development links
 
