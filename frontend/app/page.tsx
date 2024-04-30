@@ -1,95 +1,122 @@
-import Image from 'next/image';
+'use client';
 import styles from './page.module.css';
+import { useTelegram } from '@/helpers/TelegramContext/TelegramContext';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Selector } from '@/components/Selector';
+import { TaskCard } from '@/widgets/TaskCard';
+import { ITaskCard } from '@/widgets/TaskCard/types';
 
 export default function Home() {
-  return (
+  const { isLoading } = useTelegram();
+
+  const categoryOptions = [
+    'Psychology',
+    'Plumbing',
+    'Design',
+    'Marketing',
+    'Ads',
+    'Sales',
+    'Healthcare',
+  ];
+
+  const cardsData: ITaskCard[] = [
+    {
+      title: 'Set the google ads',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Set the yandex ads',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+    {
+      title: 'Develop the site',
+      cardData: {
+        Deadline: '17.05.2024',
+        Price: '250 {TIME}',
+      },
+    },
+  ];
+
+  return isLoading ? (
+    <Box className={styles.loader}>
+      <CircularProgress />
+    </Box>
+  ) : (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      <Typography variant="h1" align="center">
+        The Open Times
+      </Typography>
+      <Box className={styles.menuWrapper}>
+        <Button className={styles.menuItem} variant="outlined">
+          Profile
+        </Button>
+        <Button className={styles.menuItem} variant="contained">
+          My order
+        </Button>
+      </Box>
+      <Box className={styles.category}>
+        <Selector
+          label="Category"
+          options={categoryOptions}
+          onChange={() => {}}
         />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      </Box>
+      <Box className={styles.cards}>
+        {cardsData.map((data) => (
+          <TaskCard key={data.title} {...data} />
+        ))}
+      </Box>
+      <Button className={styles.createOrder} variant="contained">
+        Create order
+      </Button>
     </main>
   );
 }
