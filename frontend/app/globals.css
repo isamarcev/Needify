@@ -9,8 +9,8 @@
   --secondary-color: #F7F9FB;
 
   --text-color: #1E2337;
-  --background-start-rgb: #2D83EC;
-  --background-end-rgb: #1AC9FF;
+  --background-start-color: #2D83EC;
+  --background-end-color: #1AC9FF;
 
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,
@@ -41,7 +41,7 @@
   body {
     margin: 0 auto;
     color: rgb(var(--text-color));
-    background: var(--secondary-color);
+    background: var(--mui-palette-secondary-main);
   }
 
   a {
