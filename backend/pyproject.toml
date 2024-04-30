@@ -12,9 +12,18 @@ pymongo = "^4.7.0"
 motor = "^3.4.0"
 redis = "^5.0.4"
 uvicorn = "^0.29.0"
-pydantic-settings = "^2.2.1"
 pyjwt = "^2.8.0"
 python-multipart = "^0.0.9"
+tonsdk = { git = "https://github.com/isamarcev/tonsdk_hd", branch = "master" }
+requests = "^2.31.0"
+tonlib = "^0.1"
+tontools = "^2.1.2"
+python-dotenv = "^1.0.1"
+pytonlib = "^0.0.58"
+dependency-injector = "^4.41.0"
+aioredis = "^2.0.1"
+
+
 
 
 [build-system]

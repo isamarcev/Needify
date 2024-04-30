@@ -5,7 +5,6 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 class BaseUserDatabase(ABC):
 
-
     async def get_users(self):
         raise NotImplementedError()
 
