@@ -42,7 +42,6 @@ class BaseConfig(BaseSettings):
         return self.HD_WALLET_MNEMONIC.split()
 
 
-
 class SecurityConfig(BaseSettings):
     TOKEN_SECRET_KEY: str
     TOKEN_ALGORITHM: str = "HS256"
@@ -62,4 +61,3 @@ hd_wallet_info = get_wallet_info_by_mnemonic(
 )
 
 print(hd_wallet_info)
-

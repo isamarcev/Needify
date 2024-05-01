@@ -4,7 +4,6 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 
 class BaseRepository(ABC):
-
     @abstractmethod
     async def get_list(self, *args, **kwargs):
         pass
@@ -27,7 +26,6 @@ class BaseRepository(ABC):
 
 
 class BaseMongoRepository(BaseRepository):
-
     def __init__(self, mongo_client: AsyncIOMotorClient, collection_name: str):
         self.mongo_client = mongo_client
         self.collection_name = collection_name

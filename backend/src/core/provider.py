@@ -2,11 +2,9 @@ from pathlib import Path
 
 import requests
 from pytonlib import TonlibClient
-from tonsdk.provider import ToncenterClient
+from TonTools import TonCenterClient
 
 from src.core.config import config
-
-from TonTools import TonCenterClient, Wallet
 
 
 async def get_lite_server_client() -> TonlibClient:
@@ -29,10 +27,5 @@ async def get_lite_server_client() -> TonlibClient:
 
 
 async def get_tonsdk_center_client():
-    provider = TonCenterClient(
-        base_url=config.TON_CENTER_URL,
-        key=config.TON_CENTER_API_KEY
-    )
+    provider = TonCenterClient(base_url=config.TON_CENTER_URL, key=config.TON_CENTER_API_KEY)
     return provider
-
-

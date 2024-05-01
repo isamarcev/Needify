@@ -1,22 +1,23 @@
-from abc import ABC
 import random
+from abc import ABC
 
-from dependency_injector.wiring import Provide, inject
-
-from src.apps.category.dependencies import CategoryContainer
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.exceptions import TaskNotFoundJsonException, TaskValidationJsonException
 from src.apps.tasks.rules import ChangeStatusTaskRule
-from src.apps.tasks.schemas import TaskSchema, PreCreateTaskSchema, UpdateStatusTaskSchema, \
-    CreateTaskSchema, UserHistoryResponseSchema
+from src.apps.tasks.schemas import (
+    CreateTaskSchema,
+    PreCreateTaskSchema,
+    TaskSchema,
+    UpdateStatusTaskSchema,
+    UserHistoryResponseSchema,
+)
 from src.apps.wallets.manager import WalletManager
 from src.core.repository import BaseMongoRepository
 
 
 class BaseTaskManager(ABC):
-
     async def get_tasks(self):
         raise NotImplementedError()
 
@@ -34,18 +35,17 @@ class BaseTaskManager(ABC):
 
 
 class TaskManager(BaseTaskManager):
-
-    def __init__(self,
-                 task_repository: BaseMongoRepository,
-                 category_manager: CategoryManager,
-                 wallet_manager: WalletManager,
-                 ):
+    def __init__(
+        self,
+        task_repository: BaseMongoRepository,
+        category_manager: CategoryManager,
+        wallet_manager: WalletManager,
+    ):
         self.repository = task_repository
         self.category_manager = category_manager
         self.wallet_manager = wallet_manager
         self.publisher = None
 
-    @inject
     async def get_tasks(self, category: str = None) -> list[TaskSchema]:
         if category and not await self.category_manager.get(category_title=category):
             raise CategoryNotFoundException()
@@ -69,9 +69,7 @@ class TaskManager(BaseTaskManager):
             raise CategoryNotFoundException()
         data_to_insert = data_to_create.dict()
         task_id = self.task_id_generator()
-        deposit_wallet = await self.wallet_manager.create_deposit_wallet_for_task(
-            task_id=task_id
-        )
+        deposit_wallet = await self.wallet_manager.create_deposit_wallet_for_task(task_id=task_id)
         data_to_insert["task_id"] = task_id
         data_to_insert["task_deposit_address"] = deposit_wallet.address
         task_for_creating = CreateTaskSchema(**data_to_insert)
@@ -99,9 +97,9 @@ class TaskManager(BaseTaskManager):
         except ValueError as e:
             raise TaskValidationJsonException(str(e))
 
-        updated_task: TaskSchema = await self.update_task(task_id, {
-            "status": data_to_update.status
-        })
+        updated_task: TaskSchema = await self.update_task(
+            task_id, {"status": data_to_update.status}
+        )
         match updated_task.status:
             case TaskStatusEnum.CANCELLED:
                 # need to return money to customer
@@ -119,23 +117,23 @@ class TaskManager(BaseTaskManager):
             {
                 "customer_id": user_id,
                 # "status": {"$in": TaskStatusEnum.customer_active_statuses()}
-             }
+            }
         )
         picked_up_tasks = await self.repository.get_list(
             {
                 "doer_id": user_id,
                 # "status": {"$in": TaskStatusEnum.doer_active_statuses()}
-             }
+            }
         )
         completed_tasks = await self.repository.get_list(
             {
                 "doer_id": user_id,
                 # "status": {"$in": TaskStatusEnum.done_statuses()}
-             }
+            }
         )
         response = UserHistoryResponseSchema(
             published_tasks=published_tasks,
             picked_up_tasks=picked_up_tasks,
-            completed_tasks=completed_tasks
+            completed_tasks=completed_tasks,
         )
         return response

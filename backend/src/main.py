@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends
+from fastapi import APIRouter, FastAPI
 
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
@@ -6,7 +6,7 @@ from src.apps.tasks.dependencies import TaskContainer
 from src.apps.users.dependencies import UserContainer
 from src.apps.wallets.dependencies import WalletContainer
 from src.core.config import config
-from src.core.database import setup_database, async_mongo
+from src.core.database import async_mongo, setup_database
 from src.core.middlewares import setup_middlewares
 from src.core.router import v1_router
 
@@ -46,8 +46,7 @@ async def setup_containers():
 
     task_container = TaskContainer(
         category_manager=category_container.category_manager.provided,
-        wallet_manager=wallet_container.wallet_manager.provided
-
+        wallet_manager=wallet_container.wallet_manager.provided,
     )
     task_container.config.from_pydantic(settings=config)
 

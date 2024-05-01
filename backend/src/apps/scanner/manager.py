@@ -4,18 +4,21 @@ from pprint import pprint
 from pytonlib import TonlibClient
 
 from src.apps.utils.development import write_to_file
-from src.core.cache import RedisCacheDatabase, BaseCacheDatabase
+from src.core.cache import BaseCacheDatabase
 
 
 class BaseScanner(ABC):
-
     def infinity_scanner_process(self, *args, **kwargs):
         pass
 
 
 class ScannerManager(BaseScanner):
-
-    def __init__(self, lt_server_provider: TonlibClient, toncenter_provider, cache_database: BaseCacheDatabase):
+    def __init__(
+        self,
+        lt_server_provider: TonlibClient,
+        toncenter_provider,
+        cache_database: BaseCacheDatabase,
+    ):
         self.lt_server_provider = lt_server_provider
         self.toncenter_provider = toncenter_provider
         self.cache_database = cache_database
@@ -44,7 +47,11 @@ class ScannerManager(BaseScanner):
             print(shards, "shards")
 
     async def get_block_transactions(self, workchain, shard, seqno):
-        return (await self.lt_server_provider.get_block_transactions(workchain, shard, seqno, count=1000))["transactions"]
+        return (
+            await self.lt_server_provider.get_block_transactions(
+                workchain, shard, seqno, count=1000
+            )
+        )["transactions"]
 
     async def scan_last_block_masterchain(self):
 
@@ -64,23 +71,18 @@ class ScannerManager(BaseScanner):
         for shard in shards:
             # print(shard)
             # print(shard["workchain"], shard["shard"], shard["seqno"])
-        #     print(shard)
+            #     print(shard)
             shard_transactions = await self.get_block_transactions(
-                workchain=shard["workchain"],
-                shard=shard["shard"],
-                seqno=shard["seqno"]
+                workchain=shard["workchain"], shard=shard["shard"], seqno=shard["seqno"]
             )
             pprint(shard_transactions)
             write_to_file("shard_transactions", shard_transactions)
             for tr in shard_transactions:
 
-                full_tr = (
-                    await self.lt_server_provider.get_transactions(account=tr['account'], from_transaction_lt=tr['lt'],
-                                                  from_transaction_hash=tr['hash']))
+                full_tr = await self.lt_server_provider.get_transactions(
+                    account=tr["account"],
+                    from_transaction_lt=tr["lt"],
+                    from_transaction_hash=tr["hash"],
+                )
                 detailed_transactions.append(full_tr)
         write_to_file("detailed_transactions", detailed_transactions)
-
-
-
-
-

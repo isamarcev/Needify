@@ -1,22 +1,17 @@
-from TonTools.Contracts.Wallet import Wallet
+from dependency_injector import containers, providers
 from TonTools.Providers.TonCenterClient import TonCenterClient
 
-from src.apps.wallets.manager import WalletManager
-from src.core.config import config
-from src.core.database import async_mongo
-from src.core.provider import get_tonsdk_center_client
+from src.apps.utils.database import ThreadMongoSingleton
 from src.apps.wallets.jetton_manager import JettonManager
+from src.apps.wallets.manager import WalletManager
+from src.core.config import BaseConfig
+from src.core.provider import get_tonsdk_center_client
 from src.core.repository import BaseMongoRepository
 
 
 async def get_jetton_manager() -> JettonManager:
     manager = JettonManager(ton_center_client=await get_tonsdk_center_client())
     return manager
-from dependency_injector import containers, providers
-
-from src.apps.utils.database import ThreadMongoSingleton
-from src.core.config import BaseConfig
-from src.core.repository import BaseMongoRepository
 
 
 class WalletContainer(containers.DeclarativeContainer):
@@ -28,16 +23,10 @@ class WalletContainer(containers.DeclarativeContainer):
         ],
     )
 
-    async_mongo = providers.Factory(
-        ThreadMongoSingleton,
-        config.MONGO_DB_URL,
-        config.MONGO_DB_NAME
-    )
+    async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
 
     wallet_database = providers.Factory(
-        BaseMongoRepository,
-        mongo_client=async_mongo,
-        collection_name="wallets"
+        BaseMongoRepository, mongo_client=async_mongo, collection_name="wallets"
     )
 
     wallet_manager = providers.Factory(
@@ -46,9 +35,6 @@ class WalletContainer(containers.DeclarativeContainer):
         main_wallet_mnemonics=config.hd_wallet_mnemonic_list,
         main_wallet_address=config.HD_WALLET_ADDRESS,
         provider=providers.Factory(
-            TonCenterClient,
-            config.TON_CENTER_URL,
-            config.TON_CENTER_API_KEY
-        )
+            TonCenterClient, config.TON_CENTER_URL, config.TON_CENTER_API_KEY
+        ),
     )
-

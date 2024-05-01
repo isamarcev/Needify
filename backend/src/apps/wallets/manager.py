@@ -1,10 +1,12 @@
-from TonTools.Contracts.Wallet import Wallet
-from TonTools.Providers.TonCenterClient import TonCenterClient
 from tonsdk.crypto import mnemonic_to_hd_seed
 from tonsdk.crypto.hd import derive_mnemonics_path
+from TonTools.Contracts.Wallet import Wallet
+from TonTools.Providers.TonCenterClient import TonCenterClient
 
-from src.apps.wallets.exceptions import DepositWalletNotFoundException, \
-    DepositWalletValidationJsonException
+from src.apps.wallets.exceptions import (
+    DepositWalletNotFoundException,
+    DepositWalletValidationJsonException,
+)
 from src.apps.wallets.schemas import DepositWalletSchema
 from src.core.repository import BaseMongoRepository
 
@@ -14,11 +16,11 @@ class WalletManager:
     WALLET_VERSION = "v4r2"
 
     def __init__(
-            self,
-            repository: BaseMongoRepository,
-            main_wallet_mnemonics: list[str],
-            main_wallet_address: str,
-            provider: TonCenterClient,
+        self,
+        repository: BaseMongoRepository,
+        main_wallet_mnemonics: list[str],
+        main_wallet_address: str,
+        provider: TonCenterClient,
     ):
         self.repository = repository
         self.main_wallet_mnemonics = main_wallet_mnemonics
@@ -30,8 +32,7 @@ class WalletManager:
         return [DepositWalletSchema(**wallet) for wallet in wallets]
 
     async def insert_deposit_wallet(
-            self,
-            deposit_wallet: DepositWalletSchema
+        self, deposit_wallet: DepositWalletSchema
     ) -> DepositWalletSchema:
         if await self.get_deposit_wallet(deposit_wallet.address, raise_if_not_exist=False):
             raise DepositWalletValidationJsonException(
@@ -40,7 +41,9 @@ class WalletManager:
         await self.repository.create(deposit_wallet.dict())
         return deposit_wallet
 
-    async def get_deposit_wallet(self, address: str, raise_if_not_exist: bool = True) -> DepositWalletSchema:
+    async def get_deposit_wallet(
+        self, address: str, raise_if_not_exist: bool = True
+    ) -> DepositWalletSchema:
         wallet = await self.repository.get_by_filter({"address": address})
         if not wallet and raise_if_not_exist:
             raise DepositWalletNotFoundException(address)
@@ -53,8 +56,7 @@ class WalletManager:
     async def generate_deposit_wallet(self, index: int) -> DepositWalletSchema:
         path = self.get_path(index)
         deposit_wallet_mnemonic = derive_mnemonics_path(
-            mnemonic_to_hd_seed(self.main_wallet_mnemonics),
-            path
+            mnemonic_to_hd_seed(self.main_wallet_mnemonics), path
         )
         deposit_wallet = self.get_wallet(deposit_wallet_mnemonic, self.provider)
         deposit_wallet_schema = DepositWalletSchema(
@@ -79,7 +81,5 @@ class WalletManager:
     @staticmethod
     def get_wallet(wallet_mnemonics: list[str], provider: TonCenterClient) -> Wallet:
         return Wallet(
-            mnemonics=wallet_mnemonics,
-            provider=provider,
-            version=WalletManager.WALLET_VERSION
+            mnemonics=wallet_mnemonics, provider=provider, version=WalletManager.WALLET_VERSION
         )

@@ -2,7 +2,6 @@ from src.apps.utils.exceptions import JsonHTTPException
 
 
 class CurrencyValidationJsonException(JsonHTTPException):
-
     def __init__(self, description: str):
         super().__init__(
             status_code=400,
@@ -12,7 +11,6 @@ class CurrencyValidationJsonException(JsonHTTPException):
 
 
 class CurrencyNotFoundJsonException(JsonHTTPException):
-
     def __init__(self, symbol: str):
         super().__init__(
             status_code=404,

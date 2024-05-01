@@ -3,7 +3,6 @@ from src.core.repository import BaseMongoRepository
 
 
 class CategoryManager:
-
     def __init__(self, repository: BaseMongoRepository):
         self.repository = repository
 

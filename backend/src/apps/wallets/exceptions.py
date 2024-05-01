@@ -2,7 +2,6 @@ from src.apps.utils.exceptions import JsonHTTPException
 
 
 class DepositWalletValidationJsonException(JsonHTTPException):
-
     def __init__(self, description: str):
         super().__init__(
             status_code=400,
@@ -16,5 +15,5 @@ class DepositWalletNotFoundException(JsonHTTPException):
         super().__init__(
             error_description=f"Deposit wallet not found: {address}",
             status_code=404,
-            error_name="Not Found"
+            error_name="Not Found",
         )

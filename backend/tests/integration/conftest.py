@@ -42,5 +42,3 @@ def user_container():
 #         sync_mongo = MongoClient(config.MONGO_DB_URL)
 #         sync_mongo.drop_database("TEST_DATABASE_NAME")
 #     drop_database()
-
-

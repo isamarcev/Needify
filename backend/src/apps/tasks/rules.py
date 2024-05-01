@@ -7,7 +7,6 @@ from src.apps.tasks.schemas import TaskSchema
 
 @dataclass
 class BusinessRule(ABC):
-
     def is_broken(self, *args, **kwargs) -> bool:
         pass
 
@@ -20,8 +19,9 @@ class ChangeStatusTaskRule(BusinessRule):
     action_by_user_id: int
 
     def is_broken(self) -> bool:
-        if ((self.action_by_user_id != self.task_to_update.customer_id)
-                and (self.action_by_user_id != self.task_to_update.doer_id)):
+        if (self.action_by_user_id != self.task_to_update.customer_id) and (
+            self.action_by_user_id != self.task_to_update.doer_id
+        ):
             raise ValueError("Only customer or doer can change task status")
 
         match self.action_by_user_id:

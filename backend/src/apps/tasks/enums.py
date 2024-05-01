@@ -1,19 +1,17 @@
-from enum import Enum
-
 from src.core.enums import StrEnum
 
 
 class TaskStatusEnum(StrEnum):
 
-    PRE_CREATED = 'PRE_CREATED'
-    CREATED = 'CREATED'
-    WAIT_FOR_EXECUTOR = 'WAIT_FOR_EXECUTOR'
-    IN_PROGRESS = 'IN_PROGRESS'
-    COMPLETED = 'COMPLETED'
-    CONFIRMED = 'CONFIRMED'
-    FINISHED = 'FINISHED'
-    CANCELLED = 'CANCELLED'
-    FAILED = 'FAILED'
+    PRE_CREATED = "PRE_CREATED"
+    CREATED = "CREATED"
+    WAIT_FOR_EXECUTOR = "WAIT_FOR_EXECUTOR"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CONFIRMED = "CONFIRMED"
+    FINISHED = "FINISHED"
+    CANCELLED = "CANCELLED"
+    FAILED = "FAILED"
 
     @classmethod
     def choices(cls):
@@ -32,8 +30,13 @@ class TaskStatusEnum(StrEnum):
 
     @classmethod
     def customer_active_statuses(cls) -> list[str]:
-        return [cls.CREATED.value, cls.PRE_CREATED.value, cls.WAIT_FOR_EXECUTOR.value,
-                cls.COMPLETED.value, cls.IN_PROGRESS.value]
+        return [
+            cls.CREATED.value,
+            cls.PRE_CREATED.value,
+            cls.WAIT_FOR_EXECUTOR.value,
+            cls.COMPLETED.value,
+            cls.IN_PROGRESS.value,
+        ]
 
     @classmethod
     def doer_active_statuses(cls) -> list[str]:
@@ -51,4 +54,3 @@ class TaskStatusEnum(StrEnum):
             cls.WAIT_FOR_EXECUTOR.value: [cls.CANCELLED.value],
             cls.COMPLETED.value: [cls.CONFIRMED.value],
         }
-

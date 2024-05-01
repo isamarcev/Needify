@@ -1,16 +1,15 @@
 from abc import ABC
 from datetime import datetime
 
-from pymongo import IndexModel, ASCENDING
+from pymongo import ASCENDING, IndexModel
 from pymongo.errors import DuplicateKeyError
 
 from src.apps.users.database import BaseUserDatabase
-from src.apps.users.schemas import CreateUserSchema, UserSchema, UpdateUserSchema
+from src.apps.users.schemas import CreateUserSchema, UpdateUserSchema, UserSchema
 from src.apps.utils.exceptions import JsonHTTPException
 
 
 class BaseUserManager(ABC):
-
     async def create_user(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -31,7 +30,6 @@ class BaseUserManager(ABC):
 
 
 class UserManager(BaseUserManager):
-
     def __init__(self, user_repository: BaseUserDatabase):
         self.repository = user_repository
 
@@ -46,41 +44,49 @@ class UserManager(BaseUserManager):
         try:
             result = await self.repository.insert_user(**dict_to_insert)
         except DuplicateKeyError as e:
-            raise JsonHTTPException(status_code=400,
-                                    error_description="User with this telegram_id already exists",
-                                    error_name="DUPLICATE_KEY") from e
+            raise JsonHTTPException(
+                status_code=400,
+                error_description="User with this telegram_id already exists",
+                error_name="DUPLICATE_KEY",
+            ) from e
         return CreateUserSchema(**result)
 
     async def get_user(self, user_id: str, raise_if_none: bool = True) -> UserSchema | None:
         user = await self.repository.get_user(user_id)
         if not user and raise_if_none:
-            raise JsonHTTPException(status_code=404,
-                                    error_description="User not found",
-                                    error_name="NOT_FOUND")
+            raise JsonHTTPException(
+                status_code=404, error_description="User not found", error_name="NOT_FOUND"
+            )
         return UserSchema(**user) if user else None
 
-    async def get_user_by_telegram_id(self, telegram_id: int, raise_if_none: bool = True) -> UserSchema | None:
+    async def get_user_by_telegram_id(
+        self, telegram_id: int, raise_if_none: bool = True
+    ) -> UserSchema | None:
         user = await self.repository.get_user_by_telegram_id(telegram_id)
         if not user and raise_if_none:
-            raise JsonHTTPException(status_code=404,
-                                    error_description="User not found",
-                                    error_name="NOT_FOUND")
+            raise JsonHTTPException(
+                status_code=404, error_description="User not found", error_name="NOT_FOUND"
+            )
         return UserSchema(**user) if user else None
 
-    async def get_user_by_username(self, username: str, raise_if_none: bool = True) -> UserSchema | None:
+    async def get_user_by_username(
+        self, username: str, raise_if_none: bool = True
+    ) -> UserSchema | None:
         user = await self.repository.get_user_by_username(username)
         if not user and raise_if_none:
-            raise JsonHTTPException(status_code=404,
-                                    error_description="User not found",
-                                    error_name="NOT_FOUND")
+            raise JsonHTTPException(
+                status_code=404, error_description="User not found", error_name="NOT_FOUND"
+            )
         return UserSchema(**user) if user else None
 
-    async def update_user(self, telegram_id: int, update_schema: UpdateUserSchema, raise_if_none: bool = True) -> UserSchema | None:
+    async def update_user(
+        self, telegram_id: int, update_schema: UpdateUserSchema, raise_if_none: bool = True
+    ) -> UserSchema | None:
         user = await self.get_user_by_telegram_id(telegram_id)
         if not user and raise_if_none:
-            raise JsonHTTPException(status_code=404,
-                                    error_description="User not found",
-                                    error_name="NOT_FOUND")
+            raise JsonHTTPException(
+                status_code=404, error_description="User not found", error_name="NOT_FOUND"
+            )
         dict_to_update = update_schema.dict(exclude_unset=True)
         dict_to_update.update({"updated": datetime.now()})
         result = await self.repository.update_user(user.telegram_id, dict_to_update)
@@ -89,9 +95,9 @@ class UserManager(BaseUserManager):
     async def delete_user(self, telegram_id: int, raise_if_none: bool = True) -> None:
         user = await self.get_user_by_telegram_id(telegram_id)
         if not user and raise_if_none:
-            raise JsonHTTPException(status_code=404,
-                                    error_description="User not found",
-                                    error_name="NOT_FOUND")
+            raise JsonHTTPException(
+                status_code=404, error_description="User not found", error_name="NOT_FOUND"
+            )
         await self.repository.delete_user(telegram_id)
 
     async def setup_database(self):

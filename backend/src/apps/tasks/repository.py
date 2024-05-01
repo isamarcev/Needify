@@ -2,7 +2,6 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 
 class TaskRepository:
-
     def __init__(self, mongo_client: AsyncIOMotorClient, collection_name: str = "task"):
         self.mongo_client = mongo_client
         self.collection_name = collection_name

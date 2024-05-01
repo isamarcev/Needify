@@ -1,7 +1,6 @@
-import random
 from datetime import datetime
 
-from pydantic import BaseModel, PositiveInt, PositiveFloat, Field
+from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
 
 from src.apps.tasks.enums import TaskStatusEnum
 
@@ -75,5 +74,3 @@ class UserHistoryResponseSchema(BaseModel):
 class UpdateStatusTaskSchema(BaseModel):
     status: TaskStatusEnum
     action_by_user_id: int
-
-

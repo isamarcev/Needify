@@ -18,21 +18,15 @@ class TaskContainer(containers.DeclarativeContainer):
     category_manager = providers.Provider()
     wallet_manager = providers.Provider()
 
-    async_mongo = providers.Factory(
-        ThreadMongoSingleton,
-        config.MONGO_DB_URL,
-        config.MONGO_DB_NAME
-    )
+    async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
 
     task_database = providers.Factory(
-        BaseMongoRepository,
-        mongo_client=async_mongo,
-        collection_name="tasks"
+        BaseMongoRepository, mongo_client=async_mongo, collection_name="tasks"
     )
 
     task_manager = providers.Factory(
         TaskManager,
         task_repository=task_database,
         category_manager=category_manager,
-        wallet_manager=wallet_manager
+        wallet_manager=wallet_manager,
     )

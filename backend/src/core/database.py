@@ -1,12 +1,11 @@
-from pymongo import IndexModel, ASCENDING
+from aioredis import from_url
 from dependency_injector.providers import ThreadLocalSingleton
+from pymongo import ASCENDING, IndexModel
+
 from src.apps.utils.database import ThreadMongoSingleton
 from src.core.config import config
-from aioredis import from_url
 
-async_mongo = ThreadMongoSingleton(
-    config.MONGO_DB_URL, config.MONGO_DB_NAME
-)
+async_mongo = ThreadMongoSingleton(config.MONGO_DB_URL, config.MONGO_DB_NAME)
 
 redis_database = ThreadLocalSingleton(from_url, config.REDIS_URL).provided
 

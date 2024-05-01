@@ -2,11 +2,8 @@ from abc import ABC, abstractmethod
 
 from aioredis import Redis
 
-from src.core.database import redis_database
-
 
 class BaseCacheDatabase(ABC):
-
     @abstractmethod
     async def get_last_scanned_block(self, *args, **kwargs):
         pass

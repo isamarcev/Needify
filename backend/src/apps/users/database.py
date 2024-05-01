@@ -5,7 +5,6 @@ from pymongo import IndexModel
 
 
 class BaseUserDatabase(ABC):
-
     async def get_users(self):
         raise NotImplementedError()
 
@@ -32,7 +31,6 @@ class BaseUserDatabase(ABC):
 
 
 class MongoDBUserRepository(BaseUserDatabase):
-
     def __init__(self, mongo_client: AsyncIOMotorClient, collection_name: str = "users"):
         self.mongo_client = mongo_client
         self.collection_name = collection_name
@@ -59,7 +57,9 @@ class MongoDBUserRepository(BaseUserDatabase):
         return await self.collection.find_one({"username": username})
 
     async def update_user(self, telegram_id: int, dict_to_update: dict) -> None:
-        result = await self.collection.update_one({"telegram_id": telegram_id}, {"$set": dict_to_update})
+        result = await self.collection.update_one(
+            {"telegram_id": telegram_id}, {"$set": dict_to_update}
+        )
         if result.modified_count == 0:
             return None
         else:
