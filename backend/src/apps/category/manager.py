@@ -14,7 +14,7 @@ class CategoryManager:
     async def get_list(self) -> list[CategorySchema]:
         return [CategorySchema(**category) for category in await self.repository.get_list()]
 
-    async def create(self, category: CategorySchema):
+    async def create(self, category: CategorySchema) -> CategorySchema:
         if await self.get(category.title):
             raise ValueError(f"Category {category.title} already exists")
         result = await self.repository.create(category.dict())
@@ -28,5 +28,5 @@ class CategoryManager:
                 categories_to_response.append(category)
             else:
                 result = await self.create(category)
-                categories_to_response.append(CategorySchema(**result))
+                categories_to_response.append(result)
         return categories_to_response

@@ -1,6 +1,9 @@
 from abc import ABC
 import random
 
+from dependency_injector.wiring import Provide, inject
+
+from src.apps.category.dependencies import CategoryContainer
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
 from src.apps.tasks.enums import TaskStatusEnum
@@ -33,28 +36,29 @@ class BaseTaskManager(ABC):
 class TaskManager(BaseTaskManager):
 
     def __init__(self,
-                 task_repo: BaseMongoRepository,
+                 task_repository: BaseMongoRepository,
                  category_manager: CategoryManager,
                  wallet_manager: WalletManager,
                  ):
-        self.task_repo = task_repo
+        self.repository = task_repository
         self.category_manager = category_manager
         self.wallet_manager = wallet_manager
         self.publisher = None
 
+    @inject
     async def get_tasks(self, category: str = None) -> list[TaskSchema]:
         if category and not await self.category_manager.get(category_title=category):
             raise CategoryNotFoundException()
         if category:
-            return await self.task_repo.get_list({"category": category})
-        return await self.task_repo.get_list()
+            return await self.repository.get_list({"category": category})
+        return await self.repository.get_list()
 
     async def get_by_task_id(self, task_id: int) -> TaskSchema | None:
-        result = await self.task_repo.get_by_filter({"task_id": task_id})
+        result = await self.repository.get_by_filter({"task_id": task_id})
         return TaskSchema(**result) if result else None
 
     async def get_task(self, obj_id: str):
-        return await self.task_repo.get(obj_id)
+        return await self.repository.get(obj_id)
 
     @staticmethod
     def task_id_generator():
@@ -71,14 +75,14 @@ class TaskManager(BaseTaskManager):
         data_to_insert["task_id"] = task_id
         data_to_insert["task_deposit_address"] = deposit_wallet.address
         task_for_creating = CreateTaskSchema(**data_to_insert)
-        created_task = await self.task_repo.create(task_for_creating.dict())
+        created_task = await self.repository.create(task_for_creating.dict())
         return TaskSchema(**created_task)
 
     async def update_task(self, task_id: int, data_to_update: dict) -> TaskSchema | None:
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
-        result = await self.task_repo.update(task["_id"], data_to_update)
+        result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None
 
     async def update_task_status(self, task_id: int, data_to_update: UpdateStatusTaskSchema):
@@ -108,22 +112,22 @@ class TaskManager(BaseTaskManager):
         return updated_task
 
     async def delete_task(self, task_id: str):
-        return await self.task_repo.delete(task_id)
+        return await self.repository.delete(task_id)
 
     async def get_user_tasks(self, user_id: int) -> UserHistoryResponseSchema:
-        published_tasks = await self.task_repo.get_list(
+        published_tasks = await self.repository.get_list(
             {
                 "customer_id": user_id,
                 # "status": {"$in": TaskStatusEnum.customer_active_statuses()}
              }
         )
-        picked_up_tasks = await self.task_repo.get_list(
+        picked_up_tasks = await self.repository.get_list(
             {
                 "doer_id": user_id,
                 # "status": {"$in": TaskStatusEnum.doer_active_statuses()}
              }
         )
-        completed_tasks = await self.task_repo.get_list(
+        completed_tasks = await self.repository.get_list(
             {
                 "doer_id": user_id,
                 # "status": {"$in": TaskStatusEnum.done_statuses()}

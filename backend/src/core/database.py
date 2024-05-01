@@ -11,6 +11,6 @@ async_mongo = ThreadMongoSingleton(
 redis_database = ThreadLocalSingleton(from_url, config.REDIS_URL).provided
 
 
-async def setup_database():
+async def setup_database(mongo_db):
     telegram_id = IndexModel([("telegram_id", ASCENDING)], unique=True)
-    await async_mongo().users.create_indexes([telegram_id])
+    await mongo_db().users.create_indexes([telegram_id])

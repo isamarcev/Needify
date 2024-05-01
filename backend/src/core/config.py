@@ -22,6 +22,7 @@ class BaseConfig(BaseSettings):
 
     WORKCHAIN: int = 0
     IS_TESTNET: bool = False
+
     AMOUNT_TON_TO_DEPLOY: float = 0.05
     NATIVE_JETTON_CONTENT_URL: str
     LITESERVER_INDEX: int = 2
@@ -29,6 +30,9 @@ class BaseConfig(BaseSettings):
     TON_CENTER_API_KEY: str
 
     NATIVE_JETTON_ADDRESS: str
+
+    # KAFKA
+    KAFKA_BOOTSTRAP_SERVERS: list[str]
 
     class Config:
         env_file = ".env"

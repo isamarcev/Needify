@@ -6,7 +6,7 @@ from tonsdk.utils import to_nano
 from src.apps.currency.exceptions import CurrencyNotFoundJsonException, \
     CurrencyValidationJsonException
 from src.apps.currency.mint_bodies import create_state_init_jetton, increase_supply
-from src.apps.currency.schemas import MintTokenSchema, CreateCurrencySchema
+from src.apps.currency.schemas import MintTokenSchema, CreateCurrencySchema, CurrencySchema
 from src.apps.utils.wallet import get_wallet_info_by_mnemonic, get_sdk_wallet_by_mnemonic
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
@@ -22,11 +22,11 @@ class CurrencyManager(BaseCurrencyManager):
         self.lts_client = lts_client
         self.repository = repository
 
-    async def get_currencies(self):
+    async def get_currencies(self) -> list[CurrencySchema]:
         currencies = await self.repository.get_list()
-        return currencies
+        return [CurrencySchema(**currency) for currency in currencies]
 
-    async def get(self, symbol: str, raise_if_not_exist: bool = True) -> CreateCurrencySchema | None:
+    async def get(self, symbol: str, raise_if_not_exist: bool = True) -> CurrencySchema | None:
         currency = await self.repository.get_by_filter({"symbol": symbol})
         if not currency and raise_if_not_exist:
             raise CurrencyNotFoundJsonException(symbol)

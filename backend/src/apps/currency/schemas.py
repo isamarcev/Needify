@@ -1,6 +1,14 @@
 from pydantic import BaseModel, PositiveInt
 
 
+class CurrencySchema(BaseModel):
+    name: str
+    symbol: str
+    decimals: PositiveInt
+    jetton_master_address: str
+    is_active: bool
+
+
 class CreateCurrencySchema(BaseModel):
     name: str
     symbol: str

@@ -4,7 +4,7 @@ import jwt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from src.apps.users.dependencies import user_manager
+# from src.apps.users.dependencies import user_manager
 from src.apps.users.schemas import TokenData
 from src.apps.utils.exceptions import JsonHTTPException
 from src.core.config import security_settings

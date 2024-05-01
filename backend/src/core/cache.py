@@ -15,6 +15,7 @@ class BaseCacheDatabase(ABC):
     async def set_last_scanned_block(self, *args, **kwargs):
         pass
 
+
 class RedisCacheDatabase(BaseCacheDatabase):
     def __init__(self, redis: Redis):
         self.redis = redis

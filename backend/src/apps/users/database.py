@@ -1,6 +1,7 @@
 from abc import ABC
 
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import IndexModel
 
 
 class BaseUserDatabase(ABC):
@@ -26,8 +27,11 @@ class BaseUserDatabase(ABC):
     async def delete_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    async def setup_indexes(self, *args, **kwargs):
+        raise NotImplementedError()
 
-class MongoDBUserDatabase(BaseUserDatabase):
+
+class MongoDBUserRepository(BaseUserDatabase):
 
     def __init__(self, mongo_client: AsyncIOMotorClient, collection_name: str = "users"):
         self.mongo_client = mongo_client
@@ -63,3 +67,6 @@ class MongoDBUserDatabase(BaseUserDatabase):
 
     async def delete_user(self, telegram_id: int) -> None:
         await self.collection.delete_one({"telegram_id": telegram_id})
+
+    async def setup_indexes(self, indexes: list[IndexModel]):
+        await self.collection.create_indexes(indexes)
