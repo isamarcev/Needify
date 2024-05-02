@@ -1,12 +1,11 @@
+import asyncio
+
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, FastAPI
 
-from src.apps.category.dependencies import CategoryContainer
-from src.apps.currency.dependencies import CurrencyContainer
-from src.apps.tasks.dependencies import TaskContainer
-from src.apps.users.dependencies import UserContainer
-from src.apps.wallets.dependencies import WalletContainer
 from src.core.config import config
 from src.core.database import async_mongo, setup_database
+from src.core.dependencies import CoreContainer
 from src.core.middlewares import setup_middlewares
 from src.core.router import v1_router
 
@@ -28,35 +27,27 @@ def app_factory():
     return fastapi_app
 
 
-app = app_factory()
 
 
 async def setup_containers():
-    user_container = UserContainer()
-    user_container.config.from_pydantic(settings=config)
 
-    currency_container = CurrencyContainer()
-    currency_container.config.from_pydantic(settings=config)
+    core_container = CoreContainer()
+    core_container.config.from_pydantic(settings=config)
+    app.core_container = core_container
 
-    category_container = CategoryContainer()
-    category_container.config.from_pydantic(settings=config)
-
-    wallet_container = WalletContainer()
-    wallet_container.config.from_pydantic(settings=config)
-
-    task_container = TaskContainer(
-        category_manager=category_container.category_manager.provided,
-        wallet_manager=wallet_container.wallet_manager.provided,
-    )
-    task_container.config.from_pydantic(settings=config)
-
+app = app_factory()
 
 @app.on_event("startup")
 async def startup_event():
     await setup_containers()
+    core_container = app.core_container
+    message_hub = core_container.message_hub()
+    asyncio.create_task(message_hub.consume())
+
     await setup_database(async_mongo)
 
 
 @app.get("/")
+@inject
 async def root():
     return {"message": "Hello World"}

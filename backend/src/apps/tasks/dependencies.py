@@ -18,6 +18,7 @@ class TaskContainer(containers.DeclarativeContainer):
     category_manager = providers.Provider()
     wallet_manager = providers.Provider()
 
+    # async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
     async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
 
     task_database = providers.Factory(

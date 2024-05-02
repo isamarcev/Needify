@@ -3,6 +3,8 @@ from abc import ABC
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import IndexModel
 
+from src.apps.utils.database import ThreadMongoSingleton
+
 
 class BaseUserDatabase(ABC):
     async def get_users(self):
@@ -31,8 +33,8 @@ class BaseUserDatabase(ABC):
 
 
 class MongoDBUserRepository(BaseUserDatabase):
-    def __init__(self, mongo_client: AsyncIOMotorClient, collection_name: str = "users"):
-        self.mongo_client = mongo_client
+    def __init__(self, mongo_conn: str, mongo_db: str, collection_name: str = "users"):
+        self.mongo_client = ThreadMongoSingleton(mongo_conn, mongo_db)
         self.collection_name = collection_name
 
     @property

@@ -1,10 +1,11 @@
+import asyncio
 from abc import ABC
 from pprint import pprint
 
 from pytonlib import TonlibClient
 
 from src.apps.utils.development import write_to_file
-from src.core.cache import BaseCacheDatabase
+from src.core.producer import KafkaProducer
 
 
 class BaseScanner(ABC):
@@ -16,12 +17,14 @@ class ScannerManager(BaseScanner):
     def __init__(
         self,
         lt_server_provider: TonlibClient,
-        toncenter_provider,
-        cache_database: BaseCacheDatabase,
+        # toncenter_provider,
+        # cache_database: BaseCacheDatabase,
+        producer: KafkaProducer,
     ):
         self.lt_server_provider = lt_server_provider
-        self.toncenter_provider = toncenter_provider
-        self.cache_database = cache_database
+        # self.toncenter_provider = toncenter_provider
+        # self.cache_database = cache_database
+        self.producer = producer
 
     async def get_last_network_block(self):
         masterchain_info = await self.lt_server_provider.get_masterchain_info()
@@ -86,3 +89,9 @@ class ScannerManager(BaseScanner):
                 )
                 detailed_transactions.append(full_tr)
         write_to_file("detailed_transactions", detailed_transactions)
+
+    async def infinity_scanner(self):
+        while True:
+            # await self.producer.publish_message(WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET, {"test": "test"})
+            await asyncio.sleep(5)
+            print("TEST INFINITY SCANNER")

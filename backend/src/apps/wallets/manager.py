@@ -3,11 +3,13 @@ from tonsdk.crypto.hd import derive_mnemonics_path
 from TonTools.Contracts.Wallet import Wallet
 from TonTools.Providers.TonCenterClient import TonCenterClient
 
+from src.apps.wallets.events import WalletTopicsEnum
 from src.apps.wallets.exceptions import (
     DepositWalletNotFoundException,
     DepositWalletValidationJsonException,
 )
 from src.apps.wallets.schemas import DepositWalletSchema
+from src.core.producer import KafkaProducer
 from src.core.repository import BaseMongoRepository
 
 
@@ -21,15 +23,20 @@ class WalletManager:
         main_wallet_mnemonics: list[str],
         main_wallet_address: str,
         provider: TonCenterClient,
+        producer: KafkaProducer,
     ):
         self.repository = repository
         self.main_wallet_mnemonics = main_wallet_mnemonics
         self.main_wallet_address = main_wallet_address
         self.provider = provider
+        self.producer = producer
 
     async def get_deposit_wallets(self) -> list[DepositWalletSchema]:
         wallets = await self.repository.get_list()
         return [DepositWalletSchema(**wallet) for wallet in wallets]
+
+    async def test_(self):
+        await self.producer.publish_message(WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET, {"test": "test"})
 
     async def insert_deposit_wallet(
         self, deposit_wallet: DepositWalletSchema
@@ -83,3 +90,6 @@ class WalletManager:
         return Wallet(
             mnemonics=wallet_mnemonics, provider=provider, version=WalletManager.WALLET_VERSION
         )
+
+    async def handle_wallet_created(self, message: dict) -> None:
+        print(f"Wallet created: {message}")

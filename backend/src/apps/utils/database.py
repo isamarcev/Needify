@@ -27,6 +27,8 @@ class ThreadMongoSingleton:
         self._get_database()
 
     def _factory(self):
+        print("Creating new mongo connection")
+        print(self._mongo_conn, self._mongo_db)
         if self._sync_mode is True:
             return MongoClient(self._mongo_conn)[self._mongo_db]
         else:

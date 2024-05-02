@@ -5,8 +5,10 @@ from pymongo import ASCENDING, IndexModel
 from pymongo.errors import DuplicateKeyError
 
 from src.apps.users.database import BaseUserDatabase
+from src.apps.users.events import UserEventsEnum
 from src.apps.users.schemas import CreateUserSchema, UpdateUserSchema, UserSchema
 from src.apps.utils.exceptions import JsonHTTPException
+from src.core.producer import KafkaProducer
 
 
 class BaseUserManager(ABC):
@@ -30,15 +32,16 @@ class BaseUserManager(ABC):
 
 
 class UserManager(BaseUserManager):
-    def __init__(self, user_repository: BaseUserDatabase):
+    def __init__(self, user_repository: BaseUserDatabase, producer: KafkaProducer):
         self.repository = user_repository
+        self.producer = producer
 
     async def get_users(self) -> list[UserSchema]:
         users = await self.repository.get_users()
         print(users, "USERS")
         return [UserSchema(**user) for user in users]
 
-    async def create_user(self, create_schema: CreateUserSchema):
+    async def create_user(self, create_schema: CreateUserSchema) -> UserSchema:
         dict_to_insert = create_schema.dict()
         dict_to_insert.update({"created": datetime.now(), "updated": datetime.now()})
         try:
@@ -49,7 +52,8 @@ class UserManager(BaseUserManager):
                 error_description="User with this telegram_id already exists",
                 error_name="DUPLICATE_KEY",
             ) from e
-        return CreateUserSchema(**result)
+        await self.producer.publish_message(UserEventsEnum.USER_CREATED, result)
+        return UserSchema(**result)
 
     async def get_user(self, user_id: str, raise_if_none: bool = True) -> UserSchema | None:
         user = await self.repository.get_user(user_id)
@@ -103,3 +107,7 @@ class UserManager(BaseUserManager):
     async def setup_database(self):
         telegram_id = IndexModel([("telegram_id", ASCENDING)], unique=True)
         await self.repository.setup_indexes([telegram_id])
+
+    async def handle_created_user(self, data: dict):
+        user = UserSchema(**data)
+        print(f"User {user.telegram_id} was created")
