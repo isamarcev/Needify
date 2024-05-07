@@ -4,86 +4,14 @@ import { useTelegram } from '@/helpers/TelegramContext/TelegramContext';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { Selector } from '@/components/Selector';
 import { TaskCard } from '@/widgets/TaskCard';
-import { ITaskCard } from '@/widgets/TaskCard/types';
+import Link from 'next/link';
+import { cardsShortData } from '@/tests/mockData';
+import { ECategory } from '@/app/task-detail/[id]/types';
 
 export default function Home() {
   const { isLoading } = useTelegram();
 
-  const categoryOptions = [
-    'Psychology',
-    'Plumbing',
-    'Design',
-    'Marketing',
-    'Ads',
-    'Sales',
-    'Healthcare',
-  ];
-
-  const cardsData: ITaskCard[] = [
-    {
-      title: 'Set the google ads',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Set the yandex ads',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-    {
-      title: 'Develop the site',
-      cardData: {
-        Deadline: '17.05.2024',
-        Price: '250 {TIME}',
-      },
-    },
-  ];
+  const categoryOptions = Object.values(ECategory);
 
   return isLoading ? (
     <Box className={styles.loader}>
@@ -98,9 +26,15 @@ export default function Home() {
         <Button className={styles.menuItem} variant="outlined">
           Profile
         </Button>
-        <Button className={styles.menuItem} variant="contained">
-          My order
-        </Button>
+        <Link href="/my-tasks" passHref>
+          <Button
+            className={styles.menuItem}
+            variant="contained"
+            component="span"
+          >
+            My tasks
+          </Button>
+        </Link>
       </Box>
       <Box className={styles.category}>
         <Selector
@@ -110,12 +44,12 @@ export default function Home() {
         />
       </Box>
       <Box className={styles.cards}>
-        {cardsData.map((data) => (
-          <TaskCard key={data.title} {...data} />
+        {cardsShortData.map((data) => (
+          <TaskCard key={data.id} {...data} />
         ))}
       </Box>
       <Button className={styles.createOrder} variant="contained">
-        Create order
+        Create task
       </Button>
     </main>
   );
