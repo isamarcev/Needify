@@ -4,6 +4,7 @@ import styles from './page.module.css';
 import { TaskCard } from '@/widgets/TaskCard';
 import { cardsFullData } from '@/tests/mockData';
 import { useRouter } from 'next/navigation';
+import { InnerPage } from '@/components/InnerPage';
 
 export default function Page() {
   const router = useRouter();
@@ -13,10 +14,7 @@ export default function Page() {
   };
 
   return (
-    <main className={styles.main}>
-      <Typography variant="h1" align="center">
-        My tasks
-      </Typography>
+    <InnerPage title="My tasks">
       <Typography className={styles.subtitle} variant="h2">
         Published tasks
       </Typography>
@@ -44,6 +42,6 @@ export default function Page() {
       >
         Back
       </Button>
-    </main>
+    </InnerPage>
   );
 }

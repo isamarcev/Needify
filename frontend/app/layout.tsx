@@ -26,10 +26,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CssBaseline />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <CssVarsProvider theme={theme}>
             <TelegramProvider>{children}</TelegramProvider>
+            <CssBaseline />
           </CssVarsProvider>
         </AppRouterCacheProvider>
       </body>

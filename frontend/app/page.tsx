@@ -13,7 +13,7 @@ export default function Home() {
 
   const categoryOptions = Object.values(ECategory);
 
-  return isLoading ? (
+  return !isLoading ? (
     <Box className={styles.loader}>
       <CircularProgress />
     </Box>
@@ -48,9 +48,15 @@ export default function Home() {
           <TaskCard key={data.id} {...data} />
         ))}
       </Box>
-      <Button className={styles.createOrder} variant="contained">
-        Create task
-      </Button>
+      <Link href="/create-task">
+        <Button
+          className={styles.createOrder}
+          variant="contained"
+          component="div"
+        >
+          Create task
+        </Button>
+      </Link>
     </main>
   );
 }
