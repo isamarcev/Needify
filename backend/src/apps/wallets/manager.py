@@ -36,12 +36,16 @@ class WalletManager:
         return [DepositWalletSchema(**wallet) for wallet in wallets]
 
     async def test_(self):
-        await self.producer.publish_message(WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET, {"test": "test"})
+        await self.producer.publish_message(
+            WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET, {"test": "test"}
+        )
 
     async def insert_deposit_wallet(
         self, deposit_wallet: DepositWalletSchema
     ) -> DepositWalletSchema:
-        if await self.get_deposit_wallet(deposit_wallet.address, raise_if_not_exist=False):
+        if await self.get_deposit_wallet(
+            deposit_wallet.address, raise_if_not_exist=False
+        ):
             raise DepositWalletValidationJsonException(
                 f"Deposit wallet {deposit_wallet.address} already exists"
             )
@@ -88,7 +92,9 @@ class WalletManager:
     @staticmethod
     def get_wallet(wallet_mnemonics: list[str], provider: TonCenterClient) -> Wallet:
         return Wallet(
-            mnemonics=wallet_mnemonics, provider=provider, version=WalletManager.WALLET_VERSION
+            mnemonics=wallet_mnemonics,
+            provider=provider,
+            version=WalletManager.WALLET_VERSION,
         )
 
     async def handle_wallet_created(self, message: dict) -> None:

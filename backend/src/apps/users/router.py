@@ -22,7 +22,8 @@ async def get_users(
 @user_router.get("/{telegram_id}")
 @inject
 async def get_user(
-    telegram_id: int, user_manager: UserManager = Depends(Provide[UserContainer.user_manager])
+    telegram_id: int,
+    user_manager: UserManager = Depends(Provide[UserContainer.user_manager]),
 ) -> UserSchema:
     user = await user_manager.get_user_by_telegram_id(telegram_id)
     if user is None:
@@ -58,7 +59,8 @@ async def update_user(
 @user_router.delete("/{telegram_id}")
 @inject
 async def delete_user(
-    telegram_id: int, user_manager: UserManager = Depends(Provide[UserContainer.user_manager])
+    telegram_id: int,
+    user_manager: UserManager = Depends(Provide[UserContainer.user_manager]),
 ):
     await user_manager.delete_user(telegram_id)
     return {"message": "User deleted successfully"}

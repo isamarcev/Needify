@@ -34,6 +34,8 @@ class BaseConfig(BaseSettings):
     # KAFKA
     KAFKA_BOOTSTRAP_SERVERS: list[str]
 
+    MANIFEST_URL: str
+
     class Config:
         env_file = ".env"
 

@@ -63,7 +63,9 @@ class ScannerManager(BaseScanner):
         last_masterchain_seqno = 18790203
         print(last_masterchain_block)
 
-        base_data = await self.lt_server_provider.get_shards(master_seqno=last_masterchain_seqno)
+        base_data = await self.lt_server_provider.get_shards(
+            master_seqno=last_masterchain_seqno
+        )
         print(base_data)
 
         shards = base_data["shards"]

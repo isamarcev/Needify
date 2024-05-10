@@ -3,7 +3,11 @@ from fastapi import APIRouter, Depends
 
 from src.apps.currency.dependencies import CurrencyContainer
 from src.apps.currency.manager import CurrencyManager
-from src.apps.currency.schemas import BurnDataSchema, CreateCurrencySchema, MintTokenSchema
+from src.apps.currency.schemas import (
+    BurnDataSchema,
+    CreateCurrencySchema,
+    MintTokenSchema,
+)
 
 currency_router = APIRouter()
 
@@ -11,7 +15,9 @@ currency_router = APIRouter()
 @currency_router.get("/")
 @inject
 async def get_list_currencies(
-    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+    currency_manager: CurrencyManager = Depends(
+        Provide[CurrencyContainer.currency_manager]
+    ),
 ):
     result = await currency_manager.get_currencies()
     return result
@@ -21,7 +27,9 @@ async def get_list_currencies(
 @inject
 async def create_currency(
     data: CreateCurrencySchema,
-    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+    currency_manager: CurrencyManager = Depends(
+        Provide[CurrencyContainer.currency_manager]
+    ),
 ):
     result = await currency_manager.create_currency(data)
     return {"message": result}
@@ -30,7 +38,9 @@ async def create_currency(
 @currency_router.get("/deploy-minter")
 @inject
 async def deploy_minter(
-    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+    currency_manager: CurrencyManager = Depends(
+        Provide[CurrencyContainer.currency_manager]
+    ),
 ):
     result = await currency_manager.deploy_minter()
     return {"message": result}
@@ -40,7 +50,9 @@ async def deploy_minter(
 @inject
 async def mint_tokens(
     mint_data: MintTokenSchema,
-    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+    currency_manager: CurrencyManager = Depends(
+        Provide[CurrencyContainer.currency_manager]
+    ),
 ):
     result = await currency_manager.mint_tokens(mint_data)
     return {"message": result}
@@ -50,7 +62,9 @@ async def mint_tokens(
 @inject
 async def burn_tokens(
     burn_data: BurnDataSchema,
-    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+    currency_manager: CurrencyManager = Depends(
+        Provide[CurrencyContainer.currency_manager]
+    ),
 ):
     result = await currency_manager.burn_tokens(burn_data.amount)
     return {"message": result}

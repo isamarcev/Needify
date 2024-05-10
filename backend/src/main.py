@@ -27,15 +27,15 @@ def app_factory():
     return fastapi_app
 
 
-
-
 async def setup_containers():
 
     core_container = CoreContainer()
     core_container.config.from_pydantic(settings=config)
     app.core_container = core_container
 
+
 app = app_factory()
+
 
 @app.on_event("startup")
 async def startup_event():

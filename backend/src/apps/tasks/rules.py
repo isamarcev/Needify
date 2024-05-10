@@ -29,14 +29,20 @@ class ChangeStatusTaskRule(BusinessRule):
                 route_mapping = TaskStatusEnum.mapping_rules_to_update_by_customer()
                 if self.task_to_update.status.value not in route_mapping.keys():
                     raise ValueError("Customer cannot change task status")
-                if self.new_status not in route_mapping[self.task_to_update.status.value]:
+                if (
+                    self.new_status
+                    not in route_mapping[self.task_to_update.status.value]
+                ):
                     raise ValueError("Customer cannot change task status to this value")
                 return False
             case self.task_to_update.doer_id:
                 route_mapping = TaskStatusEnum.mapping_rules_to_update_by_doer()
                 if self.task_to_update.status.value not in route_mapping.keys():
                     raise ValueError("Doer cannot change task status")
-                if self.new_status not in route_mapping[self.task_to_update.status.value]:
+                if (
+                    self.new_status
+                    not in route_mapping[self.task_to_update.status.value]
+                ):
                     raise ValueError("Doer cannot change task status to this value")
                 return False
         return True

@@ -4,11 +4,9 @@ from aiokafka import AIOKafkaConsumer
 
 
 class MessageHub:
-
     def __init__(self, consumer: AIOKafkaConsumer, handlers: dict):
         self.consumer = consumer
         self.handlers = handlers
-
 
     async def consume(self):
         await self.consumer.start()

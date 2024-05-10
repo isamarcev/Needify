@@ -29,7 +29,9 @@ class WalletContainer(containers.DeclarativeContainer):
         producer_class=AIOKafkaProducer,
         bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
     )
-    async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
+    async_mongo = providers.Factory(
+        ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME
+    )
 
     wallet_database = providers.Factory(
         BaseMongoRepository, mongo_client=async_mongo, collection_name="wallets"

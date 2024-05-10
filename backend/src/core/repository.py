@@ -52,7 +52,9 @@ class BaseMongoRepository(BaseRepository):
         return await self.get(result.inserted_id)
 
     async def update(self, obj_id: str, data_to_update: dict):
-        result = await self.collection.update_one({"_id": obj_id}, {"$set": data_to_update})
+        result = await self.collection.update_one(
+            {"_id": obj_id}, {"$set": data_to_update}
+        )
         if result.modified_count == 0:
             return None
         return await self.get(obj_id)

@@ -4,7 +4,10 @@ from abc import ABC
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
 from src.apps.tasks.enums import TaskStatusEnum
-from src.apps.tasks.exceptions import TaskNotFoundJsonException, TaskValidationJsonException
+from src.apps.tasks.exceptions import (
+    TaskNotFoundJsonException,
+    TaskValidationJsonException,
+)
 from src.apps.tasks.rules import ChangeStatusTaskRule
 from src.apps.tasks.schemas import (
     CreateTaskSchema,
@@ -69,21 +72,27 @@ class TaskManager(BaseTaskManager):
             raise CategoryNotFoundException()
         data_to_insert = data_to_create.dict()
         task_id = self.task_id_generator()
-        deposit_wallet = await self.wallet_manager.create_deposit_wallet_for_task(task_id=task_id)
+        deposit_wallet = await self.wallet_manager.create_deposit_wallet_for_task(
+            task_id=task_id
+        )
         data_to_insert["task_id"] = task_id
         data_to_insert["task_deposit_address"] = deposit_wallet.address
         task_for_creating = CreateTaskSchema(**data_to_insert)
         created_task = await self.repository.create(task_for_creating.dict())
         return TaskSchema(**created_task)
 
-    async def update_task(self, task_id: int, data_to_update: dict) -> TaskSchema | None:
+    async def update_task(
+        self, task_id: int, data_to_update: dict
+    ) -> TaskSchema | None:
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
         result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None
 
-    async def update_task_status(self, task_id: int, data_to_update: UpdateStatusTaskSchema):
+    async def update_task_status(
+        self, task_id: int, data_to_update: UpdateStatusTaskSchema
+    ):
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)

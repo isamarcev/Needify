@@ -7,7 +7,11 @@ class JettonManager:
 
     @classmethod
     async def transfer(
-        cls, wallet: Wallet, destination_address: str, amount: int, jetton_master_address: str
+        cls,
+        wallet: Wallet,
+        destination_address: str,
+        amount: int,
+        jetton_master_address: str,
     ):
         result = await wallet.transfer_jetton(
             destination_address=destination_address,

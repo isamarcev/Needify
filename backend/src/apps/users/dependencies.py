@@ -29,7 +29,7 @@ class UserContainer(containers.DeclarativeContainer):
         MongoDBUserRepository,
         mongo_conn=config.MONGO_DB_URL,
         mongo_db=config.MONGO_DB_NAME,
-        collection_name="users"
+        collection_name="users",
     )
 
     user_manager = providers.Singleton(

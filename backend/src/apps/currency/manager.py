@@ -8,8 +8,15 @@ from src.apps.currency.exceptions import (
     CurrencyValidationJsonException,
 )
 from src.apps.currency.mint_bodies import create_state_init_jetton, increase_supply
-from src.apps.currency.schemas import CreateCurrencySchema, CurrencySchema, MintTokenSchema
-from src.apps.utils.wallet import get_sdk_wallet_by_mnemonic, get_wallet_info_by_mnemonic
+from src.apps.currency.schemas import (
+    CreateCurrencySchema,
+    CurrencySchema,
+    MintTokenSchema,
+)
+from src.apps.utils.wallet import (
+    get_sdk_wallet_by_mnemonic,
+    get_wallet_info_by_mnemonic,
+)
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
 
@@ -27,7 +34,9 @@ class CurrencyManager(BaseCurrencyManager):
         currencies = await self.repository.get_list()
         return [CurrencySchema(**currency) for currency in currencies]
 
-    async def get(self, symbol: str, raise_if_not_exist: bool = True) -> CurrencySchema | None:
+    async def get(
+        self, symbol: str, raise_if_not_exist: bool = True
+    ) -> CurrencySchema | None:
         currency = await self.repository.get_by_filter({"symbol": symbol})
         if not currency and raise_if_not_exist:
             raise CurrencyNotFoundJsonException(symbol)
@@ -35,7 +44,9 @@ class CurrencyManager(BaseCurrencyManager):
 
     async def create_currency(self, data: CreateCurrencySchema) -> CreateCurrencySchema:
         if await self.get(data.symbol, raise_if_not_exist=False):
-            raise CurrencyValidationJsonException(f"Currency {data.symbol} already exists")
+            raise CurrencyValidationJsonException(
+                f"Currency {data.symbol} already exists"
+            )
         elif await self.repository.get_by_filter(
             {"jetton_master_address": data.jetton_master_address}
         ):
@@ -46,7 +57,9 @@ class CurrencyManager(BaseCurrencyManager):
         return CreateCurrencySchema(**currency)
 
     async def get_seqno(self, address: str):
-        data = await self.lts_client.raw_run_method(method="seqno", stack_data=[], address=address)
+        data = await self.lts_client.raw_run_method(
+            method="seqno", stack_data=[], address=address
+        )
         return int(data["stack"][0][1], 16)
 
     async def deploy_minter(self):
@@ -87,7 +100,9 @@ class CurrencyManager(BaseCurrencyManager):
         return result
 
     async def burn_tokens(self, amount_to_burn: int):
-        body = JettonWallet().create_burn_body(jetton_amount=to_nano(amount_to_burn, "ton"))
+        body = JettonWallet().create_burn_body(
+            jetton_amount=to_nano(amount_to_burn, "ton")
+        )
         state_init, jetton_address = create_state_init_jetton()
         seqno = await self.get_seqno(config.HD_WALLET_ADDRESS)
         wallet = get_sdk_wallet_by_mnemonic(

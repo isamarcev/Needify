@@ -15,7 +15,9 @@ class CategoryContainer(containers.DeclarativeContainer):
         ],
     )
 
-    async_mongo = providers.Singleton(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
+    async_mongo = providers.Singleton(
+        ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME
+    )
 
     category_database = providers.Singleton(
         BaseMongoRepository, mongo_client=async_mongo, collection_name="categories"

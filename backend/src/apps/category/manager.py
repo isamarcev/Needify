@@ -11,7 +11,9 @@ class CategoryManager:
         return CategorySchema(**category) if category else None
 
     async def get_list(self) -> list[CategorySchema]:
-        return [CategorySchema(**category) for category in await self.repository.get_list()]
+        return [
+            CategorySchema(**category) for category in await self.repository.get_list()
+        ]
 
     async def create(self, category: CategorySchema) -> CategorySchema:
         if await self.get(category.title):

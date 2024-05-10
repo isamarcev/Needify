@@ -4,6 +4,7 @@ from dependency_injector import containers, providers
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
 from src.apps.tasks.dependencies import TaskContainer
+from src.apps.TONconnect.dependencies import TONConnectContainer
 from src.apps.users.dependencies import UserContainer
 from src.apps.users.events import UserEventsEnum
 from src.apps.wallets.dependencies import WalletContainer
@@ -20,6 +21,11 @@ class CoreContainer(containers.DeclarativeContainer):
 
     task_container = providers.Container(
         TaskContainer,
+        config=config,
+    )
+
+    ton_connect_manager = providers.Container(
+        TONConnectContainer,
         config=config,
     )
 
@@ -42,7 +48,6 @@ class CoreContainer(containers.DeclarativeContainer):
         WalletContainer,
         config=config,
     )
-
 
     kafka_consumer = providers.Singleton(
         AIOKafkaConsumer,
@@ -72,7 +77,7 @@ class CoreContainer(containers.DeclarativeContainer):
         ],
         WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET: [
             wallet_container.container.wallet_manager.provided.handle_wallet_created,
-        ]
+        ],
     }
 
     message_hub = providers.Factory(
