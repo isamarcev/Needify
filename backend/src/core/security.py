@@ -4,19 +4,19 @@ import jwt
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from src.apps.users.dependencies import user_manager
-from src.apps.users.schemas import TokenData
+# from src.apps.users.dependencies import user_manager
+# from src.apps.users.schemas import TokenData
 from src.apps.utils.exceptions import JsonHTTPException
 from src.core.config import security_settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
 
 
-async def authenticate_user(username: str):
-    user = await user_manager.get_user_by_username(username)
-    if not user:
-        return False
-    return user
+# async def authenticate_user(username: str):
+#     user = await user_manager.get_user_by_username(username)
+#     if not user:
+#         return False
+#     return user
 
 
 async def create_access_token(data: dict):
@@ -45,10 +45,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        # token_data = TokenData(username=username)
     except jwt.exceptions.InvalidTokenError:
         raise credentials_exception
-    user = await user_manager.get_user_by_username(username=token_data.username)
+    # user = await user_manager.get_user_by_username(username=token_data.username)
+    user = None
     if user is None:
         raise credentials_exception
     return user

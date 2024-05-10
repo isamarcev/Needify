@@ -1,16 +1,37 @@
+from aiokafka import AIOKafkaProducer
+from dependency_injector import containers, providers
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from src.apps.users.database import MongoDBUserRepository
 from src.apps.users.manager import UserManager
-from src.apps.users.database import MongoDBUserDatabase
-from src.core.database import async_mongo
+from src.apps.utils.database import ThreadMongoSingleton
+from src.core.config import BaseConfig
+from src.core.producer import KafkaProducer
 
 
-def get_user_database():
-    user_database = MongoDBUserDatabase(mongo_client=async_mongo, collection_name="users")
-    return user_database
+class UserContainer(containers.DeclarativeContainer):
+    config: BaseConfig = providers.Configuration("config")
+    config.from_pydantic(BaseConfig())
 
+    wiring_config = containers.WiringConfiguration(
+        modules=[
+            "src.apps.users.router",
+        ],
+    )
 
-def get_user_manager() -> UserManager:
-    user_database = get_user_database()
-    return UserManager(user_database)
+    producer = providers.Singleton(
+        KafkaProducer,
+        producer_class=AIOKafkaProducer,
+        bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
+    )
 
+    user_database = providers.Factory(
+        MongoDBUserRepository,
+        mongo_conn=config.MONGO_DB_URL,
+        mongo_db=config.MONGO_DB_NAME,
+        collection_name="users",
+    )
 
-user_manager = get_user_manager()
+    user_manager = providers.Singleton(
+        UserManager, user_repository=user_database, producer=producer
+    )

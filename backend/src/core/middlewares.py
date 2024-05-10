@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import HTTPException, FastAPI
+from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 
 from src.apps.utils.exceptions import JsonHTTPException
@@ -22,4 +22,3 @@ async def catch_exceptions_middleware(request: Request, call_next):
 
 def setup_middlewares(app: FastAPI):
     app.middleware("http")(catch_exceptions_middleware)
-

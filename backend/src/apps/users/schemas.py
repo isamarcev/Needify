@@ -1,29 +1,10 @@
 from datetime import datetime
-from pydantic_core import core_schema as cs
-from bson import ObjectId
+
 from pydantic import BaseModel, Field, validator
-from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler, TypeAdapter
-from pydantic.json_schema import JsonSchemaValue
-
-
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
 
 
 class UserSchema(BaseModel):
-    id: str = Field(str, alias="_id")
+    id: str = Field(alias="_id")
     telegram_id: int
     first_name: str | None
     last_name: str | None
