@@ -1,0 +1,1043 @@
+PROGRAM{
+  DECLPROC __tact_verify_address
+  DECLPROC __tact_load_address
+  DECLPROC __tact_load_address_opt
+  DECLPROC __tact_store_address
+  DECLPROC __tact_store_address_opt
+  DECLPROC __tact_create_address
+  DECLPROC __tact_compute_contract_address
+  DECLPROC __tact_my_balance
+  DECLPROC __tact_not_null
+  DECLPROC __tact_context_get
+  DECLPROC __tact_context_get_sender
+  DECLPROC __tact_store_bool
+  DECLPROC __tact_slice_eq_bits
+  DECLPROC __tact_dict_set_code
+  DECLPROC __tact_dict_get_code
+  DECLPROC __tact_string_builder_start
+  DECLPROC __tact_string_builder_start_comment
+  DECLPROC __tact_string_builder_end
+  DECLPROC __tact_string_builder_append
+  DECLPROC $Transfer$_store
+  DECLPROC $Transfer$_store_cell
+  DECLPROC $Deploy$_load
+  DECLPROC $DeployOk$_store
+  DECLPROC $DeployOk$_store_cell
+  DECLPROC $Approve$_load
+  DECLPROC $ChangeStatus$_load
+  DECLPROC $JobOfferCloseState$_store
+  DECLPROC $JobOfferCloseState$_load
+  DECLPROC $JobOffer$_store
+  DECLPROC $JobOffer$_load
+  DECLPROC $StateInit$_not_null
+  DECLPROC $ContractData$_to_external
+  DECLPROC $TokenWallet$init$_store
+  DECLPROC $JobOffer$init$_load
+  DECLPROC $JobOfferCloseState$_constructor_doer_owner
+  DECLPROC $JobOffer$_contract_init
+  DECLPROC $JobOffer$_contract_load
+  DECLPROC $JobOffer$_contract_store
+  DECLPROC $global_contractAddress
+  DECLPROC $global_send
+  DECLPROC $Cell$_fun_asSlice
+  DECLPROC $String$_fun_asComment
+  DECLPROC $TokenWallet$_init_child
+  DECLPROC $SendParameters$_constructor_bounce_to_value_mode_body_code_data
+  DECLPROC $SendParameters$_constructor_to_value_mode_bounce_body_code_data
+  DECLPROC $Transfer$_constructor_query_id_amount_destination_response_destination_custom_payload_forward_ton_amount_forward_payload
+  DECLPROC $JobOffer$_fun_send_deposit
+  DECLPROC $ContractData$_constructor_title_description_price_owner_doer_is_locked_state_jetton_master_balance_my_jetton_address
+  DECLPROC $JobOffer$_fun_jetton_wallet
+  DECLPROC $JobOffer$_fun_job_data
+  DECLPROC $JobOffer$_fun_forward
+  DECLPROC $JobOffer$_fun_notify
+  DECLPROC $SendParameters$_constructor_to_value_mode_bounce_body
+  DECLPROC $DeployOk$_constructor_queryId
+  DECLPROC $JobOffer$_internal_text_99731cc0dc8ddf3245fd2c86706c571aceca401335924fbca31b0dd0acdecb7e
+  DECLPROC $JobOffer$_internal_binary_ChangeStatus
+  DECLPROC $JobOffer$_internal_text_85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246
+  DECLPROC $JobOffer$_internal_text_821379415cf0a0792afb20991baf68263d3de6337b0ff7990b4c07490cd49236
+  DECLPROC $JobOffer$_internal_binary_Approve
+  DECLPROC $JobOffer$_internal_text_9a6a8b179bbe0a3043b3e2f10f6a4efad22676c1107ee3e5defdb0f5176d6d9e
+  DECLPROC $JobOffer$_internal_binary_Deploy
+  67270 DECLMETHOD %job_data
+  117972 DECLMETHOD %jetton_wallet
+  113617 DECLMETHOD supported_interfaces
+  121275 DECLMETHOD get_abi_ipfs
+  115390 DECLMETHOD lazy_deployment_completed
+  DECLPROC $JobOffer$_contract_router_internal
+  DECLPROC recv_internal
+  DECLGLOBVAR __tact_context
+  DECLGLOBVAR __tact_context_sender
+  DECLGLOBVAR __tact_context_sys
+  DECLGLOBVAR __tact_randomized
+  __tact_verify_address PROCINLINE:<{
+    DUP
+    SBITS
+    267 PUSHINT
+    EQUAL
+    136 THROWIFNOT
+    DUP
+    11 PLDU
+    DUP
+    1279 PUSHINT
+    EQUAL
+    137 THROWIF
+    10 PUSHPOW2
+    EQUAL
+    136 THROWIFNOT
+  }>
+  __tact_load_address PROCINLINE:<{
+    LDMSGADDR
+    SWAP
+    __tact_verify_address INLINECALLDICT
+  }>
+  __tact_load_address_opt PROCINLINE:<{
+    LDMSGADDR
+    OVER
+    2 PLDU
+    0 NEQINT
+    IF:<{
+      SWAP
+      __tact_verify_address INLINECALLDICT
+    }>ELSE<{
+      NIP
+      PUSHNULL
+    }>
+  }>
+  __tact_store_address PROCINLINE:<{
+    __tact_verify_address INLINECALLDICT
+    STSLICER
+  }>
+  __tact_store_address_opt PROCINLINE:<{
+    DUP
+    ISNULL
+    IF:<{
+      DROP
+      0 PUSHINT
+      SWAP
+      2 STU
+    }>ELSE<{
+      __tact_store_address INLINECALLDICT
+    }>
+  }>
+  __tact_create_address PROCINLINE:<{
+    NEWC
+    2 PUSHINT
+    SWAP
+    2 STU
+    0 PUSHINT
+    SWAP
+    1 STU
+    s1 s2 XCHG
+    8 STI
+    256 STU
+    ENDC
+    CTOS
+    __tact_verify_address INLINECALLDICT
+  }>
+  __tact_compute_contract_address PROCINLINE:<{
+    NEWC
+    0 PUSHINT
+    SWAP
+    2 STU
+    3 PUSHINT
+    SWAP
+    2 STU
+    0 PUSHINT
+    SWAP
+    1 STU
+    s1 s2 XCHG
+    STREF
+    STREF
+    ENDC
+    HASHCU
+    __tact_create_address INLINECALLDICT
+  }>
+  __tact_my_balance PROCINLINE:<{
+    BALANCE
+    FIRST
+  }>
+  __tact_not_null PROCINLINE:<{
+    DUP
+    ISNULL
+    128 THROWIF
+  }>
+  __tact_context_get PROCINLINE:<{
+    __tact_context GETGLOB
+    4 UNTUPLE
+  }>
+  __tact_context_get_sender PROCINLINE:<{
+    __tact_context_sender GETGLOB
+  }>
+  __tact_store_bool PROCINLINE:<{
+    SWAP
+    1 STI
+  }>
+  __tact_slice_eq_bits PROCINLINE:<{
+    SDEQ
+  }>
+  __tact_dict_set_code PROCINLINE:<{
+    s0 s2 XCHG
+    16 PUSHINT
+    DICTUSETREF
+  }>
+  __tact_dict_get_code PROCINLINE:<{
+    SWAP
+    16 PUSHINT
+    DICTUGETREF
+    NULLSWAPIFNOT
+    135 THROWIFNOT
+  }>
+  __tact_string_builder_start PROCINLINE:<{
+    NIL
+    SWAP
+    TPUSH
+    PUSHNULL
+    TPUSH
+  }>
+  __tact_string_builder_start_comment PROCINLINE:<{
+    NEWC
+    0 PUSHINT
+    SWAP
+    32 STU
+    __tact_string_builder_start INLINECALLDICT
+  }>
+  __tact_string_builder_end PROCINLINE:<{
+    UNCONS
+    SWAP
+    ENDC
+    WHILE:<{
+      OVER
+      ISNULL
+      NOT
+    }>DO<{
+      SWAP
+      UNCONS
+      -ROT
+      STREF
+      ENDC
+    }>
+    NIP
+  }>
+  __tact_string_builder_append PROCREF:<{
+    DUP
+    SREFS
+    OVER
+    SBITS
+    WHILE:<{
+      DUP
+      0 GTINT
+      s2 PUSH
+      0 GTINT
+      OR
+    }>DO<{
+      s0 s3 XCHG
+      UNCONS
+      127 PUSHINT
+      s2 PUSH
+      BBITS
+      3 RSHIFT#
+      SUB
+      s0 s5 XCHG
+      3 RSHIFT#
+      s5 s5 XCPU
+      MIN
+      DUP
+      0 GTINT
+      IF:<{
+        DUP
+        3 LSHIFT#
+        s1 s5 XCHG
+        LDSLICEX
+        s3 s3 XCHG2
+        STSLICER
+        s0 s1 s4 XCHG3
+      }>
+      -ROT
+      CONS
+      s4 s1 PUSH2
+      SUB
+      0 GTINT
+      IF:<{
+        NEWC
+        SWAP
+        CONS
+        s4 s4 XCHG2
+        SUB
+        3 LSHIFT#
+      }>ELSE<{
+        NIP
+        s3 POP
+        0 GTINT
+        IF:<{
+          LDREF
+          DROP
+          CTOS
+          DUP
+          SREFS
+          OVER
+          SBITS
+        }>ELSE<{
+          0 PUSHINT
+          DUP
+        }>
+      }>
+    }>
+    3 BLKDROP
+  }>
+  $Transfer$_store PROCREF:<{
+    260144805 PUSHINT
+    s0 s8 XCHG2
+    32 STU
+    s1 s6 XCHG
+    64 STU
+    s0 s4 XCHG2
+    STGRAMS
+    ROT
+    __tact_store_address INLINECALLDICT
+    SWAP
+    __tact_store_address INLINECALLDICT
+    OVER
+    ISNULL
+    NOT
+    IF:<{
+      TRUE
+      SWAP
+      1 STI
+      STREF
+    }>ELSE<{
+      FALSE
+      s2 POP
+      1 STI
+    }>
+    SWAP
+    STGRAMS
+    SWAP
+    STSLICER
+  }>
+  $Transfer$_store_cell PROCINLINE:<{
+    NEWC
+    7 -ROLL
+    $Transfer$_store INLINECALLDICT
+    ENDC
+  }>
+  $Deploy$_load PROCINLINE:<{
+    32 LDU
+    SWAP
+    2490013878 PUSHINT
+    EQUAL
+    129 THROWIFNOT
+    64 LDU
+    SWAP
+  }>
+  $DeployOk$_store PROCINLINE:<{
+    2952335191 PUSHINT
+    ROT
+    32 STU
+    64 STU
+  }>
+  $DeployOk$_store_cell PROCINLINE:<{
+    NEWC
+    SWAP
+    $DeployOk$_store INLINECALLDICT
+    ENDC
+  }>
+  $Approve$_load PROCINLINE:<{
+    32 LDU
+    SWAP
+    626997460 PUSHINT
+    EQUAL
+    129 THROWIFNOT
+    LDGRAMS
+    SWAP
+  }>
+  $ChangeStatus$_load PROCINLINE:<{
+    32 LDU
+    SWAP
+    4027264598 PUSHINT
+    EQUAL
+    129 THROWIFNOT
+    32 LDU
+    SWAP
+  }>
+  $JobOfferCloseState$_store PROCINLINE:<{
+    s0 s2 XCHG
+    1 STI
+    1 STI
+  }>
+  $JobOfferCloseState$_load PROCINLINE:<{
+    1 LDI
+    1 LDI
+    -ROT
+  }>
+  $JobOffer$_store PROCINLINE:<{
+    NEWC
+    s0 s11 XCHG2
+    STSLICER
+    ENDC
+    s0 s11 XCHG2
+    STREF
+    NEWC
+    s0 s9 XCHG2
+    STSLICER
+    ENDC
+    s0 s8 XCHG2
+    STREF
+    NEWC
+    NEWC
+    s0 s8 XCHG2
+    STSLICER
+    ENDC
+    s0 s7 XCHG2
+    STREF
+    s0 s5 XCHG2
+    STGRAMS
+    s0 s3 XCHG2
+    __tact_store_address INLINECALLDICT
+    SWAP
+    __tact_store_address_opt INLINECALLDICT
+    s0 s2 XCHG
+    $JobOfferCloseState$_store INLINECALLDICT
+    s1 s2 XCHG
+    257 PUSHINT
+    STIX
+    s1 s3 XCHG
+    1 STI
+    NEWC
+    ROT
+    __tact_store_address INLINECALLDICT
+    ENDC
+    SWAP
+    STREF
+    ENDC
+    SWAP
+    STREF
+  }>
+  $JobOffer$_load PROCINLINE:<{
+    LDREF
+    SWAP
+    CTOS
+    SWAP
+    LDREF
+    SWAP
+    CTOS
+    SWAP
+    LDREF
+    SWAP
+    CTOS
+    LDREF
+    SWAP
+    CTOS
+    SWAP
+    LDGRAMS
+    __tact_load_address INLINECALLDICT
+    SWAP
+    __tact_load_address_opt INLINECALLDICT
+    SWAP
+    $JobOfferCloseState$_load INLINECALLDICT
+    s0 s2 XCHG
+    257 PUSHINT
+    LDIX
+    1 LDI
+    LDREF
+    DROP
+    CTOS
+    __tact_load_address INLINECALLDICT
+    NIP
+    s9 s11 XCHG
+    s9 s10 XCHG
+    s3 s4 XCHG
+  }>
+  $StateInit$_not_null PROCINLINE:<{
+    DUP
+    ISNULL
+    128 THROWIF
+    2 UNTUPLE
+  }>
+  $ContractData$_to_external PROCINLINE:<{
+  }>
+  $TokenWallet$init$_store PROCINLINE:<{
+    -ROT
+    __tact_store_address INLINECALLDICT
+    SWAP
+    __tact_store_address INLINECALLDICT
+  }>
+  $JobOffer$init$_load PROCINLINE:<{
+    LDREF
+    SWAP
+    CTOS
+    SWAP
+    LDREF
+    SWAP
+    CTOS
+    SWAP
+    257 PUSHINT
+    LDIX
+    LDREF
+    SWAP
+    CTOS
+    LDREF
+    SWAP
+    CTOS
+    SWAP
+    __tact_load_address INLINECALLDICT
+    NIP
+    s2 s5 XCHG
+    s2 s4 XCHG
+    s2 s3 XCHG
+  }>
+  $JobOfferCloseState$_constructor_doer_owner PROCINLINE:<{
+  }>
+  $JobOffer$_contract_init PROCREF:<{
+    PUSHNULL
+    FALSE
+    __tact_context_get_sender INLINECALLDICT
+    FALSE
+    FALSE
+    $JobOfferCloseState$_constructor_doer_owner INLINECALLDICT
+    s6 s9 XCHG
+    s6 s8 XCHG
+    s6 s7 XCHG
+    s0 s3 s5 XCHG3
+    0 PUSHINT
+    -ROT
+  }>
+  $JobOffer$_contract_load PROCREF:<{
+    c4 PUSH
+    CTOS
+    LDREF
+    SWAP
+    __tact_context_sys SETGLOB
+    1 LDI
+    SWAP
+    IFJMP:<{
+      $JobOffer$_load INLINECALLDICT
+      1 11 BLKDROP2
+    }>
+    MYADDR
+    11 PLDU
+    10 PUSHPOW2
+    EQUAL
+    137 THROWIFNOT
+    $JobOffer$init$_load INLINECALLDICT
+    s0 s5 XCHG
+    ENDS
+    4 ROLL
+    $JobOffer$_contract_init INLINECALLDICT
+  }>
+  $JobOffer$_contract_store PROCINLINE:<{
+    NEWC
+    __tact_context_sys GETGLOB
+    SWAP
+    STREF
+    TRUE
+    SWAP
+    1 STI
+    11 -ROLL
+    $JobOffer$_store INLINECALLDICT
+    ENDC
+    c4 POP
+  }>
+  $global_contractAddress PROCINLINE:<{
+    0 PUSHINT
+    -ROT
+    __tact_compute_contract_address INLINECALLDICT
+  }>
+  $global_send PROCREF:<{
+    NEWC
+    1 PUSHINT
+    SWAP
+    2 STI
+    s0 s7 XCHG2
+    __tact_store_bool INLINECALLDICT
+    0 PUSHINT
+    SWAP
+    3 STI
+    s0 s5 XCHG2
+    __tact_store_address INLINECALLDICT
+    s0 s3 XCHG2
+    STGRAMS
+    0 PUSHINT
+    SWAP
+    105 STI
+    s3 PUSH
+    ISNULL
+    NOT
+    IF:<{
+      TRUE
+    }>ELSE<{
+      s4 PUSH
+      ISNULL
+      NOT
+    }>
+    IF:<{
+      TRUE
+      __tact_store_bool INLINECALLDICT
+      NEWC
+      FALSE
+      __tact_store_bool INLINECALLDICT
+      FALSE
+      __tact_store_bool INLINECALLDICT
+      s4 PUSH
+      ISNULL
+      NOT
+      IF:<{
+        TRUE
+        __tact_store_bool INLINECALLDICT
+        s0 s4 XCHG
+        __tact_not_null INLINECALLDICT
+        s0 s4 XCHG2
+        STREF
+      }>ELSE<{
+        s4 POP
+        s0 s3 XCHG
+        FALSE
+        __tact_store_bool INLINECALLDICT
+      }>
+      s4 PUSH
+      ISNULL
+      NOT
+      IF:<{
+        TRUE
+        __tact_store_bool INLINECALLDICT
+        s0 s4 XCHG
+        __tact_not_null INLINECALLDICT
+        s0 s4 XCHG2
+        STREF
+      }>ELSE<{
+        s4 POP
+        s0 s3 XCHG
+        FALSE
+        __tact_store_bool INLINECALLDICT
+      }>
+      FALSE
+      __tact_store_bool INLINECALLDICT
+      s0 s2 XCHG
+      TRUE
+      __tact_store_bool INLINECALLDICT
+      s0 s2 XCHG
+      ENDC
+      ROT
+      STREF
+    }>ELSE<{
+      s3 POP
+      s3 POP
+      SWAP
+      FALSE
+      __tact_store_bool INLINECALLDICT
+    }>
+    OVER
+    ISNULL
+    NOT
+    IF:<{
+      TRUE
+      __tact_store_bool INLINECALLDICT
+      SWAP
+      __tact_not_null INLINECALLDICT
+      SWAP
+      STREF
+    }>ELSE<{
+      NIP
+      FALSE
+      __tact_store_bool INLINECALLDICT
+    }>
+    ENDC
+    SWAP
+    SENDRAWMSG
+  }>
+  $Cell$_fun_asSlice PROCINLINE:<{
+    CTOS
+  }>
+  $String$_fun_asComment PROCREF:<{
+    __tact_string_builder_start_comment INLINECALLDICT
+    SWAP
+    __tact_string_builder_append INLINECALLDICT
+    __tact_string_builder_end INLINECALLDICT
+  }>
+  $TokenWallet$_init_child PROCREF:<{
+    s0 s2 XCHG
+    CTOS
+    LDDICT
+    DROP
+    NEWDICT
+    SWAP
+    56445 PUSHINT
+    __tact_dict_get_code INLINECALLDICT
+    SWAP
+    56445 PUSHINT
+    s2 PUSH
+    __tact_dict_set_code INLINECALLDICT
+    NEWC
+    SWAP
+    NEWC
+    STDICT
+    ENDC
+    SWAP
+    STREF
+    FALSE
+    SWAP
+    1 STI
+    s0 s0 s3 XCHG3
+    $TokenWallet$init$_store INLINECALLDICT
+    ENDC
+  }>
+  $SendParameters$_constructor_bounce_to_value_mode_body_code_data PROCINLINE:<{
+  }>
+  $SendParameters$_constructor_to_value_mode_bounce_body_code_data PROCINLINE:<{
+    s3 s6 XCHG
+    s3 s5 XCHG
+    s3 s4 XCHG
+  }>
+  $Transfer$_constructor_query_id_amount_destination_response_destination_custom_payload_forward_ton_amount_forward_payload PROCINLINE:<{
+  }>
+  $JobOffer$_fun_send_deposit PROCREF:<{
+    __tact_context_sys GETGLOB
+    MYADDR
+    s4 PUSH
+    $TokenWallet$_init_child INLINECALLDICT
+    2DUP
+    $global_contractAddress INLINECALLDICT
+    910000000 PUSHINT
+    64 PUSHINT
+    FALSE
+    0 PUSHINT
+    NEWC
+    ENDC
+    NEWC
+    ENDC
+    $Cell$_fun_asSlice INLINECALLDICT
+    s10 PUSH
+    s3 s5 XCHG
+    s4 s10 XCHG
+    s11 s11 s3 XCHG3
+    s6 s11 PUXC
+    $Transfer$_constructor_query_id_amount_destination_response_destination_custom_payload_forward_ton_amount_forward_payload INLINECALLDICT
+    $Transfer$_store_cell INLINECALLDICT
+    s0 s1 s6 XCHG3
+    s4 s4 XCHG2
+    s0 s5 XCHG
+    s0 s3 XCHG
+    $SendParameters$_constructor_to_value_mode_bounce_body_code_data INLINECALLDICT
+    $global_send INLINECALLDICT
+  }>
+  $ContractData$_constructor_title_description_price_owner_doer_is_locked_state_jetton_master_balance_my_jetton_address PROCINLINE:<{
+  }>
+  $JobOffer$_fun_jetton_wallet PROCREF:<{
+    __tact_context_sys GETGLOB
+    MYADDR
+    s2 PUSH
+    $TokenWallet$_init_child INLINECALLDICT
+    $global_contractAddress INLINECALLDICT
+  }>
+  $JobOffer$_fun_job_data PROCREF:<{
+    s10 s9 s8 PUSH3
+    s10 s9 s8 PUSH3
+    s10 s9 s8 PUSH3
+    s10 s9 PUSH2
+    20 s() PUSH
+    20 s() PUSH
+    20 s() PUSH
+    20 s() PUSH
+    20 s() PUSH
+    17 s() PUSH
+    19 s() PUSH
+    18 s() PUSH
+    __tact_my_balance INLINECALLDICT
+    s10 30 s() XCHG
+    s9 29 s() XCHG
+    s8 28 s() XCHG
+    s7 27 s() XCHG
+    s6 26 s() XCHG
+    s5 25 s() XCHG
+    s4 24 s() XCHG
+    s3 23 s() XCHG
+    s2 22 s() XCHG
+    s1 21 s() XCHG
+    s0 20 s() XCHG
+    $JobOffer$_fun_jetton_wallet INLINECALLDICT
+    11 1 BLKDROP2
+    s9 18 s() XCHG
+    s8 17 s() XCHG
+    s7 16 s() XCHG
+    s6 s15 XCHG
+    s5 s14 XCHG
+    s4 s13 XCHG
+    s3 s12 XCHG
+    s11 s10 s0 XCHG3
+    $ContractData$_constructor_title_description_price_owner_doer_is_locked_state_jetton_master_balance_my_jetton_address INLINECALLDICT
+    18 s() 20 s() XCHG
+    17 s() 19 s() XCHG
+    16 s() 18 s() XCHG
+    s15 17 s() XCHG
+    s14 16 s() XCHG
+    s13 s15 XCHG
+    s12 s14 XCHG
+    s11 s13 XCHG
+    s10 s12 XCHG
+    s10 s11 XCHG
+  }>
+  $JobOffer$_fun_forward PROCREF:<{
+    PUSHNULL
+    PUSHNULL
+    s2 PUSH
+    ISNULL
+    NOT
+    IF:<{
+      2DROP
+      $StateInit$_not_null INLINECALLDICT
+      SWAP
+    }>ELSE<{
+      s2 POP
+    }>
+    s2 s4 XCHG
+    0 PUSHINT
+    s0 s3 XCHG
+    s0 s4 XCHG
+    66 PUSHINT
+    s2 s3 XCHG2
+    $SendParameters$_constructor_bounce_to_value_mode_body_code_data INLINECALLDICT
+    $global_send INLINECALLDICT
+  }>
+  $JobOffer$_fun_notify PROCINLINE:<{
+    __tact_context_get_sender INLINECALLDICT
+    SWAP
+    FALSE
+    PUSHNULL
+    $JobOffer$_fun_forward INLINECALLDICT
+  }>
+  $SendParameters$_constructor_to_value_mode_bounce_body PROCINLINE:<{
+    s1 s4 XCHG
+    s3 s3 s0 XCHG3
+    PUSHNULL
+    PUSHNULL
+  }>
+  $DeployOk$_constructor_queryId PROCINLINE:<{
+  }>
+  $JobOffer$_internal_text_99731cc0dc8ddf3245fd2c86706c571aceca401335924fbca31b0dd0acdecb7e PROCINLINE:<{
+    s5 POP
+    26846 PUSHINT
+    SWAP
+    NOT
+    THROWANYIFNOT
+    22085 PUSHINT
+    __tact_context_get_sender INLINECALLDICT
+    s6 s(-1) PUXC
+    __tact_slice_eq_bits INLINECALLDICT
+    NOT
+    THROWANYIFNOT
+    __tact_context_get_sender INLINECALLDICT
+    s0 s4 XCHG
+    TRUE
+    SWAP
+  }>
+  $JobOffer$_internal_binary_ChangeStatus PROCINLINE:<{
+    DROP
+  }>
+  $JobOffer$_internal_text_85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246 PROCINLINE:<{
+    NIP
+    __tact_context_get INLINECALLDICT
+    s1 s3 XCHG
+    3 BLKDROP
+    FALSE
+    B{b5ee9c72410101010024000043800ab89de69fffad608d556b664c6d98ff2c97349a67943bb94d9c5f0cbe116e0dd02cdc63a4} B>boc <s PUSHSLICE
+    s0 s2 XCHG
+    1 RSHIFT#
+    2 PUSHINT
+    FALSE
+    s14 PUSH
+    $String$_fun_asComment INLINECALLDICT
+    s4 s5 XCHG
+    $SendParameters$_constructor_to_value_mode_bounce_body INLINECALLDICT
+    $global_send INLINECALLDICT
+    __tact_context_sys GETGLOB
+    MYADDR
+    s3 PUSH
+    $TokenWallet$_init_child INLINECALLDICT
+    $global_contractAddress INLINECALLDICT
+    0 PUSHINT
+    64 PUSHINT
+    FALSE
+    B{b5ee9c7241010101000c000014000000004465706c6f79c9cf8945} B>boc PUSHREF
+    $SendParameters$_constructor_to_value_mode_bounce_body INLINECALLDICT
+    $global_send INLINECALLDICT
+    SWAP
+  }>
+  $JobOffer$_internal_text_821379415cf0a0792afb20991baf68263d3de6337b0ff7990b4c07490cd49236 PROCINLINE:<{
+  }>
+  $JobOffer$_internal_binary_Approve PROCINLINE:<{
+    s3 POP
+    63855 PUSHINT
+    B{b5ee9c724101010100240000438008d0d4580cd8f09522be7c0390a7a632bda4a99291c435b767c95367ebe78e9af0fe792b4b} B>boc <s PUSHSLICE
+    __tact_context_get_sender INLINECALLDICT
+    __tact_slice_eq_bits INLINECALLDICT
+    THROWANYIFNOT
+    s7 PUSH
+    6344 PUSHINT
+    s0 s4 XCHG
+    EQUAL
+    s1 s3 XCHG
+    THROWANYIFNOT
+    1 PUSHINT
+    s0 s2 XCHG
+  }>
+  $JobOffer$_internal_text_9a6a8b179bbe0a3043b3e2f10f6a4efad22676c1107ee3e5defdb0f5176d6d9e PROCINLINE:<{
+    3426 PUSHINT
+    __tact_context_get_sender INLINECALLDICT
+    s8 PUSH
+    __tact_slice_eq_bits INLINECALLDICT
+    THROWANYIFNOT
+    51333 PUSHINT
+    s3 PUSH
+    1 EQINT
+    THROWANYIFNOT
+    s6 s7 PUSH2
+    $JobOffer$_fun_send_deposit INLINECALLDICT
+    6 PUSHINT
+    s3 POP
+  }>
+  $JobOffer$_internal_binary_Deploy PROCINLINE:<{
+    $DeployOk$_constructor_queryId INLINECALLDICT
+    $DeployOk$_store_cell INLINECALLDICT
+    $JobOffer$_fun_notify INLINECALLDICT
+  }>
+  %job_data PROC:<{
+    $JobOffer$_contract_load INLINECALLDICT
+    $JobOffer$_fun_job_data INLINECALLDICT
+    11 10 BLKDROP2
+    $ContractData$_to_external INLINECALLDICT
+  }>
+  %jetton_wallet PROC:<{
+    $JobOffer$_contract_load INLINECALLDICT
+    $JobOffer$_fun_jetton_wallet INLINECALLDICT
+    11 1 BLKDROP2
+  }>
+  supported_interfaces PROC:<{
+    123515602279859691144772641439386770278 PUSHINT
+    209801025412363888721030803524359905849 PUSHINT
+    42980537499636128163026532310500881091 PUSHINT
+    209474421377847335869795010607481022628 PUSHINT
+  }>
+  get_abi_ipfs PROC:<{
+    x{697066733a2f2f516d51564542547462454532386867353667383157726244546273334b64516f73677a31695361536d6a45785771} PUSHSLICE
+  }>
+  lazy_deployment_completed PROC:<{
+    c4 PUSH
+    CTOS
+    1 LDI
+    SWAP
+  }>
+  $JobOffer$_contract_router_internal PROCREF:<{
+    c2 SAVE
+    SAMEALTSAVE
+    SWAP
+    IFJMP:<{
+      DROP
+      TRUE
+    }>
+    0 PUSHINT
+    OVER
+    SBITS
+    31 GTINT
+    IF:<{
+      DROP
+      DUP
+      32 PLDU
+    }>
+    DUP
+    4027264598 PUSHINT
+    EQUAL
+    IFJMP:<{
+      DROP
+      $ChangeStatus$_load INLINECALLDICT
+      NIP
+      $JobOffer$_internal_binary_ChangeStatus INLINECALLDICT
+      TRUE
+    }>
+    DUP
+    626997460 PUSHINT
+    EQUAL
+    IFJMP:<{
+      DROP
+      $Approve$_load INLINECALLDICT
+      NIP
+      $JobOffer$_internal_binary_Approve INLINECALLDICT
+      TRUE
+    }>
+    DUP
+    2490013878 PUSHINT
+    EQUAL
+    IFJMP:<{
+      DROP
+      $Deploy$_load INLINECALLDICT
+      NIP
+      $JobOffer$_internal_binary_Deploy INLINECALLDICT
+      TRUE
+    }>
+    0 EQINT
+    IF:<{
+      HASHSU
+      DUP
+      69407251694123808713212798903301889824698181059182116307076990000855330507646 PUSHINT
+      EQUAL
+      IFJMP:<{
+        DROP
+        $JobOffer$_internal_text_99731cc0dc8ddf3245fd2c86706c571aceca401335924fbca31b0dd0acdecb7e INLINECALLDICT
+        TRUE
+        RETALT
+      }>
+      DUP
+      60529586900441909508163366315693238357781362892506273907639555627111304786502 PUSHINT
+      EQUAL
+      IFJMP:<{
+        DROP
+        $JobOffer$_internal_text_85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246 INLINECALLDICT
+        TRUE
+        RETALT
+      }>
+      DUP
+      58835077283547633791420904918672404595390558110575523938225108985554081714742 PUSHINT
+      EQUAL
+      IFJMP:<{
+        DROP
+        $JobOffer$_internal_text_821379415cf0a0792afb20991baf68263d3de6337b0ff7990b4c07490cd49236 INLINECALLDICT
+        TRUE
+        RETALT
+      }>
+      69844424449912092828699430949037159471420546266719490259832221652217982971294 PUSHINT
+      EQUAL
+      IFJMP:<{
+        $JobOffer$_internal_text_9a6a8b179bbe0a3043b3e2f10f6a4efad22676c1107ee3e5defdb0f5176d6d9e INLINECALLDICT
+        TRUE
+        RETALT
+      }>
+    }>ELSE<{
+      DROP
+    }>
+    FALSE
+  }>
+  recv_internal PROC:<{
+    SWAP
+    CTOS
+    4 LDU
+    SWAP
+    1 PUSHINT
+    AND
+    NEGATE
+    SWAP
+    LDMSGADDR
+    SWAP
+    __tact_verify_address INLINECALLDICT
+    s0 s4 s2 PUXCPU
+    s0 s3 XCHG
+    4 TUPLE
+    __tact_context SETGLOB
+    s0 s2 XCHG
+    __tact_context_sender SETGLOB
+    $JobOffer$_contract_load INLINECALLDICT
+    2 11 BLKSWAP
+    $JobOffer$_contract_router_internal INLINECALLDICT
+    130 THROWIFNOT
+    $JobOffer$_contract_store INLINECALLDICT
+  }>
+}END>c

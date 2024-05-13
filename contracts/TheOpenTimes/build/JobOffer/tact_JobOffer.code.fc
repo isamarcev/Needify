@@ -1,0 +1,233 @@
+#pragma version =0.4.4;
+#pragma allow-post-modification;
+#pragma compute-asm-ltr;
+
+#include "tact_JobOffer.headers.fc";
+#include "tact_JobOffer.stdlib.fc";
+#include "tact_JobOffer.constants.fc";
+#include "tact_JobOffer.storage.fc";
+
+;;
+;; Contract JobOffer functions
+;;
+
+(slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $JobOffer$_contract_init(slice $title, slice $description, int $price, slice $order, slice $jetton_master) impure inline_ref {
+    var (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)) = (null(), null(), null(), null(), null(), null(), null(), null(), false, null());
+    $self'order = $order;
+    $self'title = $title;
+    $self'description = $description;
+    $self'price = $price;
+    $self'jetton_master = $jetton_master;
+    $self'owner = __tact_context_get_sender();
+    ($self'job_state'doer, $self'job_state'owner) = $JobOfferCloseState$_constructor_doer_owner(false, false);
+    $self'state = 0;
+    return ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master);
+}
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), ()) $JobOffer$_fun_send_deposit((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self, slice $address, int $amount) impure inline_ref {
+    var (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)) = $self;
+    var ($init'code, $init'data) = $TokenWallet$_init_child(__tact_context_sys, my_address(), $self'jetton_master);
+    slice $my_jetton_address = $global_contractAddress(($init'code, $init'data));
+    int $forward_destination = 910000000;
+    $global_send($SendParameters$_constructor_to_value_mode_bounce_body_code_data($my_jetton_address, $forward_destination, 64, false, $Transfer$_store_cell($Transfer$_constructor_query_id_amount_destination_response_destination_custom_payload_forward_ton_amount_forward_payload(0, $amount, $address, $address, end_cell(begin_cell()), $forward_destination, $Cell$_fun_asSlice(end_cell(begin_cell())))), $init'code, $init'data));
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), slice) $JobOffer$_fun_jetton_wallet((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self) impure inline_ref {
+    var (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)) = $self;
+    var ($init'code, $init'data) = $TokenWallet$_init_child(__tact_context_sys, my_address(), $self'jetton_master);
+    slice $wallet_address = $global_contractAddress(($init'code, $init'data));
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), $wallet_address);
+}
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), (slice, slice, int, slice, slice, int, int, slice, int, slice)) $JobOffer$_fun_job_data((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self) impure inline_ref {
+    var (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)) = $self;
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), $ContractData$_constructor_title_description_price_owner_doer_is_locked_state_jetton_master_balance_my_jetton_address($self'title, $self'description, $self'price, $self'owner, $self'doer, $self'is_locked, $self'state, $self'jetton_master, __tact_my_balance(), ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)~$JobOffer$_fun_jetton_wallet()));
+}
+
+;;
+;; Receivers of a Contract JobOffer
+;;
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), ()) $JobOffer$_internal_text_99731cc0dc8ddf3245fd2c86706c571aceca401335924fbca31b0dd0acdecb7e((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    throw_unless(26846, (~ $self'is_locked));
+    throw_unless(22085, ( ~ __tact_slice_eq_bits($self'owner, __tact_context_get_sender()) ));
+    slice $doer_address = __tact_context_get_sender();
+    $self'doer = __tact_context_get_sender();
+    $self'is_locked = true;
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+(((slice, slice, slice, int, slice, slice, (int, int), int, int, slice)), ()) $JobOffer$_internal_binary_ChangeStatus((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self, (int) $msg) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    var ($msg'status) = $msg;
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), ()) $JobOffer$_internal_text_85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
+    $self'is_locked = false;
+    $global_send($SendParameters$_constructor_to_value_mode_bounce_body(__gen_slice_address_adfe543fb0a0ac78e35daf8f61e0dca46fe92148d913e1c1b86e2d4825e1ab42(), ($ctx'value / 2), 2, false, $String$_fun_asComment($self'order)));
+    var ($init'code, $init'data) = $TokenWallet$_init_child(__tact_context_sys, my_address(), $self'jetton_master);
+    slice $wallet_address = $global_contractAddress(($init'code, $init'data));
+    $global_send($SendParameters$_constructor_to_value_mode_bounce_body($wallet_address, 0, 64, false, __gen_cell_comment_85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246()));
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), ()) $JobOffer$_internal_text_821379415cf0a0792afb20991baf68263d3de6337b0ff7990b4c07490cd49236((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+(((slice, slice, slice, int, slice, slice, (int, int), int, int, slice)), ()) $JobOffer$_internal_binary_Approve((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self, (int) $msg) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    var ($msg'amount) = $msg;
+    throw_unless(63855, ( __tact_slice_eq_bits(__gen_slice_address_c07e120d5b86351428d7b4f868155216dd7fb472bb9524f33dfe91c881ff4bb3(), __tact_context_get_sender()) ));
+    throw_unless(6344, ($self'price == $msg'amount));
+    $self'state = 1;
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), ()) $JobOffer$_internal_text_9a6a8b179bbe0a3043b3e2f10f6a4efad22676c1107ee3e5defdb0f5176d6d9e((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    throw_unless(3426, ( __tact_slice_eq_bits(__tact_context_get_sender(), $self'owner) ));
+    throw_unless(51333, ($self'state == 1));
+    ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)~$JobOffer$_fun_send_deposit($self'owner, $self'price);
+    $self'state = 6;
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+(((slice, slice, slice, int, slice, slice, (int, int), int, int, slice)), ()) $JobOffer$_internal_binary_Deploy((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) $self, (int) $deploy) impure inline {
+    var ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master) = $self;
+    var ($deploy'queryId) = $deploy;
+    ($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master)~$JobOffer$_fun_notify($DeployOk$_store_cell($DeployOk$_constructor_queryId($deploy'queryId)));
+    return (($self'order, $self'title, $self'description, $self'price, $self'owner, $self'doer, ($self'job_state'doer, $self'job_state'owner), $self'state, $self'is_locked, $self'jetton_master), ());
+}
+
+;;
+;; Get methods of a Contract JobOffer
+;;
+
+_ %job_data() method_id(67270) {
+    var self = $JobOffer$_contract_load();
+    var res = self~$JobOffer$_fun_job_data();
+    return $ContractData$_to_external(res);
+}
+
+_ %jetton_wallet() method_id(117972) {
+    var self = $JobOffer$_contract_load();
+    var res = self~$JobOffer$_fun_jetton_wallet();
+    return res;
+}
+
+_ supported_interfaces() method_id {
+    return (
+        "org.ton.introspection.v0"H >> 128,
+        "org.ton.abi.ipfs.v0"H >> 128,
+        "org.ton.deploy.lazy.v0"H >> 128,
+        "org.ton.chain.workchain.v0"H >> 128
+    );
+}
+
+_ get_abi_ipfs() method_id {
+    return "ipfs://QmQVEBTtbEE28hg56g81WrbDTbs3KdQosgz1iSaSmjExWq";
+}
+
+_ lazy_deployment_completed() method_id {
+    return get_data().begin_parse().load_int(1);
+}
+
+;;
+;; Routing of a Contract JobOffer
+;;
+
+((slice, slice, slice, int, slice, slice, (int, int), int, int, slice), int) $JobOffer$_contract_router_internal((slice, slice, slice, int, slice, slice, (int, int), int, int, slice) self, int msg_bounced, slice in_msg) impure inline_ref {
+    ;; Handle bounced messages
+    if (msg_bounced) {
+        return (self, true);
+    }
+    
+    ;; Parse incoming message
+    int op = 0;
+    if (slice_bits(in_msg) >= 32) {
+        op = in_msg.preload_uint(32);
+    }
+    
+    
+    ;; Receive ChangeStatus message
+    if (op == 4027264598) {
+        var msg = in_msg~$ChangeStatus$_load();
+        self~$JobOffer$_internal_binary_ChangeStatus(msg);
+        return (self, true);
+    }
+    
+    ;; Receive Approve message
+    if (op == 626997460) {
+        var msg = in_msg~$Approve$_load();
+        self~$JobOffer$_internal_binary_Approve(msg);
+        return (self, true);
+    }
+    
+    ;; Receive Deploy message
+    if (op == 2490013878) {
+        var msg = in_msg~$Deploy$_load();
+        self~$JobOffer$_internal_binary_Deploy(msg);
+        return (self, true);
+    }
+    
+    ;; Text Receivers
+    if (op == 0) {
+        var text_op = slice_hash(in_msg);
+        
+        ;; Receive "get_job" message
+        if (text_op == 0x99731cc0dc8ddf3245fd2c86706c571aceca401335924fbca31b0dd0acdecb7e) {
+            self~$JobOffer$_internal_text_99731cc0dc8ddf3245fd2c86706c571aceca401335924fbca31b0dd0acdecb7e();
+            return (self, true);
+        }
+        
+        ;; Receive "Deploy" message
+        if (text_op == 0x85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246) {
+            self~$JobOffer$_internal_text_85d288384c0043458b02803cb22059f68803c553c3656344346468dac961f246();
+            return (self, true);
+        }
+        
+        ;; Receive "close_offer" message
+        if (text_op == 0x821379415cf0a0792afb20991baf68263d3de6337b0ff7990b4c07490cd49236) {
+            self~$JobOffer$_internal_text_821379415cf0a0792afb20991baf68263d3de6337b0ff7990b4c07490cd49236();
+            return (self, true);
+        }
+        
+        ;; Receive "revoke" message
+        if (text_op == 0x9a6a8b179bbe0a3043b3e2f10f6a4efad22676c1107ee3e5defdb0f5176d6d9e) {
+            self~$JobOffer$_internal_text_9a6a8b179bbe0a3043b3e2f10f6a4efad22676c1107ee3e5defdb0f5176d6d9e();
+            return (self, true);
+        }
+    }
+    
+    return (self, false);
+}
+
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+    
+    ;; Context
+    var cs = in_msg_cell.begin_parse();
+    var msg_flags = cs~load_uint(4);
+    var msg_bounced = -(msg_flags & 1);
+    slice msg_sender_addr = __tact_verify_address(cs~load_msg_addr());
+    __tact_context = (msg_bounced, msg_sender_addr, msg_value, cs);
+    __tact_context_sender = msg_sender_addr;
+    
+    ;; Load contract data
+    var self = $JobOffer$_contract_load();
+    
+    ;; Handle operation
+    int handled = self~$JobOffer$_contract_router_internal(msg_bounced, in_msg);
+    
+    ;; Throw if not handled
+    throw_unless(130, handled);
+    
+    ;; Persist state
+    $JobOffer$_contract_store(self);
+}
