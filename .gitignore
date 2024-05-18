@@ -7,8 +7,10 @@ setenv.sh
 dump.rdb
 /logs/**/*.log*
 .DS_Store
-/contracts/
+#/contracts/
 **/celerybeat-schedule*
+node_modules
+#contracts/TheOpenTimes/node_modules
 id_ed25519
 .python-version
 Volumes/
@@ -32,3 +34,4 @@ venv/
 # env files
 .env
 tbot/.env
+build/
