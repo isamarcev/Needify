@@ -1,6 +1,11 @@
-export interface ISelector<T = string> {
+export interface ISelector {
   label: string;
   defaultValue?: string;
-  options: T[];
-  onChange: (value: T) => void;
+  options: IOption[];
+  onChange: (value: string) => void;
+}
+
+export interface IOption {
+  id: string;
+  label: string;
 }

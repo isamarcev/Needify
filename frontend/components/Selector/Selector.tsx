@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { ISelector } from '@/components/Selector/types';
 
-export const Selector: FC<ISelector<string>> = ({
+export const Selector: FC<ISelector> = ({
   onChange,
   options,
   label,
@@ -35,9 +35,9 @@ export const Selector: FC<ISelector<string>> = ({
         label={label}
         onChange={handleChange}
       >
-        {options.map((name) => (
-          <MenuItem key={name} value={name}>
-            {name}
+        {options.map(({ id, label }) => (
+          <MenuItem key={id} value={label}>
+            {label}
           </MenuItem>
         ))}
       </Select>

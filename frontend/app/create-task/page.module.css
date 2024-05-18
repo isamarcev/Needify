@@ -5,6 +5,8 @@
   gap: 20px 24px;
 }
 
-.title {
+.wholeLine {
   grid-column: span 2;
 }
+
+
