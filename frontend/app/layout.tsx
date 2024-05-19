@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { TelegramProvider } from '@/helpers/TelegramContext/TelegramContext';
+import { TelegramProvider } from '@/providers/TelegramContext';
 import {
   CssBaseline,
   Experimental_CssVarsProvider as CssVarsProvider,
@@ -9,6 +9,7 @@ import {
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import theme from '@/theme';
 import { Inter } from 'next/font/google';
+import { DateFnsProvider } from '@/providers/DateFnsProvider';
 
 export const metadata: Metadata = {
   title: 'The Open Times',
@@ -26,11 +27,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CssBaseline />
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <CssVarsProvider theme={theme}>
-            <TelegramProvider>{children}</TelegramProvider>
-          </CssVarsProvider>
+          <DateFnsProvider>
+            <CssVarsProvider theme={theme}>
+              <TelegramProvider>{children}</TelegramProvider>
+              <CssBaseline />
+            </CssVarsProvider>
+          </DateFnsProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

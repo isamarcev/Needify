@@ -1,17 +1,16 @@
 'use client';
 import styles from './page.module.css';
-import { useTelegram } from '@/helpers/TelegramContext/TelegramContext';
+import { useTelegram } from '@/providers/TelegramContext';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { Selector } from '@/components/Selector';
 import { TaskCard } from '@/widgets/TaskCard';
 import Link from 'next/link';
 import { cardsShortData } from '@/tests/mockData';
+import { getOptionsFromEnum } from '@/helpers';
 import { ECategory } from '@/app/task-detail/[id]/types';
 
 export default function Home() {
   const { isLoading } = useTelegram();
-
-  const categoryOptions = Object.values(ECategory);
 
   return isLoading ? (
     <Box className={styles.loader}>
@@ -39,7 +38,7 @@ export default function Home() {
       <Box className={styles.category}>
         <Selector
           label="Category"
-          options={categoryOptions}
+          options={getOptionsFromEnum(ECategory)}
           onChange={() => {}}
         />
       </Box>
@@ -48,9 +47,15 @@ export default function Home() {
           <TaskCard key={data.id} {...data} />
         ))}
       </Box>
-      <Button className={styles.createOrder} variant="contained">
-        Create task
-      </Button>
+      <Link href="/create-task">
+        <Button
+          className={styles.createOrder}
+          variant="contained"
+          component="div"
+        >
+          Create task
+        </Button>
+      </Link>
     </main>
   );
 }

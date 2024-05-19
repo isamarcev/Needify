@@ -26,3 +26,10 @@ export enum ECategory {
   Sales = 'Sales',
   Healthcare = 'Healthcare',
 }
+
+export enum ECurrency {
+  TON = 'TON',
+  USDT = 'USDT',
+  NOT = 'NOT',
+  ETH = 'ETH',
+}
