@@ -1,4 +1,4 @@
-import "./token_wallet";
+import "./job_offer";
 import "@stdlib/ownable";
 import "@stdlib/deploy";
 message Mint {
@@ -13,6 +13,7 @@ struct MasterData {
     jetton_wallet_code: Cell;
 }
 
+@interface("org.ton.jetton.master")
 contract TokenMaster with Ownable, Deployable {
     total_supply: Int as coins = 0;
     mintable: Bool = true;
