@@ -1,5 +1,5 @@
 
-message(0x0f817ea5) Transfer {
+message(0xf8a7ea5) Transfer {
     query_id: Int as uint64;
     amount: Int as coins;
     destination: Address;

@@ -2,7 +2,7 @@ import "./messages";
 import "@stdlib/deploy";
 
 const gasConsumption: Int = ton("0.02");
-const minTons: Int = ton("0.01");
+const minTons: Int = ton("0.02");
 
 struct WalletData {
     balance: Int;
@@ -11,8 +11,9 @@ struct WalletData {
     code: Cell;
 }
 
+@interface("org.ton.jetton.wallet")
 contract TokenWallet with Deployable {
-    balance: Int as coins = 0;
+    balance: Int = 0;
     owner: Address;
     master: Address;
 
@@ -22,11 +23,17 @@ contract TokenWallet with Deployable {
     }
 
     receive(msg: Transfer) {
-        let ctx: Context = context();
-        require(self.owner == ctx.sender, "Invalid sender");
-        self.balance = self.balance - msg.amount;
-        require(self.balance >= 0, "Invalid token amount");
-        require(ctx.readForwardFee() * 2 + 2 * gasConsumption + minTons + msg.forward_ton_amount < ctx.value, "Invalid ton amount");
+        let ctx: Context = context(); // Check sender
+        require(ctx.sender == self.owner, "Invalid sender");
+
+        let final: Int = ctx.readForwardFee() * 2 + 
+                            2 * gasConsumption + 
+                                minTons + 
+                                    msg.forward_ton_amount;   // Gas checks, forward_ton = 0.152
+        require(ctx.value > final, "Invalid value"); 
+        // Update balance
+        self.balance = self.balance - msg.amount; 
+        // require(self.balance >= 0, "Invalid balance");
         let init: StateInit = initOf TokenWallet(msg.destination, self.master);
         let to: Address = contractAddress(init);
         send(SendParameters {
@@ -54,10 +61,10 @@ contract TokenWallet with Deployable {
         }
         self.balance = self.balance + msg.amount;
         require(self.balance >= 0, "Invalid token amount");
-        let msgValue: Int = ctx.value;
-        msgValue = msgValue - gasConsumption - (minTons - min(minTons, myBalance() - ctx.value));
+        let msg_value: Int = self.msg_value(ctx.value);  
+        let fwd_fee: Int = ctx.readForwardFee();
         if(msg.forward_ton_amount > 0) {
-            msgValue = msgValue - msg.forward_ton_amount - ctx.readForwardFee();
+            msg_value = msg_value - msg.forward_ton_amount - fwd_fee;
             send(SendParameters {
                 to: self.owner,
                 value: msg.forward_ton_amount,
@@ -71,11 +78,13 @@ contract TokenWallet with Deployable {
                 }.toCell()
             });
         }
-        if(msgValue > 0) {
-            send(SendParameters{
-                to: msg.response_destination,
-                value: msgValue,
-                body: Excesses{query_id: msg.query_id}.toCell()
+        if (msg.response_destination != null && msg_value > 0) { 
+            send(SendParameters {
+                to: msg.response_destination, 
+                value: msg_value,  
+                bounce: false,
+                body: Excesses{ query_id: msg.query_id }.toCell(),
+                mode: SendPayGasSeparately
             });
         }
     }
@@ -97,6 +106,14 @@ contract TokenWallet with Deployable {
                 response_destination: msg.response_destination
             }.toCell()
         });
+    }
+
+    fun msg_value(value: Int): Int {
+        let msg_value: Int = value;
+        let ton_balance_before_msg: Int = myBalance() - msg_value;
+        let storage_fee: Int = minTons - min(ton_balance_before_msg, minTons);
+        msg_value = msg_value - (storage_fee + gasConsumption);
+        return msg_value;
     }
 
     bounced(src: bounced<InternalTransfer>) {
