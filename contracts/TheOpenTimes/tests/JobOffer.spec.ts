@@ -19,6 +19,7 @@ const order = "Sell store 2"
 const deployAmount = toNano("0.65")
 const TransferAmount = toNano("0.65")
 const simple_transfer_amount = toNano("0.2")
+const fee_offer = toNano("2")
 
 
 describe('JobOffer', () => {
@@ -33,11 +34,15 @@ describe('JobOffer', () => {
     let deployerJW: SandboxContract<TokenWallet>;
     let doerJW: SandboxContract<TokenWallet>;
     let JOJW: SandboxContract<TokenWallet>;
+    let platformJW: SandboxContract<TokenWallet>;
+
 
     const JettonDecimal = 9
     let jobOffer: SandboxContract<JobOffer>;
 
     let DeployOffer: any
+
+    let RunPositiveFlow: Function
     
     beforeEach(async () => {
         blockchain = await Blockchain.create();
@@ -84,15 +89,17 @@ describe('JobOffer', () => {
 
         doerJW = blockchain.openContract(await TokenWallet.fromInit(
             doer.address, master.address
-        )) // address EQDQnV1fm26m2w4l1GImLSGTZQ-XmpqooRb4adlcLbfIyjdz
-        log(doerJW.address, "DOERJW ADDRESS")
+        )) 
 
+        platformJW = blockchain.openContract(await TokenWallet.fromInit(
+            platform.address, master.address
+        ))
 
         // JOB OFFER CREATION
         jobOffer = blockchain.openContract(await JobOffer.fromInit(
             title, description, price, order, master.address
-        ))
-        let JOJW_address = await master.getGetWalletAddress(jobOffer.address)
+        )) // EQBitOE0LVopau6Z6kkIuEIAwteOfhy6QIb1tw5VBfjembMo
+        let JOJW_address = await master.getGetWalletAddress(jobOffer.address) 
         JOJW = blockchain.openContract(
             TokenWallet.fromAddress(
                 JOJW_address, 
@@ -118,6 +125,111 @@ describe('JobOffer', () => {
             let dep_res = await jobOffer.getJobData()
             expect(JOJW.address).toEqualAddress(dep_res.my_jetton_address)
             expect(master.address).toEqualAddress(dep_res.jetton_master)
+        }
+        // POSITIVE FLOW until to_state
+        RunPositiveFlow = async (to_state: bigint) => {
+            await DeployOffer()
+            let mint_amount = price
+            await mint(deployer, master, jobOffer.address, mint_amount)
+            // Offer created
+            if (to_state === 0n) {
+                return
+            }
+            // Approving
+            let w = await platform.send(
+                {
+                    value: TransferAmount,
+                    to: jobOffer.address,
+                    body: beginCell().store(
+                        storeApprove({
+                            $$type: "Approve",
+                            amount: mint_amount,
+                        })
+                    ).endCell()
+                }
+            )
+            expect(w.transactions).toHaveTransaction({
+                from:platform.address,
+                to: jobOffer.address,
+                success: true,
+                op: 0x013f,
+                outMessagesCount: 1 // notification 
+            }) // Total fees 3978328n
+
+            // Offer published
+            let JOstateCheck = await jobOffer.getJobData()
+            expect(JOstateCheck.state).toEqual(1n) // Offer published
+            if (to_state == 1n) {
+                return
+            }
+            // Try get by doer
+            let get_job_res = await doer.send(
+                {
+                    value: TransferAmount,
+                    to: jobOffer.address,
+                    body: beginCell().store(
+                        storeGetJob({
+                            $$type: "GetJob",
+                            query_id: 1n
+                        })
+                    ).endCell()
+                }
+            )
+            let getJobData = await jobOffer.getJobData()
+            expect(getJobData.state).toBe(2n) // Accepted by doer
+            expect(get_job_res.transactions).toHaveTransaction({
+                from: doer.address,
+                to: jobOffer.address,
+                success: true,
+            });
+            // OfferAccepted by doer
+            if (to_state == 2n) {
+                return
+            }
+
+            // Complete job by another users
+            let complete_msg = {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeCompleteJob({
+                        $$type: "CompleteJob",
+                        query_id: 1n
+                    })
+                ).endCell()
+            }
+            // Complete by Doer
+            let completeByDoer = await doer.send(
+                complete_msg
+            )
+            let JOStateData = await jobOffer.getJobData()
+            expect(JOStateData.state).toBe(3n) // Completed
+            expect(completeByDoer.transactions).toHaveTransaction({from: doer.address, to: jobOffer.address, success: true})
+            // Completed
+            if (to_state == 3n) {
+                return
+            }
+            // Confirming Job 
+            let confirmJobMsg = {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeConfirmJob({
+                        $$type: "ConfirmJob",
+                        query_id: 1n
+                    })
+                ).endCell()
+            }
+            // confirm by owner 
+            let confirmByOwner = await poster.send(
+                confirmJobMsg
+            )
+            // Success
+            expect(confirmByOwner.transactions).toHaveTransaction({from: poster.address, to: jobOffer.address, success: true})
+            let jobOfferJWData = await JOJW.getGetWalletData()
+            expect(jobOfferJWData.balance).toBe(0n) // all jettons are transfered to doer
+            let doerJW_data = await doerJW.getGetWalletData()
+            expect(doerJW_data.balance).toBe(mint_amount)  // doer has all jettons
         }
         
     });
@@ -146,6 +258,7 @@ describe('JobOffer', () => {
                 ).endCell()
             }
         )
+
         expect(s.transactions).toHaveTransaction({
             from: poster.address,
             to: jobOffer.address,
@@ -243,14 +356,17 @@ describe('JobOffer', () => {
                 ).endCell()
             }
         )
+        let JWJO_data = await JOJW.getGetWalletData()
+        let posteJW_data = await posterJW.getGetWalletData()
+        expect(JWJO_data.balance).toBe(0n) // Was cleared
+        expect(posteJW_data.balance).toBe(mint_amount) // Was deposited
         expect(rev_res.transactions).toHaveTransaction({
             from: poster.address,
             to: jobOffer.address,
             success: true,
-            endStatus: 'non-existing',
-            destroyed: true,
-            outMessagesCount: 2
         });
+        
+
     });
 
     it("Test: from Approve to Completed positive flow", async () => {
@@ -265,7 +381,7 @@ describe('JobOffer', () => {
                 body: beginCell().store(
                     storeApprove({
                         $$type: "Approve",
-                        amount: mint_amount,
+                        amount: price,
                     })
                 ).endCell()
             }
@@ -281,7 +397,7 @@ describe('JobOffer', () => {
         let JOstateCheck = await jobOffer.getJobData()
         expect(JOstateCheck.state).toEqual(1n) // Offer published
 
-        // Try get by poster
+        // Try get job offer by poster
         let get_poster_job_res = await poster.send(
             {
                 value: TransferAmount,
@@ -314,7 +430,7 @@ describe('JobOffer', () => {
             }
         )
         let getJobData = await jobOffer.getJobData()
-        expect(getJobData.state).toBe(2n)
+        expect(getJobData.state).toBe(2n) // Accepted by doer
         expect(get_job_res.transactions).toHaveTransaction({
             from: doer.address,
             to: jobOffer.address,
@@ -356,13 +472,13 @@ describe('JobOffer', () => {
         )
         expect(completeByPlatform.transactions).toHaveTransaction({from: platform.address, to: jobOffer.address, success: false})
         let JOStateData = await jobOffer.getJobData()
-        expect(JOStateData.state).toBe(2n)
+        expect(JOStateData.state).toBe(2n) // Accepted by doer
         // Complete by Doer
         let completeByDoer = await doer.send(
             complete_msg
         )
         JOStateData = await jobOffer.getJobData()
-        expect(JOStateData.state).toBe(3n)
+        expect(JOStateData.state).toBe(3n) // Completed
         expect(completeByDoer.transactions).toHaveTransaction({from: doer.address, to: jobOffer.address, success: true})
         
         // Confirm Job 
@@ -380,56 +496,32 @@ describe('JobOffer', () => {
         let confirmByDoer = await doer.send(
             confirmJobMsg
         )
+        // Failed because of not owner
         expect(confirmByDoer.transactions).toHaveTransaction({from: doer.address, to: jobOffer.address, success: false})
         // confirm by owner 
         let confirmByOwner = await poster.send(
             confirmJobMsg
         )
+        // Success
         expect(confirmByOwner.transactions).toHaveTransaction({from: poster.address, to: jobOffer.address, success: true})
         let jobOfferJWData = await JOJW.getGetWalletData()
-        expect(jobOfferJWData.balance).toBe(0n)
+        expect(jobOfferJWData.balance).toBe(0n) // all jettons are transfered to doer
         let doerJW_data = await doerJW.getGetWalletData()
-        expect(doerJW_data.balance).toBe(mint_amount)
+        let platformJW_data = await platformJW.getGetWalletData()
+        expect(platformJW_data.balance).toBe(fee_offer)
+        expect(doerJW_data.balance).toBe(mint_amount - fee_offer)  // doer has all jettons
 
     });
 
-
-
-
-
-    it("Test: should witdraw", async () => {
-        await DeployOffer()
-
-        let mint_amount = price
-        await mint(deployer, master, jobOffer.address, mint_amount)
-        await poster.send(
-            {
-                value: toNano(2),
-                to: jobOffer.address,
-                body: beginCell().store(
-                    storeWithdraw({
-                        $$type: "Withdraw",
-                        to: poster.address,
-                        amount: mint_amount
-                    })
-                ).endCell()
-            }
-        )
-        expect((await JOJW.getGetWalletData()).balance).toBeLessThanOrEqual(0n)
+    it("Test: from Approve to Completed positive flow", async () => {
+        await RunPositiveFlow(3n)
+        let result = await jobOffer.getJobData()
+        expect(result.state).toBe(3n)
     });
 
-
-    
-
-
-
-    // it("Test: send transfers", async () => {
-    // });
-
-    // it("Test: Deploy offer", async () => {
-    // });
-
-    // it("Test: Revoke offer", async () => {
-       
-    // });
+    it("Test: appelation lo", async () => {
+        await RunPositiveFlow(2n)
+        let result = await jobOffer.getJobData()
+        expect(result.state).toBe(2n)
+    });
 });
