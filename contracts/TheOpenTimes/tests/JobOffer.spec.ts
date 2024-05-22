@@ -83,7 +83,7 @@ describe('JobOffer', () => {
         ))
 
         doerJW = blockchain.openContract(await TokenWallet.fromInit(
-            poster.address, master.address
+            doer.address, master.address
         )) // address EQDQnV1fm26m2w4l1GImLSGTZQ-XmpqooRb4adlcLbfIyjdz
         log(doerJW.address, "DOERJW ADDRESS")
 
@@ -388,9 +388,9 @@ describe('JobOffer', () => {
         expect(confirmByOwner.transactions).toHaveTransaction({from: poster.address, to: jobOffer.address, success: true})
         let jobOfferJWData = await JOJW.getGetWalletData()
         expect(jobOfferJWData.balance).toBe(0n)
+        let doerJW_data = await doerJW.getGetWalletData()
+        expect(doerJW_data.balance).toBe(mint_amount)
 
-        // HERE IS PROBLEM. Jetton was sent to her znaet address. Need fix
-        let tes = blockchain.openContract(TokenWallet.fromAddress(Address.parse("EQBTa4whhrgzTwcr344FHvCO3yUUyik9k6W1Z7qTD3J2N6Qh")))
     });
 
 
