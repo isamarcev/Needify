@@ -259,7 +259,7 @@ contract JobOffer with Deployable, Ownable {
         require(self.state == self.OfferAccepted || self.state == self.OfferCompleted, "Only for accepted or completed state.");
         require(self.doer == sender() || self.owner == sender(), "Only for doer or owner");
         let ctx: Context = context();
-        require(ctx.value >= ton("0.65"), "Not enough deposit. ");
+        require(ctx.value >= minGasCunsumption, "Not enough deposit. ");
         let init: StateInit = initOf AppealContract(myAddress(), msg.description);
         let to: Address = contractAddress(init);
         self.appeal_address = to;
