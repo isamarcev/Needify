@@ -76,7 +76,6 @@ struct ContractData {
     appeal_address: Address?;
 }
 
-
 contract AppealContract with Deployable {
     created_by: Address;
     JudgesAmount: Int = 0;
@@ -149,7 +148,7 @@ contract AppealContract with Deployable {
             to: sender(),
             value: 0,
             mode: SendRemainingBalance | SendDestroyIfZero,
-            body: "Revoke appelation".asComment()
+            body: null
         });
     }
 
@@ -175,11 +174,14 @@ contract JobOffer with Deployable, Ownable {
     description: String;
     price: Int as coins;
     wallet_balance: Int as coins = 0;
-    const feePercent: Int = ton("2");
     owner: Address;
     doer: Address?;
     state: Int;
     jetton_master: Address;
+    on_appelation_by: Address?;
+    appeal_description: String?;
+    appeal_address: Address?;
+
     const OfferCreated: Int = 0;
     const OfferPublished: Int = 1;
     const OfferAccepted: Int = 2;
@@ -187,10 +189,7 @@ contract JobOffer with Deployable, Ownable {
     const OfferConfirmed: Int = 4;
     const OfferAppelation: Int = 5;
     const OfferClosed: Int = 6;
-    on_appelation_by: Address?;
-    appeal_description: String?;
-    appeal_address: Address?;
-
+    const feePercent: Int = ton("2");
 
     init(title: String, description: String, price: Int, order: String, jetton_master: Address) {
         self.title = title;
@@ -208,7 +207,6 @@ contract JobOffer with Deployable, Ownable {
             body: self.order.asComment(),
         }); 
 
-        // Skip Reason: cskip_no_gas
         send(SendParameters{
             to: PlatformAddress, // sending message back to the sender
             value: 0, 
@@ -262,7 +260,7 @@ contract JobOffer with Deployable, Ownable {
         require(self.doer == sender() || self.owner == sender(), "Only for doer or owner");
         let ctx: Context = context();
         require(ctx.value >= ton("0.65"), "Not enough deposit. ");
-        let init: StateInit = initOf AppealContract(sender(), msg.description);
+        let init: StateInit = initOf AppealContract(myAddress(), msg.description);
         let to: Address = contractAddress(init);
         self.appeal_address = to;
         send(SendParameters{
@@ -284,6 +282,10 @@ contract JobOffer with Deployable, Ownable {
         require(self.state == self.OfferAppelation, "Only for appealation state");
         require(self.on_appelation_by == sender(), "Only for appealation owner");
         let init: StateInit = initOf AppealContract(myAddress(), self.appeal_description!!);
+        self.appeal_address = null;
+        self.on_appelation_by = null;
+        self.appeal_description = null;
+        self.state = self.OfferCompleted;
         send(SendParameters{
             to: contractAddress(init),
             value: 0,
@@ -292,9 +294,6 @@ contract JobOffer with Deployable, Ownable {
                 query_id: 0
                 }.toCell()
         });
-        self.on_appelation_by = null;
-        self.appeal_description = null;
-        self.state = self.OfferCompleted;
     }
 
     receive(msg: ConfirmAppeal) {

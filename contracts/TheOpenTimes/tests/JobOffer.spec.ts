@@ -1,14 +1,16 @@
 import dotenv from 'dotenv'; 
 dotenv.config()
 import { Blockchain, SandboxContract, TreasuryContract } from '@ton/sandbox';
-import { toNano, contractAddress, beginCell, internal, fromNano, SendMode, Address, Contract, OpenedContract } from '@ton/core';
+import { toNano, contractAddress, beginCell, internal, fromNano, SendMode, Address, Contract, OpenedContract, storeAccountState } from '@ton/core';
 import { content } from '../scripts/deployMaster';
 import { TokenMaster } from "../build/TokenMaster/tact_TokenMaster"
-import { JobOffer, storeDeploy, storeDeployOk, storeMint, storeRevoke, storeWithdraw, storeApprove, storeGetJob, storeCompleteJob, storeConfirmJob } from "../build/TokenMaster/tact_JobOffer"
+import { JobOffer, storeDeploy, storeDeployOk, storeMint, storeRevoke, storeWithdraw, storeApprove, storeGetJob, storeCompleteJob, storeConfirmJob, storeAppeal } from "../build/TokenMaster/tact_JobOffer"
 import { TokenWallet } from "../build/TokenMaster/tact_TokenWallet"
 import '@ton/test-utils';
 import { assert, log } from 'console';
 import { deploy, mint } from './test_utils';
+import { AppealContract, storeConfirmAppeal, storeRevokeAppeal } from '../build/TokenMaster/tact_AppealContract';
+import exp from 'constants';
 
 
 const title = "Sell Store 321"
@@ -519,9 +521,272 @@ describe('JobOffer', () => {
         expect(result.state).toBe(3n)
     });
 
-    it("Test: appelation lo", async () => {
-        await RunPositiveFlow(2n)
+    it("Test: appelation and revoke by poster", async () => {
+        await RunPositiveFlow(3n)
         let result = await jobOffer.getJobData()
-        expect(result.state).toBe(2n)
+        expect(result.state).toBe(3n)
+        // Make appeal by poster
+        await poster.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeAppeal({
+                        $$type: "Appeal",
+                        query_id: 0n,
+                        description: "Here is a problem with doer JOB",
+                    })
+                ).endCell()
+            }
+        )
+        let JOData = await jobOffer.getJobData()
+        expect(JOData.appeal_address).toBeDefined()
+        let Appeal = blockchain.openContract(
+            AppealContract.fromAddress(JOData.appeal_address!)
+        )
+        // Revoke appeal
+        let revokeAppealRes = await poster.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeRevokeAppeal({
+                        $$type: "RevokeAppeal",
+                        query_id: 0n
+                    })
+                ).endCell()
+            }
+        )
+        let JOData2 = await jobOffer.getJobData()
+        expect(JOData2.appeal_address).toBeNull()
+        expect(JOData2.state).toBe(3n) // return to OfferCompleted
+        expect(revokeAppealRes.transactions).toHaveTransaction({
+            from: jobOffer.address,
+            to: Appeal.address,
+            success: true,
+            destroyed: true
+        })
+        await poster.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeConfirmJob({
+                        $$type: "ConfirmJob",
+                        query_id: 0n,
+                    })
+                ).endCell()
+            }
+        )
+        let JOJWData = await JOJW.getGetWalletData()
+        expect(JOJWData.balance).toBe(0n)
+        let doerJWdata = await doerJW.getGetWalletData()
+        expect(doerJWdata.balance).toBe(price - fee_offer)
+        let platformJWData = await platformJW.getGetWalletData()
+        expect(platformJWData.balance).toBe(fee_offer)
+
+    });
+
+    it("Test: appelation and confirm appeal by platform to poster", async () => {
+        await RunPositiveFlow(3n)
+        let result = await jobOffer.getJobData()
+        expect(result.state).toBe(3n)
+        // Make appeal by poster
+        await poster.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeAppeal({
+                        $$type: "Appeal",
+                        query_id: 0n,
+                        description: "Here is a problem with doer JOB",
+                    })
+                ).endCell()
+            }
+        )
+        let JOData = await jobOffer.getJobData()
+        expect(JOData.appeal_address).toBeDefined()
+        let Appeal = blockchain.openContract(
+            AppealContract.fromAddress(JOData.appeal_address!)
+        )
+
+        let confirmAppealMessage = {
+            value: TransferAmount,
+            to: Appeal.address,
+            body: beginCell().store(
+                storeConfirmAppeal({
+                    $$type: "ConfirmAppeal",
+                    query_id: 0n,
+                    verdict: true
+                })
+            ).endCell()
+        }
+        // Try to appeal by another user
+        let resD = await doer.send(
+            confirmAppealMessage
+        )
+        expect(resD.transactions).toHaveTransaction({
+            from: doer.address,
+            to: Appeal.address,
+            success: false
+        })
+        let resP = await poster.send(
+            confirmAppealMessage
+        )
+        expect(resP.transactions).toHaveTransaction({
+            from: poster.address,
+            to: Appeal.address,
+            success: false
+        })
+
+        // Confirm appeal by platform
+        let res = await platform.send(
+            confirmAppealMessage
+        )
+        expect(res.transactions).toHaveTransaction({
+            from: platform.address,
+            to: Appeal.address,
+            success: true
+        })
+        let JOJWData = await JOJW.getGetWalletData()
+        expect(JOJWData.balance).toBe(0n) // all jettons are transfered to poster 
+        let posterJWdata = await posterJW.getGetWalletData()
+        expect(posterJWdata.balance).toBe(price) // poster has all jettons 
+    });
+
+    it("Test: appelation and confirm appeal by platform to doer", async () => {
+        await RunPositiveFlow(3n)
+        let result = await jobOffer.getJobData()
+        expect(result.state).toBe(3n)
+        // Make appeal by poster
+        await poster.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeAppeal({
+                        $$type: "Appeal",
+                        query_id: 0n,
+                        description: "Here is a problem with doer JOB",
+                    })
+                ).endCell()
+            }
+        )
+        let JOData = await jobOffer.getJobData()
+        expect(JOData.appeal_address).toBeDefined()
+        let Appeal = blockchain.openContract(
+            AppealContract.fromAddress(JOData.appeal_address!)
+        )
+
+        let confirmAppealMessage = {
+            value: TransferAmount,
+            to: Appeal.address,
+            body: beginCell().store(
+                storeConfirmAppeal({
+                    $$type: "ConfirmAppeal",
+                    query_id: 0n,
+                    verdict: false
+                })
+            ).endCell()
+        }
+        // Try to appeal by another user
+        let resD = await doer.send(
+            confirmAppealMessage
+        )
+        expect(resD.transactions).toHaveTransaction({
+            from: doer.address,
+            to: Appeal.address,
+            success: false
+        })
+        let resP = await poster.send(
+            confirmAppealMessage
+        )
+        expect(resP.transactions).toHaveTransaction({
+            from: poster.address,
+            to: Appeal.address,
+            success: false
+        })
+
+        // Confirm appeal by platform
+        let res = await platform.send(
+            confirmAppealMessage
+        )
+        expect(res.transactions).toHaveTransaction({
+            from: platform.address,
+            to: Appeal.address,
+            success: true
+        })
+        let JOJWData = await JOJW.getGetWalletData()
+        expect(JOJWData.balance).toBe(0n) // all jettons are transfered to poster 
+        let doerJWData = await doerJW.getGetWalletData()
+        expect(doerJWData.balance).toBe(price - fee_offer) // doer has all jettons without fee
+        let platformJWData = await platformJW.getGetWalletData()
+        expect(platformJWData.balance).toBe(fee_offer)
+    });
+
+    it("Test: appelation from doer", async () => {
+        await RunPositiveFlow(3n)
+        let result = await jobOffer.getJobData()
+        expect(result.state).toBe(3n)
+        // Make appeal by poster
+        await doer.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeAppeal({
+                        $$type: "Appeal",
+                        query_id: 0n,
+                        description: "Here is a problem with poster approving",
+                    })
+                ).endCell()
+            }
+        )
+        let JOData = await jobOffer.getJobData()
+        expect(JOData.appeal_address).toBeDefined()
+        let Appeal = blockchain.openContract(
+            AppealContract.fromAddress(JOData.appeal_address!)
+        )
+
+        let revokeAppealRes = await doer.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeRevokeAppeal({
+                        $$type: "RevokeAppeal",
+                        query_id: 0n
+                    })
+                ).endCell()
+            }
+        )
+        let JOData2 = await jobOffer.getJobData()
+        expect(JOData2.appeal_address).toBeNull()
+        expect(JOData2.state).toBe(3n) // return to OfferCompleted
+        expect(revokeAppealRes.transactions).toHaveTransaction({
+            from: jobOffer.address,
+            to: Appeal.address,
+            success: true,
+            destroyed: true
+        })
+        await poster.send(
+            {
+                value: TransferAmount,
+                to: jobOffer.address,
+                body: beginCell().store(
+                    storeConfirmJob({
+                        $$type: "ConfirmJob",
+                        query_id: 0n,
+                    })
+                ).endCell()
+            }
+        )
+        let JOJWData = await JOJW.getGetWalletData()
+        expect(JOJWData.balance).toBe(0n)
+        let doerJWdata = await doerJW.getGetWalletData()
+        expect(doerJWdata.balance).toBe(price - fee_offer)
+        let platformJWData = await platformJW.getGetWalletData()
+        expect(platformJWData.balance).toBe(fee_offer)
     });
 });
