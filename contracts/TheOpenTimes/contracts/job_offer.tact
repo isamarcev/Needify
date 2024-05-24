@@ -189,7 +189,7 @@ contract JobOffer with Deployable, Ownable {
     const OfferConfirmed: Int = 4;
     const OfferAppelation: Int = 5;
     const OfferClosed: Int = 6;
-    const feePercent: Int = ton("2");
+    const feePercent: Int = 200; // 2 percent
 
     init(title: String, description: String, price: Int, order: String, jetton_master: Address) {
         self.title = title;
@@ -321,13 +321,14 @@ contract JobOffer with Deployable, Ownable {
         let init: StateInit = initOf TokenWallet(myAddress(), self.jetton_master);  
         let to: Address = contractAddress(init);
         if (withFee) {
+            let fee_amount: Int = self.wallet_balance * self.feePercent / 100000;
             send(SendParameters{
                 to: to, 
                 value: 0,
                 mode: SendRemainingValue, 
                 body: Transfer{ // 0x0f817ea5
                     query_id: 0,
-                    amount: self.feePercent,
+                    amount: fee_amount,
                     destination: PlatformAddress,
                     response_destination: address,
                     custom_payload: beginCell().endCell(),
@@ -337,7 +338,7 @@ contract JobOffer with Deployable, Ownable {
                 data: init.data,
                 code: init.code,
                 });
-            self.wallet_balance = self.wallet_balance - self.feePercent;
+            self.wallet_balance = self.wallet_balance - fee_amount;
         }
         self.state = self.OfferClosed;
         send(SendParameters{

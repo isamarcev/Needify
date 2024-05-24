@@ -21,7 +21,13 @@ const order = "Sell store 2"
 const deployAmount = toNano("0.65")
 const TransferAmount = toNano("0.65")
 const simple_transfer_amount = toNano("0.2")
-const fee_offer = toNano("2")
+const fee_offer = 200n
+
+function calculate_fee(withdraw_amount: bigint) {
+    // calcluate fee
+    let fee = withdraw_amount * fee_offer / 100000n
+    return fee
+}
 
 
 describe('JobOffer', () => {
@@ -510,8 +516,8 @@ describe('JobOffer', () => {
         expect(jobOfferJWData.balance).toBe(0n) // all jettons are transfered to doer
         let doerJW_data = await doerJW.getGetWalletData()
         let platformJW_data = await platformJW.getGetWalletData()
-        expect(platformJW_data.balance).toBe(fee_offer)
-        expect(doerJW_data.balance).toBe(mint_amount - fee_offer)  // doer has all jettons
+        expect(platformJW_data.balance).toBe(calculate_fee(price))
+        expect(doerJW_data.balance).toBe(mint_amount - calculate_fee(mint_amount))  // doer has all jettons
 
     });
 
@@ -581,9 +587,9 @@ describe('JobOffer', () => {
         let JOJWData = await JOJW.getGetWalletData()
         expect(JOJWData.balance).toBe(0n)
         let doerJWdata = await doerJW.getGetWalletData()
-        expect(doerJWdata.balance).toBe(price - fee_offer)
+        expect(doerJWdata.balance).toBe(price - calculate_fee(price))
         let platformJWData = await platformJW.getGetWalletData()
-        expect(platformJWData.balance).toBe(fee_offer)
+        expect(platformJWData.balance).toBe(calculate_fee(price))
 
     });
 
@@ -720,9 +726,9 @@ describe('JobOffer', () => {
         let JOJWData = await JOJW.getGetWalletData()
         expect(JOJWData.balance).toBe(0n) // all jettons are transfered to poster 
         let doerJWData = await doerJW.getGetWalletData()
-        expect(doerJWData.balance).toBe(price - fee_offer) // doer has all jettons without fee
+        expect(doerJWData.balance).toBe(price - calculate_fee(price)) // doer has all jettons without fee
         let platformJWData = await platformJW.getGetWalletData()
-        expect(platformJWData.balance).toBe(fee_offer)
+        expect(platformJWData.balance).toBe(calculate_fee(price))
     });
 
     it("Test: appelation from doer", async () => {
@@ -785,8 +791,8 @@ describe('JobOffer', () => {
         let JOJWData = await JOJW.getGetWalletData()
         expect(JOJWData.balance).toBe(0n)
         let doerJWdata = await doerJW.getGetWalletData()
-        expect(doerJWdata.balance).toBe(price - fee_offer)
+        expect(doerJWdata.balance).toBe(price - calculate_fee(price))
         let platformJWData = await platformJW.getGetWalletData()
-        expect(platformJWData.balance).toBe(fee_offer)
+        expect(platformJWData.balance).toBe(calculate_fee(price))
     });
 });
