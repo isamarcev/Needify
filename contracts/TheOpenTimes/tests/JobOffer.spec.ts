@@ -11,6 +11,7 @@ import { assert, log } from 'console';
 import { deploy, mint } from './test_utils';
 import { AppealContract, storeConfirmAppeal, storeRevokeAppeal } from '../build/TokenMaster/tact_AppealContract';
 import exp from 'constants';
+import { triggerAsyncId } from 'async_hooks';
 
 
 const title = "Sell Store 321"
@@ -59,7 +60,6 @@ describe('JobOffer', () => {
         doer = await blockchain.treasury('doer'); //EQB1cX3AWEUC64v6rhRjwdEk0fRV6Qn-JBFqXSFY30PitP6c
         platform = await blockchain.treasury('platform'); 
         third_user = await blockchain.treasury('third_user'); //EQD6BRvNYA5F5U4g8YJ9utWbtxQQDoVhjemWlUBaK3eAKBDL
-
         // Jetton Master
         let master_init = await TokenMaster.init(
             deployer.address, content
@@ -67,6 +67,8 @@ describe('JobOffer', () => {
         master = blockchain.openContract(await TokenMaster.fromInit(
             deployer.address, content
         ));
+
+        
 
         await deployer.send(
             {

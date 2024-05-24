@@ -1,4 +1,5 @@
 import "./token_wallet";
+import "./native_wallet";
 import "./messages";
 import "@stdlib/ownable";
 import "@stdlib/deploy";
@@ -57,10 +58,6 @@ message(0x021f) Vote {
     query_id: Int;
     verdict: Int as uint8;
 }
-
-
-
-
 
 struct ContractData {
     title: String;
@@ -173,14 +170,20 @@ contract JobOffer with Deployable, Ownable {
     title: String;
     description: String;
     price: Int as coins;
-    wallet_balance: Int as coins = 0;
     owner: Address;
     doer: Address?;
     state: Int;
-    jetton_master: Address;
+
     on_appelation_by: Address?;
     appeal_description: String?;
     appeal_address: Address?;
+
+    jetton_master: Address;
+    wallet_balance: Int as coins = 0;
+
+    native_master: Address;
+    const PublicCost: Int = ton("100");
+    paid: Bool = false;
 
     const OfferCreated: Int = 0;
     const OfferPublished: Int = 1;
@@ -189,30 +192,42 @@ contract JobOffer with Deployable, Ownable {
     const OfferConfirmed: Int = 4;
     const OfferAppelation: Int = 5;
     const OfferClosed: Int = 6;
+    const OfferPrePublished: Int = 7;
     const feePercent: Int = 200; // 2 percent
 
-    init(title: String, description: String, price: Int, order: String, jetton_master: Address) {
+    init(title: String, description: String, price: Int, order: String, jetton_master: Address, native_master: Address) {
+        let ctx: Context = context();
         self.title = title;
         self.description = description;
         self.price = price;
         self.order = order;
         self.jetton_master = jetton_master;
-        self.owner = sender();
+        self.native_master = native_master;
+        self.owner = ctx.sender;
         self.state = self.OfferCreated;
-        let ctx: Context = context();
 
         send(SendParameters{
-            to: sender(), // sending message back to the sender
+            to: ctx.sender, // sending message back to the sender
             value: ctx.value - minTonStorage, // don't add Toncoins to the message...
             body: self.order.asComment(),
         }); 
 
         send(SendParameters{
             to: PlatformAddress, // sending message back to the sender
-            value: 0, 
+            value: 1, 
             body: self.order.asComment(),
             mode: SendPayGasSeparately
         });
+    }
+
+    fun checkPublish(): Bool {
+        if (self.wallet_balance >= self.price && self.paid) {
+            self.state = self.OfferPublished;
+            return true;
+        } else {
+            self.state = self.OfferPrePublished;
+            return false;
+        }
     }
 
     receive(msg: Revoke) {
@@ -223,14 +238,11 @@ contract JobOffer with Deployable, Ownable {
 
     receive(msg: Approve) {
         require(sender() == PlatformAddress, "Only for platform method");
-        require(self.state == self.OfferCreated, "Invalid status for operation");
+        require(self.state == self.OfferCreated || self.state == self.OfferPrePublished, "Invalid status for operation");
         self.wallet_balance = msg.amount;
-        if (self.wallet_balance >= self.price) {
-            self.state = self.OfferPublished;
+        if (self.checkPublish()) {
             self.send_notification(self.owner, "Your task was published");
-        } else {
-            self.send_notification(self.owner, "Not enough deposit. Need to send more jettons");
-        }
+        } 
     }
 
     receive(msg: GetJob) {
@@ -316,16 +328,41 @@ contract JobOffer with Deployable, Ownable {
         }
     }
 
+    receive(msg: DepositNotification) {
+        let ctx: Context = context();
+        let n_init: StateInit = initOf NativeWallet(myAddress(), self.native_master);
+        require(ctx.sender == contractAddress(n_init), "Only for Offer native wallet");
+        require(msg.balance >= self.PublicCost, "Not enough deposit. ");
+        self.paid = true;
+        if (self.checkPublish()) {
+            self.send_notification(self.owner, "Your task was published");
+        } 
+    }
+
+
     fun withdraw_deposit(address: Address, withFee: Bool) {
         let ctx: Context = context();
         let init: StateInit = initOf TokenWallet(myAddress(), self.jetton_master);  
         let to: Address = contractAddress(init);
+        let n_init: StateInit = initOf NativeWallet(myAddress(), self.native_master);
+        send(SendParameters{
+                to: contractAddress(n_init),
+                value: 0,
+                mode: SendPayGasSeparately,
+                body: WithdrawDeposit{
+                    query_id: 0,
+                    destination: address,
+                    response_destination: address
+                }.toCell(),
+                data: n_init.data,
+                code: n_init.code
+            });
         if (withFee) {
             let fee_amount: Int = self.wallet_balance * self.feePercent / 100000;
             send(SendParameters{
                 to: to, 
                 value: 0,
-                mode: SendRemainingValue, 
+                mode: SendRemainingValue | SendIgnoreErrors, 
                 body: Transfer{ // 0x0f817ea5
                     query_id: 0,
                     amount: fee_amount,
@@ -381,7 +418,7 @@ contract JobOffer with Deployable, Ownable {
         send(SendParameters{
                 to: address,
                 value: 1,
-                mode: SendPayGasSeparately,
+                mode: SendPayGasSeparately | SendIgnoreErrors,
                 body: message.asComment(),
         });
     }
