@@ -1,17 +1,17 @@
 import "./job_offer";
 import "@stdlib/ownable";
 import "@stdlib/deploy";
-message Mint {
-    amount: Int;
-    receiver: Address;
-}
-struct MasterData {
-    total_supply: Int;
-    mintable: Bool;
-    owner: Address;
-    jetton_content: Cell;
-    jetton_wallet_code: Cell;
-}
+// // message Mint {
+// //     amount: Int;
+// //     receiver: Address;
+// // }
+// struct MasterData {
+//     total_supply: Int;
+//     mintable: Bool;
+//     owner: Address;
+//     jetton_content: Cell;
+//     jetton_wallet_code: Cell;
+// }
 
 @interface("org.ton.jetton.master")
 contract TokenMaster with Ownable, Deployable {

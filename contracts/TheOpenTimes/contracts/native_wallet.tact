@@ -1,6 +1,7 @@
 import "./messages";
 import "@stdlib/deploy";
 import "./job_offer";
+import "./native_master";
 
 message(0x050f) Deposit {
     query_id: Int as uint64;
@@ -43,7 +44,7 @@ contract NativeWallet with Deployable {
     balance: Int = 0;
     owner: Address;
     master: Address;
-    const burning_percent: Int = 2000; // 20%
+    const burning_percent: Int = 20000; // 20%
 
     init(owner: Address, master: Address) {
         self.owner = owner;
@@ -84,7 +85,7 @@ contract NativeWallet with Deployable {
         require(ctx.sender == self.owner, "Invalid sender");
         let d_init: StateInit = initOf NativeWallet(msg.destination, self.master);
         let fwd_amount: Int = myBalance() - ctx.readForwardFee() * 2 - gasConsumption - gasConsumption;
-        let burning_amount: Int = self.balance * self.burning_percent / 10000;
+        let burning_amount: Int = self.balance * self.burning_percent / 100000;
         send(SendParameters{
             to: self.master,
             value: 0,
@@ -101,7 +102,7 @@ contract NativeWallet with Deployable {
         send(SendParameters {
             to: contractAddress(d_init),
             value: 0,
-            mode: SendRemainingValue,
+            mode: SendRemainingBalance,
             bounce: false,
             body: InternalTransfer{
                 query_id: msg.query_id,

@@ -21,19 +21,29 @@ const jettonParams = {
 };
 export let content = buildOnchainMetadata(jettonParams);
 
+const NativejettonParams = {
+    name: "The Open Needs",
+    description: "This is True description",
+    symbol: "NEED",
+    image: "https://play-lh.googleusercontent.com/ahJtMe0vfOlAu1XJVQ6rcaGrQBgtrEZQefHy7SXB7jpijKhu1Kkox90XDuH8RmcBOXNn",
+};
+export let native_content = buildOnchainMetadata(NativejettonParams);
+
 const deploy_mnemonics_array = process.env.DEPLOYER_MNEMONIC || "";
 const mnemonic = deploy_mnemonics_array?.split(" ");
 
+const poster_mnemonics_array = process.env.POSTER_MNEMONIC || "";
+const poster_mnemonic = poster_mnemonics_array?.split(" ");
 
 export async function run(provider: NetworkProvider) {
     let client = provider
     
-    let keyPair = await mnemonicToPrivateKey(mnemonic);
-    let secretKey = keyPair.secretKey;
+    let DeloyerkeyPair = await mnemonicToPrivateKey(mnemonic);
+    let secretKey = DeloyerkeyPair.secretKey;
     let workchain = 0;
     let deployer_wallet = WalletContractV4.create({
         workchain,
-        publicKey: keyPair.publicKey,
+        publicKey: DeloyerkeyPair.publicKey,
     });
     let wallet_contract = client.open(deployer_wallet);
     const master = client.open(await TokenMaster.fromInit(
@@ -45,6 +55,7 @@ export async function run(provider: NetworkProvider) {
     // ========================================
     console.log("Current deployment wallet balance: ", fromNano(balance).toString(), "💎TON");
     console.log("\n🛠️ Calling To JettonWallet:\n" + master.address + "\n");
+
     let transferMessagePkg = beginCell().store(
         storeTransfer({
             $$type: "Transfer",

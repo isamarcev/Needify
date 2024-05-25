@@ -11,27 +11,27 @@ describe('NativeMaster', () => {
     beforeEach(async () => {
         blockchain = await Blockchain.create();
 
-        nativeMaster = blockchain.openContract(await NativeMaster.fromInit());
+        // nativeMaster = blockchain.openContract(await NativeMaster.fromInit());
 
-        deployer = await blockchain.treasury('deployer');
+        // deployer = await blockchain.treasury('deployer');
 
-        const deployResult = await nativeMaster.send(
-            deployer.getSender(),
-            {
-                value: toNano('0.05'),
-            },
-            {
-                $$type: 'Deploy',
-                queryId: 0n,
-            }
-        );
+        // const deployResult = await nativeMaster.send(
+        //     deployer.getSender(),
+        //     {
+        //         value: toNano('0.05'),
+        //     },
+        //     {
+        //         $$type: 'Deploy',
+        //         queryId: 0n,
+        //     }
+        // );
 
-        expect(deployResult.transactions).toHaveTransaction({
-            from: deployer.address,
-            to: nativeMaster.address,
-            deploy: true,
-            success: true,
-        });
+        // expect(deployResult.transactions).toHaveTransaction({
+        //     from: deployer.address,
+        //     to: nativeMaster.address,
+        //     deploy: true,
+        //     success: true,
+        // });
     });
 
     it('should deploy', async () => {

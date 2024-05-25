@@ -5,8 +5,13 @@ import { storeMint } from "../build/TokenMaster/tact_JobOffer";
 
 let value_to_transfer: bigint = toNano(0.1)
 
-export async function mint(master_owner: SandboxContract<TreasuryContract>, master_contract: SandboxContract<TokenMaster>, receipient_address: Address, amount: bigint) {
-    await master_owner.send(
+export async function mint(
+        master_owner: SandboxContract<TreasuryContract>, 
+        master_contract: any, 
+        receipient_address: Address, 
+        amount: bigint
+    ) {
+    let result = await master_owner.send(
         {
             value: value_to_transfer,
             to: master_contract.address,
@@ -20,6 +25,7 @@ export async function mint(master_owner: SandboxContract<TreasuryContract>, mast
             ).endCell()
         }
     )
+    return result
 }
 
 

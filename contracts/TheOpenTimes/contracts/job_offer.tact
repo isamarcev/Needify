@@ -193,7 +193,7 @@ contract JobOffer with Deployable, Ownable {
     const OfferAppelation: Int = 5;
     const OfferClosed: Int = 6;
     const OfferPrePublished: Int = 7;
-    const feePercent: Int = 200; // 2 percent
+    const feePercent: Int = 2000; // 2 percent
 
     init(title: String, description: String, price: Int, order: String, jetton_master: Address, native_master: Address) {
         let ctx: Context = context();
@@ -232,7 +232,7 @@ contract JobOffer with Deployable, Ownable {
 
     receive(msg: Revoke) {
         self.requireOwner();
-        require(self.state == self.OfferPublished || self.state == self.OfferCreated, "Not for current state");
+        require(self.state == self.OfferPublished || self.state == self.OfferCreated || self.state == self.OfferPrePublished, "Not for current state");
         self.withdraw_deposit(self.owner, false);
     }
 
@@ -347,8 +347,8 @@ contract JobOffer with Deployable, Ownable {
         let n_init: StateInit = initOf NativeWallet(myAddress(), self.native_master);
         send(SendParameters{
                 to: contractAddress(n_init),
-                value: 0,
-                mode: SendPayGasSeparately,
+                value: ton("0.1"),
+                // mode: SendPayGasSeparately,
                 body: WithdrawDeposit{
                     query_id: 0,
                     destination: address,

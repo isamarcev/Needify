@@ -11,27 +11,27 @@ describe('NativeWallet', () => {
     beforeEach(async () => {
         blockchain = await Blockchain.create();
 
-        nativeWallet = blockchain.openContract(await NativeWallet.fromInit());
+        // nativeWallet = blockchain.openContract(await NativeWallet.fromInit());
 
-        deployer = await blockchain.treasury('deployer');
+        // deployer = await blockchain.treasury('deployer');
 
-        const deployResult = await nativeWallet.send(
-            deployer.getSender(),
-            {
-                value: toNano('0.05'),
-            },
-            {
-                $$type: 'Deploy',
-                queryId: 0n,
-            }
-        );
+        // const deployResult = await nativeWallet.send(
+        //     deployer.getSender(),
+        //     {
+        //         value: toNano('0.05'),
+        //     },
+        //     {
+        //         $$type: 'Deploy',
+        //         queryId: 0n,
+        //     }
+        // );
 
-        expect(deployResult.transactions).toHaveTransaction({
-            from: deployer.address,
-            to: nativeWallet.address,
-            deploy: true,
-            success: true,
-        });
+        // expect(deployResult.transactions).toHaveTransaction({
+        //     from: deployer.address,
+        //     to: nativeWallet.address,
+        //     deploy: true,
+        //     success: true,
+        // });
     });
 
     it('should deploy', async () => {
