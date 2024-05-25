@@ -34,6 +34,8 @@ message(0x015f) CompleteJob {
 
 message(0x016f) ConfirmJob {
     query_id: Int;
+    mark: Int? as uint8;
+    review: String?;
 }
 
 message(0x017f) Appeal {
@@ -57,6 +59,10 @@ message(0x020f) BeJudge {
 message(0x021f) Vote {
     query_id: Int;
     verdict: Int as uint8;
+}
+
+message(0x022f) ChooseDoer {
+    doer: Address;
 }
 
 struct ContractData {
@@ -180,20 +186,24 @@ contract JobOffer with Deployable, Ownable {
 
     jetton_master: Address;
     wallet_balance: Int as coins = 0;
-
     native_master: Address;
+
     const PublicCost: Int = ton("100");
+    const feePercent: Int = 2000; // 2 %
     paid: Bool = false;
 
     const OfferCreated: Int = 0;
+    const OfferPrePublished: Int = 7;
     const OfferPublished: Int = 1;
+    doers: map<Address, Bool>;
+    const maxVacancies: Int = 2;
     const OfferAccepted: Int = 2;
     const OfferCompleted: Int = 3;
     const OfferConfirmed: Int = 4;
     const OfferAppelation: Int = 5;
     const OfferClosed: Int = 6;
-    const OfferPrePublished: Int = 7;
-    const feePercent: Int = 2000; // 2 percent
+    mark: Int = 0;
+    review: String = "";
 
     init(title: String, description: String, price: Int, order: String, jetton_master: Address, native_master: Address) {
         let ctx: Context = context();
@@ -246,11 +256,35 @@ contract JobOffer with Deployable, Ownable {
     }
 
     receive(msg: GetJob) {
+        let ctx: Context = context();
+        require(ctx.value >= minGasCunsumption, "Not enough value for gas. ");
         require(self.doer == null, "Job already got. ");
         require(sender() != self.owner, "Poster could not pick up job. ");
         require(self.state == self.OfferPublished, "Task is not approved. ");
-        self.doer = sender();
+        let map_size: Int = 0;
+        let map_: map<Address, Bool> = self.doers;
+        foreach (doer, _ in map_) {
+            map_size += 1;
+        }
+        require(map_size <= self.maxVacancies, "No more vacancies. ");
+        if (self.doers.get(sender()) == null) {
+            self.doers.set(sender(), false);
+            self.send_notification(self.owner, "You have a new candidate for the job.");
+        }
+    }
+
+    get fun vacancies(): Cell? {
+        return self.doers.asCell();
+    }
+
+    receive(msg: ChooseDoer) {
+        self.requireOwner();
+        require(self.state == self.OfferPublished, "Task is not published. ");
+        require(self.doers.get(msg.doer) != null, "Doer is not registered. ");
+        self.doers.set(msg.doer, true);
+        self.doer = msg.doer;
         self.state = self.OfferAccepted;
+        self.send_notification(self.doer!!, "You are accepted for the job.");
     }
 
     receive(msg: CompleteJob) {
@@ -264,6 +298,12 @@ contract JobOffer with Deployable, Ownable {
         self.requireOwner();
         require(self.state == self.OfferCompleted || self.state == self.OfferAccepted, "Only for completed or accepted state.");
         self.state = self.OfferConfirmed;
+        if (msg.mark != null) {
+            self.mark = msg.mark!!;
+        }
+        if (msg.review != null) {
+            self.review = msg.review!!;
+        }
         self.withdraw_deposit(self.doer!!, true);
     }
     receive(msg: Appeal) {
@@ -348,7 +388,6 @@ contract JobOffer with Deployable, Ownable {
         send(SendParameters{
                 to: contractAddress(n_init),
                 value: ton("0.1"),
-                // mode: SendPayGasSeparately,
                 body: WithdrawDeposit{
                     query_id: 0,
                     destination: address,
@@ -381,7 +420,7 @@ contract JobOffer with Deployable, Ownable {
         send(SendParameters{
             to: to, 
             value: 0,
-            mode: SendRemainingBalance | SendDestroyIfZero, 
+            mode: SendRemainingBalance, 
             body: Transfer{ // 0x0f817ea5
                 query_id: 0,
                 amount: self.wallet_balance,
@@ -418,6 +457,7 @@ contract JobOffer with Deployable, Ownable {
         send(SendParameters{
                 to: address,
                 value: 1,
+                bounce: false,
                 mode: SendPayGasSeparately | SendIgnoreErrors,
                 body: message.asComment(),
         });
