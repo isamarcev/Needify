@@ -35,3 +35,4 @@ venv/
 .env
 tbot/.env
 build/
+contracts/TheOpenTimes/temp
