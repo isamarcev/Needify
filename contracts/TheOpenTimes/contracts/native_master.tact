@@ -1,12 +1,7 @@
 import "@stdlib/deploy";
-import "./job_offer";
+import "./native_wallet";
 import "@stdlib/ownable";
-import "@stdlib/deploy";
 
-message Mint {
-    amount: Int;
-    receiver: Address;
-}
 struct MasterData {
     total_supply: Int;
     mintable: Bool;

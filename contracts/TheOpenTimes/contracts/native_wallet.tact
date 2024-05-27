@@ -1,7 +1,8 @@
 import "./messages";
 import "@stdlib/deploy";
-import "./job_offer";
-import "./native_master";
+// import "./native_master";
+const gasConsumption: Int = ton("0.02");
+const minTons: Int = ton("0.02");
 
 message(0x050f) Deposit {
     query_id: Int as uint64;
@@ -49,47 +50,17 @@ contract NativeWallet with Deployable {
     init(owner: Address, master: Address) {
         self.owner = owner;
         self.master = master;
-    }
 
-    receive(msg: Deposit) {
-        let ctx: Context = context();
-        require(ctx.sender == self.owner, "Invalid sender");
-        let final: Int = ctx.readForwardFee() * 2 + 
-                            2 * gasConsumption + 
-                                minTons + 
-                                    msg.forward_ton_amount;   // Gas checks, forward_ton = 0.152
-        require(ctx.value > final, "Invalid value"); 
-        self.balance = self.balance - msg.amount; 
-        require(self.balance >= 0, "Invalid balance");
-        let init: StateInit = initOf NativeWallet(msg.destination, self.master);
-        let to: Address = contractAddress(init);
-        send(SendParameters {
-            to: to,
-            value: 0,
-            mode: SendRemainingValue,
-            bounce: false,
-            body: InternalDeposit{
-                query_id: msg.query_id,
-                amount: msg.amount,
-                from: self.owner,
-                response_destination: msg.response_destination,
-                forward_ton_amount: msg.forward_ton_amount
-                }.toCell(),
-            data: init.data,
-            code: init.code
-        });
     }
 
     receive(msg: WithdrawDeposit) {
         let ctx: Context = context();
         require(ctx.sender == self.owner, "Invalid sender");
         let d_init: StateInit = initOf NativeWallet(msg.destination, self.master);
-        let fwd_amount: Int = myBalance() - ctx.readForwardFee() * 2 - gasConsumption - gasConsumption;
         let burning_amount: Int = self.balance * self.burning_percent / 100000;
         send(SendParameters{
             to: self.master,
-            value: 0,
-            mode: SendPayGasSeparately,
+            value: gasConsumption,
             body: BurnNotification {
                 query_id: msg.query_id,
                 amount: burning_amount,
@@ -109,7 +80,7 @@ contract NativeWallet with Deployable {
                 amount: balance_to_send,
                 from: self.owner,
                 response_destination: msg.response_destination,
-                forward_ton_amount: fwd_amount,
+                forward_ton_amount: gasConsumption,
                 forward_payload: beginCell().endCell().asSlice()}.toCell(),
             data: d_init.data,
             code: d_init.code
