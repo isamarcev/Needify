@@ -8,7 +8,7 @@ const minTonStorage: Int = ton("0.3");
 const minGasCunsumption: Int = ton("0.1");
 const simple_message_request: Int = ton("0.05");
 
-const PlatformAddress: Address = address("EQBYuxKgz-W5DeoBTgxaLgxGO9OHOVgjt-1qV0HGoQtp9_Wt");
+const PlatformAddress: Address = address("UQBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8Itwbjl1");
 const jetton_transer_value: Int = ton("0.06");
 
 
@@ -279,7 +279,7 @@ contract JobOffer with Deployable, Ownable {
 
     receive(msg: CheckPublish) {
         let ctx: Context = context();
-        require(ctx.sender == myAddress(), "Only for order contract method");
+        require(ctx.sender == myAddress() || ctx.sender == PlatformAddress, "Only for order contract method");
         if (self.state == self.OfferCreated || self.state == self.OfferPrePublished) {
             if (self.costs.get(self.jetton_wallet!!) != null) {
                 self.jetton_balance = self.costs.get(self.jetton_wallet!!)!!;
