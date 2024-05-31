@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import Script from 'next/script';
+import { useRouter } from 'next/navigation';
 
 export const TelegramContext = createContext<{
   telegramApp?: Telegram;
@@ -15,6 +16,7 @@ export const TelegramProvider = ({
 }) => {
   const [webApp, setWebApp] = useState<Telegram | undefined>(undefined);
   const [isLoading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const app = window.Telegram;
@@ -22,6 +24,8 @@ export const TelegramProvider = ({
     if (app) {
       app.WebApp.ready();
       app.WebApp.expand();
+      app.WebApp.BackButton.onClick(() => router.back());
+      app.WebApp.BackButton.show();
       setWebApp(app);
       setLoading(false);
     }
