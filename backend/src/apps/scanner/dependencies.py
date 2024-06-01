@@ -23,9 +23,7 @@ class ScannerContainer(containers.DeclarativeContainer):
         bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
     )
 
-    async_mongo = providers.Factory(
-        ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME
-    )
+    async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
 
     lts_client = providers.Singleton(
         get_ton_lib_client,

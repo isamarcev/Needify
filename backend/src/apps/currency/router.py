@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends
 
 from src.apps.currency.dependencies import CurrencyContainer
 from src.apps.currency.manager import CurrencyManager
-from src.apps.currency.schemas import BurnDataSchema, CreateCurrencySchema, MintTokenSchema, \
-    CurrencySchema
+from src.apps.currency.schemas import (
+    CurrencySchema,
+)
 
 currency_router = APIRouter()
 
@@ -35,32 +36,28 @@ currency_router = APIRouter()
 #     return result
 
 
-
-@currency_router.get("/",
-                     response_model=list[CurrencySchema],
-                     )
+@currency_router.get(
+    "/",
+    response_model=list[CurrencySchema],
+)
 @inject
 async def get_list_currencies(
-    currency_manager: CurrencyManager = Depends(
-        Provide[CurrencyContainer.currency_manager]
-    ),
+    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
 ):
     result = await currency_manager.get_currencies()
     return result
 
 
-@currency_router.get("/native-currency",
-                     response_model=CurrencySchema,
-                     )
+@currency_router.get(
+    "/native-currency",
+    response_model=CurrencySchema,
+)
 @inject
 async def get_native_currency(
-    currency_manager: CurrencyManager = Depends(
-        Provide[CurrencyContainer.currency_manager]
-    ),
+    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
 ):
     result = await currency_manager.get_native_currency()
     return result
-
 
 
 # @currency_router.post("/")

@@ -3,6 +3,7 @@ import pathlib
 from uuid import uuid4
 
 from dotenv import load_dotenv
+
 # from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseSettings
 
@@ -73,4 +74,3 @@ hd_wallet_info = get_wallet_info_by_mnemonic(
     config.WORKCHAIN,
     is_testnet=config.IS_TESTNET,
 )
-

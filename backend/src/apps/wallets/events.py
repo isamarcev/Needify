@@ -2,7 +2,6 @@ from src.core.enums import StrEnum
 
 
 class WalletTopicsEnum(StrEnum):
-
     FOUNDED_DEPOSIT_WALLET = "FOUNDED_DEPOSIT_WALLET"
 
     @classmethod

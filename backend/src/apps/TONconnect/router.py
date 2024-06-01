@@ -15,9 +15,7 @@ ton_connect = APIRouter()
 @inject
 async def get_last_masterchain_block(
     data: ConnectDepositSchema,
-    scanner_manager: TONConnectManager = Depends(
-        Provide[TONConnectContainer.ton_connect_manager]
-    ),
+    scanner_manager: TONConnectManager = Depends(Provide[TONConnectContainer.ton_connect_manager]),
 ):
     last_masterchain_block = await scanner_manager.test(data)
     return {"scan_last_block_masterchain": last_masterchain_block}

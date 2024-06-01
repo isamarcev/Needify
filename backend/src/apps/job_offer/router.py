@@ -3,15 +3,16 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from src.apps.tasks.dependencies import TaskContainer
-from src.apps.tasks.enums import JobOfferMessagesEnum
 from src.apps.tasks.manager import TaskManager
 from src.apps.tasks.schemas import (
-    PreCreateTaskSchema,
-    TaskSchema,
-    UpdateStatusTaskSchema,
-    UserHistoryResponseSchema, JobOfferMessageResponseSchema, JobOfferMessageSchema,
-    ChooseDoerSchema, CompleteJob, GetJob, ConfirmJob, RevokeJob,
+    ChooseDoerSchema,
+    CompleteJob,
+    ConfirmJob,
+    GetJob,
     JobOfferMessageDeployResponseSchema,
+    JobOfferMessageResponseSchema,
+    JobOfferMessageSchema,
+    RevokeJob,
 )
 from src.core.schemas import BaseErrorResponse
 
@@ -96,7 +97,7 @@ async def complete_job_offer_message(
     },
 )
 @inject
-async def complete_job_offer_message(
+async def confirm_job_offer_message(
     data: ConfirmJob,
     task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
 ):
@@ -113,7 +114,7 @@ async def complete_job_offer_message(
     },
 )
 @inject
-async def complete_job_offer_message(
+async def revoke_job_offer_message(
     data: RevokeJob,
     task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
 ):

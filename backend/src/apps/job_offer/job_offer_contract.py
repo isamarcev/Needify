@@ -2,7 +2,7 @@ import base64
 import json
 from datetime import datetime
 
-from tonsdk.boc import Cell, Builder
+from tonsdk.boc import Builder, Cell
 from tonsdk.contract import Contract
 from tonsdk.utils import Address, to_nano
 
@@ -25,9 +25,16 @@ def find_key_path_and_value(d, target_key, path=None):
 
 
 class JobOfferContract(Contract):
-
-    def __init__(self, task_id: int | str, title: str, description: str,
-                 price: int, jetton_master: str, native_master: str, **kwargs):
+    def __init__(
+        self,
+        task_id: int | str,
+        title: str,
+        description: str,
+        price: int,
+        jetton_master: str,
+        native_master: str,
+        **kwargs,
+    ):
         if isinstance(task_id, int):
             task_id = str(task_id)
         self.order = task_id
@@ -40,7 +47,7 @@ class JobOfferContract(Contract):
 
     @classmethod
     def collect_text_to_cell(cls, text: str) -> Cell:
-        encoded_text = text.encode('utf-8')
+        encoded_text = text.encode("utf-8")
         b = Builder()
         b.store_bytes(encoded_text[:127])
         if len(encoded_text) > 127:
@@ -52,8 +59,7 @@ class JobOfferContract(Contract):
         data_cell = self.create_data_cell()
         state_init = self.__create_state_init(code_cell, data_cell)
         state_init_hash = state_init.bytes_hash()
-        address = Address(
-            str(self.options["wc"]) + ":" + state_init_hash.hex())
+        address = Address(str(self.options["wc"]) + ":" + state_init_hash.hex())
         return {
             "code": code_cell,
             "data": data_cell,
@@ -80,11 +86,23 @@ class JobOfferContract(Contract):
 
     def __create_state_init(self, code, data, library=None, split_depth=None, ticktock=None):
         if library or split_depth or ticktock:
-            raise Exception(
-                "Library/SplitDepth/Ticktock in state init is not implemented")
+            raise Exception("Library/SplitDepth/Ticktock in state init is not implemented")
         state_init = Cell()
-        settings = bytes(''.join(['1' if i else '0' for i in [bool(split_depth), bool(
-            ticktock), bool(code), bool(data), bool(library)]]), 'utf-8')
+        settings = bytes(
+            "".join(
+                [
+                    "1" if i else "0"
+                    for i in [
+                        bool(split_depth),
+                        bool(ticktock),
+                        bool(code),
+                        bool(data),
+                        bool(library),
+                    ]
+                ]
+            ),
+            "utf-8",
+        )
         state_init.bits.write_bit_array(settings)
         if code:
             state_init.refs.append(code)
@@ -104,7 +122,9 @@ class JobOfferContract(Contract):
     def get_deploy_message(self):
         state_init = self.create_state_init()
         data = {
-            "jetton_master_address": self.address.to_string(is_user_friendly=False, is_test_only=True, is_bounceable=False),
+            "jetton_master_address": self.address.to_string(
+                is_user_friendly=False, is_test_only=True, is_bounceable=False
+            ),
             "amount": str(to_nano(0.5, "ton")),
             "payload": base64.urlsafe_b64encode(self.create_deploy_message().to_boc()).decode(),
             "stateInit": base64.urlsafe_b64encode(state_init["state_init"].to_boc()).decode(),
@@ -113,15 +133,15 @@ class JobOfferContract(Contract):
 
     @classmethod
     def get_system_cell(cls):
-        with open(BASE_DIR / 'contracts/tact_JobOffer.pkg', 'r') as file:
+        with open(BASE_DIR / "contracts/tact_JobOffer.pkg") as file:
             file_json = json.load(file)
-            __system = file_json.get('system')
-            path_to_key, value = find_key_path_and_value(file_json, 'system')
+            __system = file_json.get("system")
+            path_to_key, value = find_key_path_and_value(file_json, "system")
             system_code_value = base64.b64decode(value)
         return Cell.one_from_boc(system_code_value)
 
     @classmethod
     def get_code_cell(cls) -> str:
-        with open(BASE_DIR / 'contracts/tact_JobOffer.code.boc', 'rb') as file:
+        with open(BASE_DIR / "contracts/tact_JobOffer.code.boc", "rb") as file:
             code = Cell.one_from_boc(file.read())
         return code

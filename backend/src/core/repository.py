@@ -35,10 +35,7 @@ class BaseMongoRepository(BaseRepository):
         return self.mongo_client[self.collection_name]
 
     async def get_list(self, by_filter: dict | None = None):
-        if by_filter:
-            cursor = self.collection.find(by_filter)
-        else:
-            cursor = self.collection.find()
+        cursor = self.collection.find(by_filter) if by_filter else self.collection.find()
         return [obj_ async for obj_ in cursor]
 
     async def get_by_filter(self, by_filter: dict):
@@ -52,9 +49,7 @@ class BaseMongoRepository(BaseRepository):
         return await self.get(result.inserted_id)
 
     async def update(self, obj_id: str, data_to_update: dict):
-        result = await self.collection.update_one(
-            {"_id": obj_id}, {"$set": data_to_update}
-        )
+        result = await self.collection.update_one({"_id": obj_id}, {"$set": data_to_update})
         if result.modified_count == 0:
             return None
         return await self.get(obj_id)

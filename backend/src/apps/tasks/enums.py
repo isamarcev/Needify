@@ -2,7 +2,6 @@ from src.core.enums import StrEnum
 
 
 class TaskStatusEnum(StrEnum):
-
     PRE_CREATED = "PRE_CREATED"
     DEPLOYING = "DEPLOYING"
     PUBLISHED = "PUBLISHED"
@@ -52,10 +51,6 @@ class TaskStatusEnum(StrEnum):
     #         cls.WAIT_FOR_EXECUTOR.value: [cls.CANCELLED.value],
     #         cls.COMPLETED.value: [cls.CONFIRMED.value],
     #     }
-
-
-
-
 
 
 class JobOfferMessagesEnum(StrEnum):

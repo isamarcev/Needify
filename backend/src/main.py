@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 
-from dependency_injector.wiring import Provide, inject
+from dependency_injector.wiring import inject
 from fastapi import APIRouter, FastAPI
 
 from src.core.config import config
@@ -22,9 +22,8 @@ setup_logging()
 
 logger = logging.getLogger("root")
 fastapi_app = FastAPI(
-        **FASTAPI_CONFIG,
-    )
-
+    **FASTAPI_CONFIG,
+)
 
 
 async def setup_containers():
@@ -41,12 +40,11 @@ def app_factory():
     return fastapi_app
 
 
-
 @fastapi_app.on_event("startup")
 async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
-    ton_lib_client = core_container.ton_lib_client()
+    core_container.ton_lib_client()
     message_hub = core_container.message_hub()
     asyncio.create_task(message_hub.consume())
     openapi_data = fastapi_app.openapi()
@@ -56,6 +54,7 @@ async def startup_event():
 
     await setup_database(async_mongo)
 
+
 @fastapi_app.get("/")
 @inject
 async def root():
@@ -64,5 +63,6 @@ async def root():
     logger.error("Hello World")
 
     return {"message": "Hello World"}
+
 
 app = app_factory()

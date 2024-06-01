@@ -1,6 +1,6 @@
 import logging
 import random
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
@@ -18,25 +18,29 @@ from src.apps.tasks.schemas import (
 from src.apps.users.manager import UserManager
 from src.apps.utils.exceptions import JsonHTTPException
 from src.apps.wallets.manager import WalletManager
-from src.core.config import config
 from src.core.repository import BaseMongoRepository
-
 
 logger = logging.getLogger("root")
 
+
 class BaseTaskManager(ABC):
+    @abstractmethod
     async def get_tasks(self):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_task(self, task_id: str):
         raise NotImplementedError()
 
+    @abstractmethod
     async def create_task(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def update_task(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def delete_task(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -57,7 +61,9 @@ class TaskManager(BaseTaskManager):
         self.user_manager = user_manager
         self.publisher = None
 
-    async def get_tasks(self, category: str = None, status: TaskStatusEnum = TaskStatusEnum.PUBLISHED) -> list[TaskSchema]:
+    async def get_tasks(
+        self, category: str = None, status: TaskStatusEnum = TaskStatusEnum.PUBLISHED
+    ) -> list[TaskSchema]:
         if category and not await self.category_manager.get(category_title=category):
             raise CategoryNotFoundException()
         filter_ = {}
@@ -85,7 +91,7 @@ class TaskManager(BaseTaskManager):
                 error_name="BAD_REQUEST",
             )
         await self.category_manager.get(data_to_create.category)
-        currency = await self.currency_manager.get(data_to_create.currency)
+        await self.currency_manager.get(data_to_create.currency)
         # is_enough_balance = await self.wallet_manager.is_enough_jettons_to_transfer(
         #     currency, data_to_create.poster_address, data_to_create.price
         # )
@@ -115,18 +121,14 @@ class TaskManager(BaseTaskManager):
         created_task = await self.repository.create(task_for_creating.dict())
         return TaskSchema(**created_task)
 
-    async def update_task(
-        self, task_id: int, data_to_update: dict
-    ) -> TaskSchema | None:
+    async def update_task(self, task_id: int, data_to_update: dict) -> TaskSchema | None:
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
         result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None
 
-    async def update_task_status(
-        self, task_id: int, data_to_update: UpdateStatusTaskSchema
-    ):
+    async def update_task_status(self, task_id: int, data_to_update: UpdateStatusTaskSchema):
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
@@ -138,7 +140,7 @@ class TaskManager(BaseTaskManager):
             if is_broken:
                 raise ValueError("Rule is broken")
         except ValueError as e:
-            raise TaskValidationJsonException(str(e))
+            raise TaskValidationJsonException(str(e)) from e
 
         updated_task: TaskSchema = await self.update_task(
             task_id, {"status": data_to_update.status}

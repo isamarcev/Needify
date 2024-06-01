@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from datetime import datetime
 
 from pymongo import ASCENDING, IndexModel
@@ -6,28 +6,38 @@ from pymongo.errors import DuplicateKeyError
 
 from src.apps.users.database import BaseUserDatabase
 from src.apps.users.events import UserEventsEnum
-from src.apps.users.schemas import CreateUserSchema, UpdateUserSchema, UserSchema, \
-    UserWeb3WalletSchema
+from src.apps.users.schemas import (
+    CreateUserSchema,
+    UpdateUserSchema,
+    UserSchema,
+    UserWeb3WalletSchema,
+)
 from src.apps.utils.exceptions import JsonHTTPException
 from src.core.producer import KafkaProducer
 
 
 class BaseUserManager(ABC):
+    @abstractmethod
     async def create_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user_by_telegram_id(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user_by_username(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def update_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def delete_user(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -56,7 +66,9 @@ class UserManager(BaseUserManager):
         await self.producer.publish_message(UserEventsEnum.USER_CREATED, result)
         return UserSchema(**result)
 
-    async def add_wallet(self, telegram_id: int, web3_wallet_data: UserWeb3WalletSchema) -> UserSchema:
+    async def add_wallet(
+        self, telegram_id: int, web3_wallet_data: UserWeb3WalletSchema
+    ) -> UserSchema:
         user = await self.get_user_by_telegram_id(telegram_id)
         if not user:
             raise JsonHTTPException(
@@ -75,9 +87,7 @@ class UserManager(BaseUserManager):
         result = await self.repository.update_user(user.telegram_id, dict_to_update)
         return UserSchema(**result)
 
-    async def get_user(
-        self, user_id: str, raise_if_none: bool = True
-    ) -> UserSchema | None:
+    async def get_user(self, user_id: str, raise_if_none: bool = True) -> UserSchema | None:
         user = await self.repository.get_user(user_id)
         if not user and raise_if_none:
             raise JsonHTTPException(

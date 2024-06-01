@@ -6,8 +6,9 @@ from tonsdk.utils import Address, to_nano
 from src.core.config import config
 
 
-def create_state_init_jetton(minter_class: Type[JettonMinter] = JettonMinter, wallet_class: Type[JettonWallet] = JettonWallet):
-
+def create_state_init_jetton(
+    minter_class: Type[JettonMinter] = JettonMinter, wallet_class: Type[JettonWallet] = JettonWallet
+):
     minter = minter_class(
         admin_address=Address(config.HD_WALLET_ADDRESS),
         jetton_content_uri=config.NATIVE_JETTON_CONTENT_URL,
@@ -17,7 +18,12 @@ def create_state_init_jetton(minter_class: Type[JettonMinter] = JettonMinter, wa
     return minter.create_state_init()["state_init"], minter.address.to_string()
 
 
-def increase_supply(amount_to_supply: int, destination: str = None, minter_class: Type[JettonMinter] = JettonMinter, wallet_class: Type[JettonWallet] = JettonWallet):
+def increase_supply(
+    amount_to_supply: int,
+    destination: str = None,
+    minter_class: Type[JettonMinter] = JettonMinter,
+    wallet_class: Type[JettonWallet] = JettonWallet,
+):
     minter = minter_class(
         admin_address=Address(config.HD_WALLET_ADDRESS),
         jetton_content_uri=config.NATIVE_JETTON_CONTENT_URL,

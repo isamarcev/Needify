@@ -1,3 +1,4 @@
+# noqa
 import asyncio
 from datetime import datetime
 from pprint import pprint
@@ -6,13 +7,13 @@ from types import coroutine
 from dotenv import load_dotenv
 
 load_dotenv()
-from pytoniq.liteclient import LiteClient
-from pytoniq_core import Transaction
+from pytoniq.liteclient import LiteClient  # noqa
+from pytoniq_core import Transaction  # noqa
 from pytoniq_core.boc.deserialize import Boc  # noqa
-from pytoniq_core.tl import BlockIdExt
-from pytoniq_core.tlb.block import ExtBlkRef
+from pytoniq_core.tl import BlockIdExt  # noqa
+from pytoniq_core.tlb.block import ExtBlkRef  # noqa
 
-from src.core.provider import get_ton_lib_client
+from src.core.provider import get_ton_lib_client  # noqa
 
 
 async def log_transaction(ftx, identity: str):
@@ -49,7 +50,6 @@ class BlockScanner:
                 await log_transaction(ftx, identity=f"{wc}:{shard}:{seqno}")
 
     async def get_block_transactions(self, client, wc, shard, seqno):
-
         txs = await client.get_block_transactions(
             workchain=wc, shard=shard, seqno=seqno, count=1000
         )
@@ -78,9 +78,7 @@ class BlockScanner:
                 base_seqno = shard["seqno"]
                 print(f"Scanning {workchain=}:{base_shard=}:{base_seqno=}")
 
-                txs = await self.get_block_transactions(
-                    client, workchain, base_shard, base_seqno
-                )
+                txs = await self.get_block_transactions(client, workchain, base_shard, base_seqno)
                 # # print(txs)
                 for tx in txs:
                     full_tr = await client.get_transactions(
@@ -94,73 +92,6 @@ class BlockScanner:
                             ftx, identity=f"{workchain}:{base_shard}:{base_seqno}"
                         )
         # print(txs)
-
-        # txs = await self.get_block_transactions(client, -1, 8000000000000000, last_master_block["seqno"])
-
-    #     txs = await client.get_bl ock_transactions_ext(workchain=0, shard=6000000000000000, seqno=20370035, count=1000)
-    #     print(txs)
-    #     for tx in txs.get("transactions"):
-    #         print(tx)
-    #     return
-    #     result = await client.lookup_block(workchain=-1, shard=8000000000000000, seqno=mc_seqno)
-    #     # print(result)
-    #     shards = await client.get_shards(mc_seqno)
-    #     shards = shards.get("shards")
-    #     # print(shards, "SHARDS")
-    #     for shard in shards:
-    #         result = await client.get_block_transactions_ext(workchain=shard["workchain"], shard=shard["shard"], seqno=shard["seqno"], count=1024)
-    #         print(result, "RESULT")
-    #         txs = result.get("transactions")
-    #         if txs:
-    #             for tx in txs:
-    #                 print(tx)
-    #     return
-    # if not self.client.inited:
-    #     raise Exception('should init client first')
-    # master_blk_prev, _ = await self.client.lookup_block(wc=-1, shard=8000000000000000, seqno=mc_seqno)
-    # print(master_blk_prev, "master_blk_prev")
-    #
-    # shards_prev = await self.client.get_all_shards_info(master_blk_prev)
-    #
-    #
-    # account = await client.get_transactions(jetton_master_address="kQDY0mpjkDtRJ2NyBrUfgW7eZZvrr2aAbGSkQHorQ4FgAval", count=1)
-    # for tx in account:
-    #     print(tx)
-    # for shard in shards_prev:
-    #     # await self.block_handler(shard)
-    #     result = await client.raw_get_block_transactions(block=shard)
-    #     print(result, "RESULT")
-    #     if result:
-    #         for tx in result:
-    #             account = (tx.get("account"))
-    #             print(account.to_str(True, True, True, True))
-    #             pprint(tx)
-    # print(shards_prev, "shards_prev")
-    # return
-    # result = await self.client.get_masterchain_info_ext()
-    # shards = await client.get_all_shards_info(last_ms_block)
-    # print(result, "result")
-    # print(last_ms_block, "last_ms_block")
-    # return
-    # master_ = await client.get_masterchain_info()
-    # print(master_)
-    # blockMaster = await client.get_block(-1, shard=master_["last"]["shard"], seqno=master_['last']['seqno'], root_hash=master_['last']['root_hash'], file_hash=master_['last']['file_hash'])
-    # print(blockMaster, "blockMaster")
-    # block = await client.gesha
-    # pprint(master_)
-    # return
-    # master_blk, _ = await self.client.lookup_block(wc=-1, shard=8000000000000000, seqno=mc_seqno)
-    # print(master_blk, "master_blk")
-    # print(_, "_")
-    # # master_blk_prev, _ = await self.client.lookup_block(wc=-1, shard=-9223372036854775808, seqno=master_blk.seqno - 1)
-    # # shards_prev = await self.client.get_all_shards_info(master_blk_prev)
-    # # print(shards_prev, "shards_prev")
-    # shards = await self.client.get_all_shards_info(master_blk)
-    # master_blk_info = await self.block_handler(master_blk)
-    # print(master_blk_info, "master_blk_info")
-    # for shard in shards:
-    #     print("SHARD", shard)
-    #     await self.block_handler(shard)
 
     async def run(self, mc_seqno: int | None = None):
         if not self.client.inited:
@@ -215,9 +146,7 @@ class BlockScanner:
         if prev_ref.type_ == "prev_blk_info":  # only one prev block
             prev: ExtBlkRef = prev_ref.prev
             prev_shard = (
-                self.get_parent_shard(shard.shard)
-                if full_blk.info.after_split
-                else shard.shard
+                self.get_parent_shard(shard.shard) if full_blk.info.after_split else shard.shard
             )
             await self.get_not_seen_shards(
                 BlockIdExt(
@@ -303,7 +232,6 @@ client = LiteClient.from_testnet_config(ls_i=3, trust_level=2, timeout=20)
 
 
 async def main():
-
     await client.connect()
     await client.reconnect()
     await BlockScanner(client=client, block_handler=handle_block).one_more_manual_scan(

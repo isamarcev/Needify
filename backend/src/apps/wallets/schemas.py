@@ -16,4 +16,3 @@ class JettonTransferSchema(BaseModel):
 class Web3Wallet(BaseModel):
     owner_id: int
     address: str
-

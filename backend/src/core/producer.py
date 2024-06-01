@@ -9,6 +9,7 @@ from bson import ObjectId
 
 logger = logging.getLogger("root")
 
+
 class KafkaProducer:
     def __init__(self, producer_class: Type[AIOKafkaProducer], bootstrap_servers: list):
         self.producer_class = producer_class

@@ -1,5 +1,5 @@
 import asyncio
-from abc import ABC
+from abc import ABC, abstractmethod
 from pprint import pprint
 
 from pytonlib import TonlibClient
@@ -9,6 +9,7 @@ from src.core.producer import KafkaProducer
 
 
 class BaseScanner(ABC):
+    @abstractmethod
     def infinity_scanner_process(self, *args, **kwargs):
         pass
 
@@ -57,15 +58,12 @@ class ScannerManager(BaseScanner):
         )["transactions"]
 
     async def scan_last_block_masterchain(self):
-
         last_masterchain_block = await self.get_last_network_block()
         last_masterchain_seqno = last_masterchain_block["seqno"]
         last_masterchain_seqno = 18790203
         print(last_masterchain_block)
 
-        base_data = await self.lt_server_provider.get_shards(
-            master_seqno=last_masterchain_seqno
-        )
+        base_data = await self.lt_server_provider.get_shards(master_seqno=last_masterchain_seqno)
         print(base_data)
 
         shards = base_data["shards"]
@@ -83,7 +81,6 @@ class ScannerManager(BaseScanner):
             pprint(shard_transactions)
             write_to_file("shard_transactions", shard_transactions)
             for tr in shard_transactions:
-
                 full_tr = await self.lt_server_provider.get_transactions(
                     account=tr["account"],
                     from_transaction_lt=tr["lt"],
@@ -94,6 +91,5 @@ class ScannerManager(BaseScanner):
 
     async def infinity_scanner(self):
         while True:
-            # await self.producer.publish_message(WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET, {"test": "test"})
             await asyncio.sleep(5)
             print("TEST INFINITY SCANNER")

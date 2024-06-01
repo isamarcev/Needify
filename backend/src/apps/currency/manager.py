@@ -1,35 +1,39 @@
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from TonTools.Contracts.Jetton import Jetton
-from TonTools.Providers.LsClient import LsClient
-from TonTools.Providers.TonCenterClient import TonCenterClient
 from pytonlib import TonlibClient
-from tonsdk.contract.token.ft import JettonWallet
 from tonsdk.utils import to_nano
+from TonTools.Contracts.Jetton import Jetton
+from TonTools.Providers.TonCenterClient import TonCenterClient
 
-from src.apps.currency.custom_minter import jUSDTMinter, jUSDTWallet, jUSDT_content
+from src.apps.currency.custom_minter import jUSDT_content, jUSDTMinter, jUSDTWallet
 from src.apps.currency.exceptions import (
+    CurrencyAddressNotFoundJsonException,
     CurrencyNotFoundJsonException,
-    CurrencyValidationJsonException, CurrencyAddressNotFoundJsonException,
+    CurrencyValidationJsonException,
 )
 from src.apps.currency.mint_bodies import create_state_init_jetton, increase_supply
 from src.apps.currency.schemas import CreateCurrencySchema, CurrencySchema, MintTokenSchema
 from src.apps.utils.wallet import get_sdk_wallet_by_mnemonic, get_wallet_info_by_mnemonic
 from src.core.config import config
-from src.core.provider import get_liteserver_client, get_toncenter_client
 from src.core.repository import BaseMongoRepository
-
 
 logger = logging.getLogger("root")
 
 
 class BaseCurrencyManager(ABC):
-    pass
+    @abstractmethod
+    async def get_currencies(self) -> list[CurrencySchema]:
+        pass
 
 
 class CurrencyManager(BaseCurrencyManager):
-    def __init__(self, ton_lib_client: TonlibClient, repository: BaseMongoRepository, ton_center_client: TonCenterClient):
+    def __init__(
+        self,
+        ton_lib_client: TonlibClient,
+        repository: BaseMongoRepository,
+        ton_center_client: TonCenterClient,
+    ):
         self.ton_lib_client = ton_lib_client
         self.ton_center_client = ton_center_client
         self.repository = repository
@@ -37,24 +41,21 @@ class CurrencyManager(BaseCurrencyManager):
     async def get_currencies(self) -> list[CurrencySchema]:
         native_currency = await self.get_native_currency()
         # exclude native currency
-        currencies = await self.repository.get_list(by_filter={
-            "jetton_master_address": {"$ne": native_currency.jetton_master_address}
-        })
-        return [CurrencySchema(**currency) for currency in currencies if currency != native_currency]
+        currencies = await self.repository.get_list(
+            by_filter={"jetton_master_address": {"$ne": native_currency.jetton_master_address}}
+        )
+        return [
+            CurrencySchema(**currency) for currency in currencies if currency != native_currency
+        ]
 
-    async def get(
-        self, symbol: str, raise_if_not_exist: bool = True
-    ) -> CurrencySchema | None:
+    async def get(self, symbol: str, raise_if_not_exist: bool = True) -> CurrencySchema | None:
         currency = await self.repository.get_by_filter({"symbol": symbol})
         if not currency and raise_if_not_exist:
             raise CurrencyNotFoundJsonException(symbol)
         return CreateCurrencySchema(**currency) if currency else None
 
     async def get_jetton_master(self, jetton_master_address: str):
-        return Jetton(
-            data=jetton_master_address,
-            provider=self.ton_center_client
-        )
+        return Jetton(data=jetton_master_address, provider=self.ton_center_client)
 
     async def get_jetton_wallet(self, jetton_master_address: str, owner: str | None = None):
         if not owner:
@@ -76,12 +77,10 @@ class CurrencyManager(BaseCurrencyManager):
         # data_to_insert = jetton_master.to_dict() | {"is_active": True}
         # logger.info(f"Creating currency with data: {data_to_insert}")
         # currency = await self.repository.create(data_to_insert)
-        return CurrencySchema(**currency)
+        # return CurrencySchema(**currency)
 
     async def get_currency_by_address(self, address: str, raise_if_not_exist: bool = True):
-        currency = await self.repository.get_by_filter(
-            {"jetton_master_address": address}
-        )
+        currency = await self.repository.get_by_filter({"jetton_master_address": address})
         if not currency and raise_if_not_exist:
             raise CurrencyAddressNotFoundJsonException(address)
         return CurrencySchema(**currency)
@@ -106,7 +105,9 @@ class CurrencyManager(BaseCurrencyManager):
         return int(data["stack"][0][1], 16)
 
     async def deploy_jUSDT_minter(self):
-        state_init, jetton_address = create_state_init_jetton(minter_class=jUSDTMinter, wallet_class=jUSDTWallet)
+        state_init, jetton_address = create_state_init_jetton(
+            minter_class=jUSDTMinter, wallet_class=jUSDTWallet
+        )
         hd_wallet_info = get_wallet_info_by_mnemonic(
             config.hd_wallet_mnemonic_list,
             config.WORKCHAIN,
@@ -128,12 +129,20 @@ class CurrencyManager(BaseCurrencyManager):
         if jetton_master is None or not jetton_master.is_active:
             raise CurrencyAddressNotFoundJsonException(mint_data.jetton_master_address)
         if jetton_master.symbol == jUSDT_content.get("symbol"):
-            body = increase_supply(to_nano(mint_data.amount, "ton"), destination=mint_data.destination,
-                                   minter_class=jUSDTMinter, wallet_class=jUSDTWallet)
-            state_init, jetton_address = create_state_init_jetton(minter_class=jUSDTMinter, wallet_class=jUSDTWallet)
+            body = increase_supply(
+                to_nano(mint_data.amount, "ton"),
+                destination=mint_data.destination,
+                minter_class=jUSDTMinter,
+                wallet_class=jUSDTWallet,
+            )
+            state_init, jetton_address = create_state_init_jetton(
+                minter_class=jUSDTMinter, wallet_class=jUSDTWallet
+            )
         elif jetton_master.symbol == config.NATIVE_SYMBOL:
-                body = increase_supply(to_nano(mint_data.amount, "ton"), destination=mint_data.destination)
-                state_init, jetton_address = create_state_init_jetton()
+            body = increase_supply(
+                to_nano(mint_data.amount, "ton"), destination=mint_data.destination
+            )
+            state_init, jetton_address = create_state_init_jetton()
         else:
             raise CurrencyAddressNotFoundJsonException(mint_data.jetton_master_address)
         seqno = await self.get_seqno(config.HD_WALLET_ADDRESS)

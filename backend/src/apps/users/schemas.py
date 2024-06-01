@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
-
 from tonsdk.utils import Address, InvalidAddressError
 
 from src.core.config import config
@@ -14,9 +13,11 @@ class UserWeb3WalletSchema(BaseModel):
     def validate_address(cls, v):
         try:
             address = Address(v)
-            return address.to_string(is_user_friendly=True, is_url_safe=True, is_test_only=config.IS_TESTNET)
-        except InvalidAddressError:
-            raise ValueError("Invalid address")
+            return address.to_string(
+                is_user_friendly=True, is_url_safe=True, is_test_only=config.IS_TESTNET
+            )
+        except InvalidAddressError as e:
+            raise ValueError("Invalid address") from e
 
 
 class UserSchema(BaseModel):

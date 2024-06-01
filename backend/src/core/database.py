@@ -18,7 +18,9 @@ async def insert_default_currency():
         "jetton_master_address": config.JETTON_USDT_ADDRESS,
         "is_active": True,
     }
-    if not await async_mongo().currency.find_one({"jetton_master_address": USDT_CURRENCY["jetton_master_address"]}):
+    if not await async_mongo().currency.find_one(
+        {"jetton_master_address": USDT_CURRENCY["jetton_master_address"]}
+    ):
         await async_mongo().currency.insert_one(USDT_CURRENCY)
 
     # NATIVE CURRENCY
@@ -29,10 +31,13 @@ async def insert_default_currency():
         "jetton_master_address": config.NATIVE_MASTER_ADDRESS,
         "is_active": True,
     }
-    if not await async_mongo().currency.find_one({"jetton_master_address": NEED_CURRENCY["jetton_master_address"]}):
+    if not await async_mongo().currency.find_one(
+        {"jetton_master_address": NEED_CURRENCY["jetton_master_address"]}
+    ):
         await async_mongo().currency.insert_one(NEED_CURRENCY)
 
     # await async_mongo().currency.insert_one(USDT_CURRENCY)
+
 
 async def setup_database(mongo_db):
     telegram_id = IndexModel([("telegram_id", ASCENDING)], unique=True)

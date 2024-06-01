@@ -2,7 +2,6 @@ from src.core.enums import StrEnum
 
 
 class UserEventsEnum(StrEnum):
-
     USER_CREATED = "USER_CREATED"
 
     @classmethod

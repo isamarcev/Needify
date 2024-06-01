@@ -22,9 +22,7 @@ class TaskRepository:
         return await self.get(result.inserted_id)
 
     async def update(self, task_id: str, data_to_update: dict) -> dict | None:
-        result = await self.collection.update_one(
-            {"_id": task_id}, {"$set": data_to_update}
-        )
+        result = await self.collection.update_one({"_id": task_id}, {"$set": data_to_update})
         if result.modified_count == 0:
             return None
         return await self.get(task_id)

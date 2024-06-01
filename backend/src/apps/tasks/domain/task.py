@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from pytoniq import Contract
 
 @dataclass
 class Task:
-
     task_id: int
     title: str
     description: str
@@ -43,5 +41,5 @@ class Task:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "doer_id": self.doer_id,
-            "doer_address": self.doer_address
+            "doer_address": self.doer_address,
         }

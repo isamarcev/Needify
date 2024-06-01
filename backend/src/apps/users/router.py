@@ -4,8 +4,12 @@ from starlette import status
 
 from src.apps.users.dependencies import UserContainer
 from src.apps.users.manager import UserManager
-from src.apps.users.schemas import CreateUserSchema, UpdateUserSchema, UserSchema, \
-    UserWeb3WalletSchema
+from src.apps.users.schemas import (
+    CreateUserSchema,
+    UpdateUserSchema,
+    UserSchema,
+    UserWeb3WalletSchema,
+)
 from src.apps.utils.exceptions import JsonHTTPException
 
 user_router = APIRouter()

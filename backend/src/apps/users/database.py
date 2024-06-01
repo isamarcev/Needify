@@ -1,33 +1,40 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import IndexModel
 
 from src.apps.utils.database import ThreadMongoSingleton
 
 
 class BaseUserDatabase(ABC):
+    @abstractmethod
     async def get_users(self):
         raise NotImplementedError()
 
+    @abstractmethod
     async def insert_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user_by_telegram_id(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user_by_username(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def update_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def delete_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def setup_indexes(self, *args, **kwargs):
         raise NotImplementedError()
 

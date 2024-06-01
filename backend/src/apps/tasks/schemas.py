@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
 
-from src.apps.tasks.enums import TaskStatusEnum, JobOfferMessagesEnum
+from src.apps.tasks.enums import TaskStatusEnum
 
 
 class TaskTitle(str):

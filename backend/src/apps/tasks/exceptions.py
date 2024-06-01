@@ -1,5 +1,3 @@
-import logging
-
 from src.apps.utils.exceptions import JsonHTTPException
 
 

@@ -5,11 +5,7 @@ from starlette import status
 from src.apps.tasks.dependencies import TaskContainer
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.manager import TaskManager
-from src.apps.tasks.schemas import (
-    PreCreateTaskSchema,
-    TaskSchema,
-    UserHistoryResponseSchema
-)
+from src.apps.tasks.schemas import PreCreateTaskSchema, TaskSchema, UserHistoryResponseSchema
 from src.core.schemas import BaseErrorResponse
 
 task_router = APIRouter()
@@ -67,6 +63,7 @@ async def create_task(
     task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
 ):
     return await task_manager.create_task(data_to_create)
+
 
 #
 # @task_router.put(

@@ -31,9 +31,7 @@ async def test_create_user(user_container):
     # Assert that the correct error name and description are provided
     assert exc_info.value.status_code == 400
     assert exc_info.value.error_name == "DUPLICATE_KEY"
-    assert (
-        exc_info.value.error_description == "User with this telegram_id already exists"
-    )
+    assert exc_info.value.error_description == "User with this telegram_id already exists"
     users_after_error = await user_manager.get_users()
 
     assert len(users) + 1 == len(users_after)

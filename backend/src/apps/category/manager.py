@@ -7,11 +7,14 @@ from src.core.repository import BaseMongoRepository
 
 logger = logging.getLogger("root")
 
+
 class CategoryManager:
     def __init__(self, repository: BaseMongoRepository):
         self.repository = repository
 
-    async def get(self, category_title: str, raise_if_not_exist: bool = True) -> CategorySchema | None:
+    async def get(
+        self, category_title: str, raise_if_not_exist: bool = True
+    ) -> CategorySchema | None:
         category = await self.repository.get_by_filter({"title": category_title})
         logger.info(f"Category {category_title} found: {category}")
         if category is None and raise_if_not_exist is True:
@@ -19,9 +22,7 @@ class CategoryManager:
         return CategorySchema(**category) if category else None
 
     async def get_list(self) -> list[CategorySchema]:
-        return [
-            CategorySchema(**category) for category in await self.repository.get_list()
-        ]
+        return [CategorySchema(**category) for category in await self.repository.get_list()]
 
     async def create(self, category: CategorySchema) -> CategorySchema:
         if await self.get(category.title, raise_if_not_exist=False):

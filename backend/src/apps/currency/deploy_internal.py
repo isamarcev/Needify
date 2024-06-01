@@ -32,7 +32,6 @@ async def deploy_minter():
 
 
 async def mint_tokens():
-
     body = increase_supply(1000000000)
     client = await get_ton_lib_client()
     seqno = await get_seqno(client, config.HD_WALLET_ADDRESS)

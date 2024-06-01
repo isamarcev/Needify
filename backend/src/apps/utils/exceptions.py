@@ -20,9 +20,8 @@ class JsonHTTPException(Exception):
         self.error_meta = error_meta
         self.headers = headers or {}
 
-        if status_code == 401:
-            if self.headers.get("WWW-Authenticate") is None:
-                self.headers["WWW-Authenticate"] = "Bearer"
+        if status_code == 401 and self.headers.get("WWW-Authenticate") is None:
+            self.headers["WWW-Authenticate"] = "Bearer"
 
     def _render_response_body(self) -> dict:
         return {

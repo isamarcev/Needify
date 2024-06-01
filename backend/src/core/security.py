@@ -47,7 +47,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
         # token_data = TokenData(username=username)
     except jwt.exceptions.InvalidTokenError:
-        raise credentials_exception
+        raise credentials_exception  # noqa
     # user = await user_manager.get_user_by_username(username=token_data.username)
     user = None
     if user is None:

@@ -1,7 +1,6 @@
-from TonTools.Providers.TonCenterClient import TonCenterClient
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from dependency_injector import containers, providers
-from pytonlib import TonlibClient
+from TonTools.Providers.TonCenterClient import TonCenterClient
 
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
@@ -22,9 +21,7 @@ class CoreContainer(containers.DeclarativeContainer):
     config.from_pydantic(BaseConfig())
 
     ton_center_client = providers.Singleton(
-        TonCenterClient,
-        base_url=config.TON_CENTER_URL,
-        key=config.TON_CENTER_API_KEY
+        TonCenterClient, base_url=config.TON_CENTER_URL, key=config.TON_CENTER_API_KEY
     )
 
     ton_lib_client = providers.Singleton(
