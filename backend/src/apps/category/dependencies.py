@@ -2,7 +2,7 @@ from dependency_injector import containers, providers
 
 from src.apps.category.manager import CategoryManager
 from src.apps.utils.database import ThreadMongoSingleton
-from src.core.config import BaseConfig
+from src.core.config import BaseConfig, config
 from src.core.repository import BaseMongoRepository
 
 

@@ -2,22 +2,22 @@ from pydantic import BaseModel, PositiveInt
 
 
 class CurrencySchema(BaseModel):
-    name: str
-    symbol: str
-    decimals: PositiveInt
+    # supply: int
     jetton_master_address: str
+    decimals: int
+    symbol: str
+    name: str
+    # image: str
+    # token_supply: float
     is_active: bool
 
 
 class CreateCurrencySchema(BaseModel):
-    name: str
-    symbol: str
-    decimals: PositiveInt
     jetton_master_address: str
-    is_active: bool = True
 
 
 class MintTokenSchema(BaseModel):
+    jetton_master_address: str
     amount: PositiveInt
     destination: str
 

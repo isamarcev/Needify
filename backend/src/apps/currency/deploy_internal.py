@@ -4,7 +4,7 @@ from tonsdk.utils import to_nano
 
 from src.apps.utils.wallet import get_wallet_info_by_mnemonic
 from src.core.config import config
-from src.core.provider import get_lite_server_client
+from src.core.provider import get_ton_lib_client
 
 
 async def get_seqno(client: TonlibClient, address: str):
@@ -14,7 +14,7 @@ async def get_seqno(client: TonlibClient, address: str):
 
 async def deploy_minter():
     state_init, jetton_address = create_state_init_jetton()
-    client = await get_lite_server_client()
+    client = await get_ton_lib_client()
     hd_wallet_info = get_wallet_info_by_mnemonic(
         config.hd_wallet_mnemonic_list,
         config.WORKCHAIN,
@@ -34,7 +34,7 @@ async def deploy_minter():
 async def mint_tokens():
 
     body = increase_supply(1000000000)
-    client = await get_lite_server_client()
+    client = await get_ton_lib_client()
     seqno = await get_seqno(client, config.HD_WALLET_ADDRESS)
     hd_wallet_info = get_wallet_info_by_mnemonic(
         config.hd_wallet_mnemonic_list,

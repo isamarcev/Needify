@@ -1,8 +1,12 @@
+from TonTools.Contracts.Jetton import JettonWallet, Jetton
+from TonTools.Providers.LsClient import LsClient
+from pytoniq import LiteClient
 from tonsdk.crypto import mnemonic_to_hd_seed
 from tonsdk.crypto.hd import derive_mnemonics_path
 from TonTools.Contracts.Wallet import Wallet
 from TonTools.Providers.TonCenterClient import TonCenterClient
 
+from src.apps.currency.schemas import CurrencySchema
 from src.apps.wallets.events import WalletTopicsEnum
 from src.apps.wallets.exceptions import (
     DepositWalletNotFoundException,
@@ -23,6 +27,7 @@ class WalletManager:
         main_wallet_mnemonics: list[str],
         main_wallet_address: str,
         provider: TonCenterClient,
+        liteserver_client: LsClient,
         producer: KafkaProducer,
     ):
         self.repository = repository
@@ -40,6 +45,31 @@ class WalletManager:
             WalletTopicsEnum.FOUNDED_DEPOSIT_WALLET, {"test": "test"}
         )
 
+    def get_jetton_master(self, jetton_master_address: str):
+        return Jetton(
+            data=jetton_master_address,
+            provider=self.provider
+        )
+
+    async def get_wallet(self, address: str, mnemonics: list = None, version="v4r2") -> Wallet:
+        return Wallet(
+            provider=self.provider,
+            address=address,
+            mnemonics=mnemonics,
+            version=version,)
+
+    async def is_enough_jettons_to_transfer(self, currency: CurrencySchema, source_address: str, amount: float):
+        jetton_wallet = await self.get_jetton_wallet(currency.jetton_master_address, source_address)
+        balance = await jetton_wallet.get_balance()  # nanoTons
+        amount = amount * 10 ** currency.decimals
+        return balance >= amount
+
+    async def get_jetton_wallet(self, jetton_master_address: str, address: str) -> JettonWallet:
+        jetton_master = self.get_jetton_master(jetton_master_address)
+        jetton_wallet = await jetton_master.get_jetton_wallet(address)
+        return jetton_wallet
+
+
     async def insert_deposit_wallet(
         self, deposit_wallet: DepositWalletSchema
     ) -> DepositWalletSchema:
@@ -55,7 +85,7 @@ class WalletManager:
     async def get_deposit_wallet(
         self, address: str, raise_if_not_exist: bool = True
     ) -> DepositWalletSchema:
-        wallet = await self.repository.get_by_filter({"address": address})
+        wallet = await self.repository.get_by_filter({"jetton_master_address": address})
         if not wallet and raise_if_not_exist:
             raise DepositWalletNotFoundException(address)
         return DepositWalletSchema(**wallet) if wallet else None

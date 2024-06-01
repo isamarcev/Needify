@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from src.apps.tasks.dependencies import TaskContainer
+from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.manager import TaskManager
 from src.apps.tasks.schemas import (
     PreCreateTaskSchema,
     TaskSchema,
-    UpdateStatusTaskSchema,
-    UserHistoryResponseSchema,
+    UserHistoryResponseSchema
 )
 from src.core.schemas import BaseErrorResponse
 
@@ -27,9 +27,10 @@ task_router = APIRouter()
 @inject
 async def get_list_tasks(
     category: str | None = None,
+    status_: TaskStatusEnum | None = TaskStatusEnum.PUBLISHED,
     task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
 ):
-    tasks = await task_manager.get_tasks(category=category)
+    tasks = await task_manager.get_tasks(category=category, status=status_)
     return tasks
 
 
@@ -67,23 +68,23 @@ async def create_task(
 ):
     return await task_manager.create_task(data_to_create)
 
-
-@task_router.put(
-    "/{task_id}",
-    response_model=TaskSchema,
-    responses={
-        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        status.HTTP_200_OK: {"model": TaskSchema},
-    },
-)
-@inject
-async def update_task_status(
-    task_id: int,
-    data_to_update: UpdateStatusTaskSchema,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
-):
-    return await task_manager.update_task_status(task_id, data_to_update)
+#
+# @task_router.put(
+#     "/{task_id}",
+#     response_model=TaskSchema,
+#     responses={
+#         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+#         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+#         status.HTTP_200_OK: {"model": TaskSchema},
+#     },
+# )
+# @inject
+# async def update_task_status(
+#     task_id: int,
+#     data_to_update: UpdateStatusTaskSchema,
+#     task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+# ):
+#     return await task_manager.update_task_status(task_id, data_to_update)
 
 
 @task_router.get(

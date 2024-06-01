@@ -19,13 +19,13 @@ class ChangeStatusTaskRule(BusinessRule):
     action_by_user_id: int
 
     def is_broken(self) -> bool:
-        if (self.action_by_user_id != self.task_to_update.customer_id) and (
+        if (self.action_by_user_id != self.task_to_update.poster_id) and (
             self.action_by_user_id != self.task_to_update.doer_id
         ):
             raise ValueError("Only customer or doer can change task status")
 
         match self.action_by_user_id:
-            case self.task_to_update.customer_id:
+            case self.task_to_update.poster_id:
                 route_mapping = TaskStatusEnum.mapping_rules_to_update_by_customer()
                 if self.task_to_update.status.value not in route_mapping.keys():
                     raise ValueError("Customer cannot change task status")

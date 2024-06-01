@@ -6,7 +6,8 @@ from pymongo.errors import DuplicateKeyError
 
 from src.apps.users.database import BaseUserDatabase
 from src.apps.users.events import UserEventsEnum
-from src.apps.users.schemas import CreateUserSchema, UpdateUserSchema, UserSchema
+from src.apps.users.schemas import CreateUserSchema, UpdateUserSchema, UserSchema, \
+    UserWeb3WalletSchema
 from src.apps.utils.exceptions import JsonHTTPException
 from src.core.producer import KafkaProducer
 
@@ -53,6 +54,25 @@ class UserManager(BaseUserManager):
                 error_name="DUPLICATE_KEY",
             ) from e
         await self.producer.publish_message(UserEventsEnum.USER_CREATED, result)
+        return UserSchema(**result)
+
+    async def add_wallet(self, telegram_id: int, web3_wallet_data: UserWeb3WalletSchema) -> UserSchema:
+        user = await self.get_user_by_telegram_id(telegram_id)
+        if not user:
+            raise JsonHTTPException(
+                status_code=404,
+                error_description="User not found",
+                error_name="NOT_FOUND",
+            )
+        if user.web3_wallet:
+            raise JsonHTTPException(
+                status_code=400,
+                error_description="User already has a wallet",
+                error_name="BAD_REQUEST",
+            )
+        dict_to_update = {"web3_wallet": web3_wallet_data.dict()}
+        dict_to_update.update({"updated": datetime.now()})
+        result = await self.repository.update_user(user.telegram_id, dict_to_update)
         return UserSchema(**result)
 
     async def get_user(

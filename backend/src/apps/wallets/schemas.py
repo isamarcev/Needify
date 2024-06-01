@@ -11,3 +11,9 @@ class DepositWalletSchema(BaseModel):
 class JettonTransferSchema(BaseModel):
     destination_address: str
     amount: int
+
+
+class Web3Wallet(BaseModel):
+    owner_id: int
+    address: str
+

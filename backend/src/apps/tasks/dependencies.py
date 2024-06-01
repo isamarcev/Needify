@@ -5,7 +5,6 @@ from src.apps.utils.database import ThreadMongoSingleton
 from src.core.config import BaseConfig
 from src.core.repository import BaseMongoRepository
 
-
 class TaskContainer(containers.DeclarativeContainer):
     config: BaseConfig = providers.Configuration("config")
 
@@ -14,11 +13,11 @@ class TaskContainer(containers.DeclarativeContainer):
             "src.apps.tasks.router",
         ],
     )
+    category_manager = providers.Dependency()
+    wallet_manager = providers.Dependency()
+    currency_manager = providers.Dependency()
+    user_manager = providers.Dependency()
 
-    category_manager = providers.Provider()
-    wallet_manager = providers.Provider()
-
-    # async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
     async_mongo = providers.Factory(
         ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME
     )
@@ -32,4 +31,6 @@ class TaskContainer(containers.DeclarativeContainer):
         task_repository=task_database,
         category_manager=category_manager,
         wallet_manager=wallet_manager,
+        currency_manager=currency_manager,
+        user_manager=user_manager,
     )

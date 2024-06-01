@@ -1,13 +1,12 @@
+import logging
 import random
 from abc import ABC
 
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
+from src.apps.currency.manager import CurrencyManager
 from src.apps.tasks.enums import TaskStatusEnum
-from src.apps.tasks.exceptions import (
-    TaskNotFoundJsonException,
-    TaskValidationJsonException,
-)
+from src.apps.tasks.exceptions import TaskNotFoundJsonException, TaskValidationJsonException
 from src.apps.tasks.rules import ChangeStatusTaskRule
 from src.apps.tasks.schemas import (
     CreateTaskSchema,
@@ -16,9 +15,14 @@ from src.apps.tasks.schemas import (
     UpdateStatusTaskSchema,
     UserHistoryResponseSchema,
 )
+from src.apps.users.manager import UserManager
+from src.apps.utils.exceptions import JsonHTTPException
 from src.apps.wallets.manager import WalletManager
+from src.core.config import config
 from src.core.repository import BaseMongoRepository
 
+
+logger = logging.getLogger("root")
 
 class BaseTaskManager(ABC):
     async def get_tasks(self):
@@ -43,18 +47,23 @@ class TaskManager(BaseTaskManager):
         task_repository: BaseMongoRepository,
         category_manager: CategoryManager,
         wallet_manager: WalletManager,
+        currency_manager: CurrencyManager,
+        user_manager: UserManager,
     ):
         self.repository = task_repository
         self.category_manager = category_manager
         self.wallet_manager = wallet_manager
+        self.currency_manager = currency_manager
+        self.user_manager = user_manager
         self.publisher = None
 
-    async def get_tasks(self, category: str = None) -> list[TaskSchema]:
+    async def get_tasks(self, category: str = None, status: TaskStatusEnum = TaskStatusEnum.PUBLISHED) -> list[TaskSchema]:
         if category and not await self.category_manager.get(category_title=category):
             raise CategoryNotFoundException()
+        filter_ = {}
         if category:
-            return await self.repository.get_list({"category": category})
-        return await self.repository.get_list()
+            filter_["category"] = category
+        return await self.repository.get_list(by_filter=filter_)
 
     async def get_by_task_id(self, task_id: int) -> TaskSchema | None:
         result = await self.repository.get_by_filter({"task_id": task_id})
@@ -68,15 +77,40 @@ class TaskManager(BaseTaskManager):
         return random.randint(1000000, 1000000000)
 
     async def create_task(self, data_to_create: PreCreateTaskSchema) -> TaskSchema:
-        if not await self.category_manager.get(data_to_create.category):
-            raise CategoryNotFoundException()
+        poster = await self.user_manager.get_user_by_telegram_id(data_to_create.poster_id)
+        if not poster.web3_wallet:
+            raise JsonHTTPException(
+                status_code=400,
+                error_description="User has no wallet",
+                error_name="BAD_REQUEST",
+            )
+        await self.category_manager.get(data_to_create.category)
+        currency = await self.currency_manager.get(data_to_create.currency)
+        # is_enough_balance = await self.wallet_manager.is_enough_jettons_to_transfer(
+        #     currency, data_to_create.poster_address, data_to_create.price
+        # )
+        native_currency = await self.currency_manager.get_native_currency()
+        # is_enough_native_balance = await self.wallet_manager.is_enough_jettons_to_transfer(
+        #     native_currency, data_to_create.poster_address, data_to_create.price
+        # )
+        # if not is_enough_balance:
+        #     descr = (f"User {data_to_create.poster_id} has not enough balance "
+        #              f"{data_to_create.poster_address} for transfer "
+        #              f"{data_to_create.price} {currency.symbol}")
+        #     logger.debug(descr)
+        #     raise TaskValidationJsonException(descr)
+        # if not is_enough_native_balance:
+        #     descr = (f"User {data_to_create.poster_id} has not enough balance "
+        #              f"{data_to_create.poster_address} for transfer "
+        #              f"{data_to_create.price} {native_currency.symbol}")
+        #     logger.debug(descr)
+        #     raise TaskValidationJsonException(descr)
+
         data_to_insert = data_to_create.dict()
         task_id = self.task_id_generator()
-        deposit_wallet = await self.wallet_manager.create_deposit_wallet_for_task(
-            task_id=task_id
-        )
         data_to_insert["task_id"] = task_id
-        data_to_insert["task_deposit_address"] = deposit_wallet.address
+        data_to_insert["native_currency"] = native_currency.symbol
+        data_to_insert["poster_address"] = poster.web3_wallet.address
         task_for_creating = CreateTaskSchema(**data_to_insert)
         created_task = await self.repository.create(task_for_creating.dict())
         return TaskSchema(**created_task)
@@ -124,7 +158,7 @@ class TaskManager(BaseTaskManager):
     async def get_user_tasks(self, user_id: int) -> UserHistoryResponseSchema:
         published_tasks = await self.repository.get_list(
             {
-                "customer_id": user_id,
+                "poster_id": user_id,
                 # "status": {"$in": TaskStatusEnum.customer_active_statuses()}
             }
         )

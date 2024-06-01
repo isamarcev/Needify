@@ -1,5 +1,8 @@
+import contextvars
 import pathlib
+from uuid import uuid4
 
+from dotenv import load_dotenv
 # from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseSettings
 
@@ -11,9 +14,13 @@ PROJECT_DIR = BASE_DIR / "app"
 LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 
+CONTEXT_ID = contextvars.ContextVar("context_id", default=str(uuid4()))
+
+load_dotenv(BASE_DIR / ".env")
+
 
 class BaseConfig(BaseSettings):
-    BOT_TOKEN: str
+    # BOT_TOKEN: str
     REDIS_URL: str
     MONGO_DB_URL: str
     MONGO_DB_NAME: str
@@ -30,6 +37,11 @@ class BaseConfig(BaseSettings):
     TON_CENTER_API_KEY: str
 
     NATIVE_JETTON_ADDRESS: str
+
+    NATIVE_MASTER_ADDRESS: str
+    NATIVE_SYMBOL: str
+
+    JETTON_USDT_ADDRESS: str
 
     # KAFKA
     KAFKA_BOOTSTRAP_SERVERS: list[str]

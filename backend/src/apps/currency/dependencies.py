@@ -2,8 +2,8 @@ from dependency_injector import containers, providers
 
 from src.apps.currency.manager import CurrencyManager
 from src.apps.utils.database import ThreadMongoSingleton
-from src.core.config import BaseConfig
-from src.core.provider import get_lite_server_client
+from src.core.config import BaseConfig, config
+from src.core.provider import get_ton_lib_client, get_liteserver_client
 from src.core.repository import BaseMongoRepository
 
 
@@ -24,12 +24,15 @@ class CurrencyContainer(containers.DeclarativeContainer):
         BaseMongoRepository, mongo_client=async_mongo, collection_name="currency"
     )
 
-    lts_client = providers.Factory(
-        get_lite_server_client,
+    ton_center_client = providers.Dependency()
+    ton_lib_client = providers.Dependency()
+    liteserver_client = providers.Singleton(
+        get_liteserver_client,
     )
 
     currency_manager = providers.Factory(
         CurrencyManager,
-        lts_client=lts_client,
+        ton_lib_client=ton_lib_client,
+        ton_center_client=ton_center_client,
         repository=currency_database,
     )

@@ -12,7 +12,7 @@ from pytoniq_core.boc.deserialize import Boc  # noqa
 from pytoniq_core.tl import BlockIdExt
 from pytoniq_core.tlb.block import ExtBlkRef
 
-from src.core.provider import get_lite_server_client
+from src.core.provider import get_ton_lib_client
 
 
 async def log_transaction(ftx, identity: str):
@@ -36,7 +36,7 @@ class BlockScanner:
         self.blks_queue = asyncio.Queue()
 
     async def one_more_manual_scan(self, wc, shard, seqno):
-        client = await get_lite_server_client()
+        client = await get_ton_lib_client()
         txs = await self.get_block_transactions(client, wc, shard, seqno)
         # print(txs, "TXS")
         for tx in txs:
@@ -56,7 +56,7 @@ class BlockScanner:
         return txs["transactions"]
 
     async def manual_scan(self, mc_seqno: int | None = None):
-        client = await get_lite_server_client()
+        client = await get_ton_lib_client()
         last_master_seqno = 0
         while True:
             last_master_block = (await client.get_masterchain_info())["last"]
@@ -123,7 +123,7 @@ class BlockScanner:
     # shards_prev = await self.client.get_all_shards_info(master_blk_prev)
     #
     #
-    # account = await client.get_transactions(address="kQDY0mpjkDtRJ2NyBrUfgW7eZZvrr2aAbGSkQHorQ4FgAval", count=1)
+    # account = await client.get_transactions(jetton_master_address="kQDY0mpjkDtRJ2NyBrUfgW7eZZvrr2aAbGSkQHorQ4FgAval", count=1)
     # for tx in account:
     #     print(tx)
     # for shard in shards_prev:

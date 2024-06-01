@@ -11,9 +11,22 @@ class CurrencyValidationJsonException(JsonHTTPException):
 
 
 class CurrencyNotFoundJsonException(JsonHTTPException):
-    def __init__(self, symbol: str):
+    def __init__(self, symbol: str, description: str = None):
+        if not description:
+            description = f"Currency {symbol} not found"
         super().__init__(
             status_code=404,
             error_name="Not Found",
-            error_description=f"Currency {symbol} not found",
+            error_description=description,
+        )
+
+
+class CurrencyAddressNotFoundJsonException(JsonHTTPException):
+    def __init__(self, address: str, description: str = None):
+        if not description:
+            description = f"Currency with {address} not found"
+        super().__init__(
+            status_code=404,
+            error_name="Not Found",
+            error_description=description,
         )

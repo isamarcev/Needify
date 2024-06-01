@@ -5,9 +5,25 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from src.apps.users.database import MongoDBUserRepository
 from src.apps.users.manager import UserManager
 from src.apps.utils.database import ThreadMongoSingleton
-from src.core.config import BaseConfig
+from src.core.config import BaseConfig, config
 from src.core.producer import KafkaProducer
 
+
+def get_user_manager():
+    async_mongo = ThreadMongoSingleton(
+        config.MONGO_DB_URL, config.MONGO_DB_NAME
+    )
+    return UserManager(
+        user_repository=MongoDBUserRepository(
+            mongo_conn=async_mongo,
+            mongo_db=config.MONGO_DB_NAME,
+            collection_name="users",
+        ),
+        producer=KafkaProducer(
+            producer_class=AIOKafkaProducer,
+            bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
+        ),
+    )
 
 class UserContainer(containers.DeclarativeContainer):
     config: BaseConfig = providers.Configuration("config")

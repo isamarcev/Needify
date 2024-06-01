@@ -5,7 +5,7 @@ from src.apps.scanner.manager import ScannerManager
 from src.apps.utils.database import ThreadMongoSingleton
 from src.core.config import BaseConfig
 from src.core.producer import KafkaProducer
-from src.core.provider import get_lite_server_client
+from src.core.provider import get_ton_lib_client
 
 
 class ScannerContainer(containers.DeclarativeContainer):
@@ -28,7 +28,7 @@ class ScannerContainer(containers.DeclarativeContainer):
     )
 
     lts_client = providers.Singleton(
-        get_lite_server_client,
+        get_ton_lib_client,
     )
 
     scanner_manager = providers.Factory(

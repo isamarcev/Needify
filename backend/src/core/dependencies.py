@@ -1,5 +1,7 @@
+from TonTools.Providers.TonCenterClient import TonCenterClient
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from dependency_injector import containers, providers
+from pytonlib import TonlibClient
 
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
@@ -12,16 +14,21 @@ from src.apps.wallets.events import WalletTopicsEnum
 from src.core.config import BaseConfig
 from src.core.message_hub import MessageHub
 from src.core.producer import KafkaProducer
-from src.core.provider import get_lite_server_client
+from src.core.provider import get_ton_lib_client
 
 
 class CoreContainer(containers.DeclarativeContainer):
     config: BaseConfig = providers.Configuration("config")
     config.from_pydantic(BaseConfig())
 
-    task_container = providers.Container(
-        TaskContainer,
-        config=config,
+    ton_center_client = providers.Singleton(
+        TonCenterClient,
+        base_url=config.TON_CENTER_URL,
+        key=config.TON_CENTER_API_KEY
+    )
+
+    ton_lib_client = providers.Singleton(
+        get_ton_lib_client,
     )
 
     ton_connect_manager = providers.Container(
@@ -36,17 +43,25 @@ class CoreContainer(containers.DeclarativeContainer):
 
     currency_container = providers.Container(
         CurrencyContainer,
+        ton_center_client=ton_center_client,
+        ton_lib_client=ton_lib_client,
         config=config,
     )
-
+    wallet_container = providers.Container(
+        WalletContainer,
+        config=config,
+    )
     category_container = providers.Container(
         CategoryContainer,
         config=config,
     )
-
-    wallet_container = providers.Container(
-        WalletContainer,
+    task_container = providers.Container(
+        TaskContainer,
         config=config,
+        currency_manager=currency_container.currency_manager,
+        wallet_manager=wallet_container.wallet_manager,
+        user_manager=user_container.user_manager,
+        category_manager=category_container.category_manager,
     )
 
     kafka_consumer = providers.Singleton(
@@ -64,7 +79,7 @@ class CoreContainer(containers.DeclarativeContainer):
     )
 
     lts_client = providers.Factory(
-        get_lite_server_client,
+        get_ton_lib_client,
     )
 
     # scanner_manager = providers.Factory(
