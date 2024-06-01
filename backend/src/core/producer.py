@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 from enum import Enum
 from typing import Type
@@ -6,6 +7,7 @@ from typing import Type
 from aiokafka import AIOKafkaProducer
 from bson import ObjectId
 
+logger = logging.getLogger("root")
 
 class KafkaProducer:
     def __init__(self, producer_class: Type[AIOKafkaProducer], bootstrap_servers: list):
@@ -13,24 +15,19 @@ class KafkaProducer:
         self.bootstrap_servers = bootstrap_servers
         self.consumer = None
 
-    async def start(self):
-        producer = self.producer_class(bootstrap_servers=self.bootstrap_servers)
-        await producer.start()
-        return producer
-
-    async def stop(self, producer):
-        await producer.stop()
-
     async def publish_message(self, topic: str, message: str | list | dict):
-        producer = await self.start()
+        producer = self.producer_class(bootstrap_servers=self.bootstrap_servers)
         try:
+            await producer.start()
             message_bytes = self._prepare_message(message)
             # Produce message
             result = await producer.send(topic, message_bytes)
-            print("Message sent", result)
+            logger.info(f"Message {message} sent to topic {topic}")
             return result
+        except Exception as e:
+            logger.error(f"Error while sending message to topic {topic}: {e}")
         finally:
-            await self.stop(producer)
+            await producer.stop()
 
     def _prepare_message(self, message):
         def replace_uuids(obj):

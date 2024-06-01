@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, FastAPI
@@ -19,10 +20,20 @@ FASTAPI_CONFIG = {
 
 setup_logging()
 
-def app_factory():
-    fastapi_app = FastAPI(
+logger = logging.getLogger("root")
+fastapi_app = FastAPI(
         **FASTAPI_CONFIG,
     )
+
+
+
+async def setup_containers():
+    core_container = CoreContainer()
+    core_container.config.from_pydantic(settings=config)
+    fastapi_app.core_container = core_container
+
+
+def app_factory():
     main_router = APIRouter()
     main_router.include_router(v1_router)
     fastapi_app.include_router(main_router)
@@ -30,32 +41,28 @@ def app_factory():
     return fastapi_app
 
 
-async def setup_containers():
 
-    core_container = CoreContainer()
-    core_container.config.from_pydantic(settings=config)
-    app.core_container = core_container
-
-
-app = app_factory()
-
-
-@app.on_event("startup")
+@fastapi_app.on_event("startup")
 async def startup_event():
     await setup_containers()
-    core_container = app.core_container
+    core_container = fastapi_app.core_container
     ton_lib_client = core_container.ton_lib_client()
     message_hub = core_container.message_hub()
     asyncio.create_task(message_hub.consume())
-    openapi_data = app.openapi()
+    openapi_data = fastapi_app.openapi()
     # Change "openapi.json" to desired filename
     with open("openapi.json", "w") as file:
         json.dump(openapi_data, file)
 
     await setup_database(async_mongo)
 
-
-@app.get("/")
+@fastapi_app.get("/")
 @inject
 async def root():
+    logger.info("Hello World")
+    logger.warning("Hello World")
+    logger.error("Hello World")
+
     return {"message": "Hello World"}
+
+app = app_factory()

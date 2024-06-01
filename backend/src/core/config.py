@@ -74,4 +74,3 @@ hd_wallet_info = get_wallet_info_by_mnemonic(
     is_testnet=config.IS_TESTNET,
 )
 
-print(hd_wallet_info)

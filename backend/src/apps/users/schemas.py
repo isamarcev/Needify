@@ -26,9 +26,9 @@ class UserSchema(BaseModel):
     last_name: str | None
     username: str | None
     image: str | None
-    permissions: list[str] | None
+    # permissions: list[str] | None
     web3_wallet: UserWeb3WalletSchema | None
-    disabled: bool | None
+    # disabled: bool | None
     created: datetime
     updated: datetime | None
 
@@ -52,8 +52,8 @@ class CreateUserSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     image: str | None = None
-    permissions: list[str] | None = None
-    disabled: bool = False
+    # permissions: list[str] | None = None
+    # disabled: bool = False
 
 
 class UpdateUserSchema(BaseModel):

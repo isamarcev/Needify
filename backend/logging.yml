@@ -21,6 +21,12 @@ handlers:
     formatter: file
     filename: "{logdir}/debug.log"
     encoding: utf8
+  error:
+    class: logging.FileHandler
+    level: ERROR
+    formatter: file
+    filename: "{logdir}/error.log"
+    encoding: utf8
 
 loggers:
   root:
@@ -45,4 +51,13 @@ loggers:
   passlib:
     level: CRITICAL
 
+  gunicorn.error:
+    level: DEBUG
+    handlers: [ debug, error ]
+    propagate: no
+
+  gunicorn.access:
+    level: INFO
+    handlers: [ debug, error, console ]
+    propagate: yes
 
