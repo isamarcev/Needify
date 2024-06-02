@@ -1,36 +1,35 @@
 from datetime import datetime
-from pydantic_core import core_schema as cs
-from bson import ObjectId
+
 from pydantic import BaseModel, Field, validator
-from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler, TypeAdapter
-from pydantic.json_schema import JsonSchemaValue
+from tonsdk.utils import Address, InvalidAddressError
+
+from src.core.config import config
 
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+class UserWeb3WalletSchema(BaseModel):
+    address: str
 
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+    @validator("address", pre=True, always=True)
+    def validate_address(cls, v):
+        try:
+            address = Address(v)
+            return address.to_string(
+                is_user_friendly=True, is_url_safe=True, is_test_only=config.IS_TESTNET
+            )
+        except InvalidAddressError as e:
+            raise ValueError("Invalid address") from e
 
 
 class UserSchema(BaseModel):
-    id: str = Field(str, alias="_id")
+    id: str = Field(alias="_id")
     telegram_id: int
     first_name: str | None
     last_name: str | None
     username: str | None
     image: str | None
-    permissions: list[str] | None
-    disabled: bool | None
+    # permissions: list[str] | None
+    web3_wallet: UserWeb3WalletSchema | None
+    # disabled: bool | None
     created: datetime
     updated: datetime | None
 
@@ -54,8 +53,8 @@ class CreateUserSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     image: str | None = None
-    permissions: list[str] | None = None
-    disabled: bool = False
+    # permissions: list[str] | None = None
+    # disabled: bool = False
 
 
 class UpdateUserSchema(BaseModel):

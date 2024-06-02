@@ -1,0 +1,2 @@
+class JobOfferFactory:
+    pass

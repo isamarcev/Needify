@@ -1,37 +1,47 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import IndexModel
+
+from src.apps.utils.database import ThreadMongoSingleton
 
 
 class BaseUserDatabase(ABC):
-
-
+    @abstractmethod
     async def get_users(self):
         raise NotImplementedError()
 
+    @abstractmethod
     async def insert_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user_by_telegram_id(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def get_user_by_username(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def update_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
     async def delete_user(self, *args, **kwargs):
         raise NotImplementedError()
 
+    @abstractmethod
+    async def setup_indexes(self, *args, **kwargs):
+        raise NotImplementedError()
 
-class MongoDBUserDatabase(BaseUserDatabase):
 
-    def __init__(self, mongo_client: AsyncIOMotorClient, collection_name: str = "users"):
-        self.mongo_client = mongo_client
+class MongoDBUserRepository(BaseUserDatabase):
+    def __init__(self, mongo_conn: str, mongo_db: str, collection_name: str = "users"):
+        self.mongo_client = ThreadMongoSingleton(mongo_conn, mongo_db)
         self.collection_name = collection_name
 
     @property
@@ -56,7 +66,9 @@ class MongoDBUserDatabase(BaseUserDatabase):
         return await self.collection.find_one({"username": username})
 
     async def update_user(self, telegram_id: int, dict_to_update: dict) -> None:
-        result = await self.collection.update_one({"telegram_id": telegram_id}, {"$set": dict_to_update})
+        result = await self.collection.update_one(
+            {"telegram_id": telegram_id}, {"$set": dict_to_update}
+        )
         if result.modified_count == 0:
             return None
         else:
@@ -64,3 +76,6 @@ class MongoDBUserDatabase(BaseUserDatabase):
 
     async def delete_user(self, telegram_id: int) -> None:
         await self.collection.delete_one({"telegram_id": telegram_id})
+
+    async def setup_indexes(self, indexes: list[IndexModel]):
+        await self.collection.create_indexes(indexes)
