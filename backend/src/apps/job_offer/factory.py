@@ -9,6 +9,7 @@ class JobOfferFactory:
         task_schema: TaskSchema,
         native_currency: CurrencySchema,
         master_currency: CurrencySchema,
+        # provider: LiteClient,
     ):
         int_token_price = int(task_schema.price * 10**master_currency.decimals)
         job_offer = JobOfferContract(

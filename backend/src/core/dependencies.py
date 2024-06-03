@@ -77,6 +77,8 @@ class CoreContainer(containers.DeclarativeContainer):
         user_manager=user_container.user_manager,
         task_manager=task_container.task_manager,
         config=config,
+        lite_client=lite_client,
+        ton_lib_client=ton_lib_client,
     )
 
     kafka_consumer = providers.Singleton(

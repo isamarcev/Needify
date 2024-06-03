@@ -20,6 +20,9 @@ class JobOfferContainer(containers.DeclarativeContainer):
     user_manager = providers.Dependency()
     task_manager = providers.Dependency()
 
+    lite_client = providers.Dependency()
+    ton_lib_client = providers.Dependency()
+
     job_offer_factory = providers.Factory(JobOfferFactory)
 
     ton_connect_manager = providers.Singleton(
@@ -35,4 +38,6 @@ class JobOfferContainer(containers.DeclarativeContainer):
         task_manager=task_manager,
         job_offer_factory=job_offer_factory,
         ton_connect_manager=ton_connect_manager,
+        lite_client=lite_client,
+        ton_lib_client=ton_lib_client,
     )
