@@ -8,7 +8,7 @@ const minTonStorage: Int = ton("0.3");
 const minGasCunsumption: Int = ton("0.1");
 const simple_message_request: Int = ton("0.05");
 
-const PlatformAddress: Address = address("UQBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8Itwbjl1");
+const PlatformAddress: Address = address("0QCMXPXy0VYOSWtukH5UTP4QT4BojXMEbxWQPoFGJNogK-so");
 const jetton_transer_value: Int = ton("0.06");
 
 
@@ -263,7 +263,7 @@ contract JobOffer with Deployable, Ownable {
             to: PlatformAddress, // sending message back to the sender
             value: 1, 
             body: "Order was deployed. ".asComment(),
-            mode: SendPayGasSeparately
+            mode: SendPayGasSeparately | SendIgnoreErrors,
         });
     }
 
