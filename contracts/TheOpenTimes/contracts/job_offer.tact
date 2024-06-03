@@ -260,9 +260,8 @@ contract JobOffer with Deployable, Ownable {
         });
         send(SendParameters{
             to: sender(), // sending message back to the sender
-            value: 0,
+            value: remaining_value,
             body: self.order.asComment(),
-            mode: SendRemainingValue,
         });
     }
 
