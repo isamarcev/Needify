@@ -291,7 +291,8 @@ contract JobOffer with Deployable, Ownable {
         if (!self.tryPublish() && myBalance() > ton("0.1")) {
             send(SendParameters{
                 to: myAddress(), 
-                value: simple_message_request, 
+                value: 0, 
+                mode: SendPayGasSeparately,
                 body: CheckPublish{
                     query_id: 0
                 }.toCell(),
@@ -310,7 +311,8 @@ contract JobOffer with Deployable, Ownable {
         if (self.state == self.OfferPrePublished || self.state == self.OfferCreated) {
             send(SendParameters{
             to: myAddress(), 
-            value: simple_message_request, 
+            value: 0, 
+            mode: SendPayGasSeparately,
             body: CheckPublish{
                 query_id: 0
             }.toCell(),
