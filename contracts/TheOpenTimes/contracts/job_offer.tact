@@ -2,7 +2,6 @@ import "./messages";
 import "@stdlib/ownable";
 import "@stdlib/deploy";
 
-const forwardTonAmount: Int = 1;
 const notificationAmount: Int = 1;
 const minTonStorage: Int = ton("0.3");
 const minGasCunsumption: Int = ton("0.1");
@@ -260,10 +259,10 @@ contract JobOffer with Deployable, Ownable {
             }.toCell(),
         });
         send(SendParameters{
-            to: PlatformAddress, // sending message back to the sender
-            value: 1, 
-            body: "Order was deployed. ".asComment(),
-            mode: SendPayGasSeparately | SendIgnoreErrors,
+            to: sender(), // sending message back to the sender
+            value: 0,
+            body: self.order.asComment(),
+            mode: SendRemainingValue,
         });
     }
 
