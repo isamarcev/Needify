@@ -72,9 +72,7 @@ class PreCreateTaskSchema(BaseModel):
     images: List[str] = Field(..., description="Image in string format")
     price: PositiveFloat
     currency: str = Field(..., description="Currency symbol")
-
     poster_id: PositiveInt = Field(..., description="Customer telegram ID")
-    poster_address: str = Field(..., description="Customer wallet jetton_master_address")
     deadline: datetime
 
 
@@ -96,48 +94,8 @@ class UpdateStatusTaskSchema(BaseModel):
     action_by_user_id: int
 
 
-class JobOfferMessageSchema(BaseModel):
-    task_id: int
-    action_by_user: int
-
-
-class ChooseDoerSchema(JobOfferMessageSchema):
-    doer: str
-
-
-class CompleteJob(JobOfferMessageSchema):
-    pass
-
-
-class GetJob(JobOfferMessageSchema):
-    pass
-
-
-class ConfirmJob(JobOfferMessageSchema):
-    mark: int | None = None
-    review: str | None = None
-
-
-class RevokeJob(JobOfferMessageSchema):
-    pass
-
-
-class AppealJob(JobOfferMessageSchema):
-    pass
-
-
 class TONConnectMessageSchema(BaseModel):
-    address: str = Field(..., description="TON/JettonWallet/etc jetton_master_address")
+    address: str = Field(..., description="TON/JettonWallet/etc address")
     amount: str = Field(..., description="String amount in nanoTON")
     payload: str = Field(..., description="Base64 encoded string")
-
-
-class JobOfferMessageResponseSchema(BaseModel):
-    valid_until: int
-    messages: List[TONConnectMessageSchema]
-
-
-class JobOfferMessageDeployResponseSchema(BaseModel):
-    valid_until: int
-    messages: List[TONConnectMessageSchema]
-    stateInit: str
+    stateInit: str | None = None

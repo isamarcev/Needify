@@ -2,9 +2,9 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from src.apps.tasks.dependencies import TaskContainer
-from src.apps.tasks.manager import TaskManager
-from src.apps.tasks.schemas import (
+from src.apps.job_offer.dependencies import JobOfferContainer
+from src.apps.job_offer.manager import JobOfferManager
+from src.apps.job_offer.schemas import (
     ChooseDoerSchema,
     CompleteJob,
     ConfirmJob,
@@ -14,6 +14,8 @@ from src.apps.tasks.schemas import (
     JobOfferMessageSchema,
     RevokeJob,
 )
+from src.apps.tasks.dependencies import TaskContainer
+from src.apps.tasks.manager import TaskManager
 from src.core.schemas import BaseErrorResponse
 
 job_offer_router = APIRouter()
@@ -31,9 +33,9 @@ job_offer_router = APIRouter()
 @inject
 async def get_deploy_job_offer_message(
     data: JobOfferMessageSchema,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ):
-    return await task_manager.get_user_tasks(data)
+    return await job_offer_manager.create_deploy_message(data)
 
 
 @job_offer_router.post(

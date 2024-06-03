@@ -63,7 +63,7 @@ class JobOfferContract(Contract):
         return {
             "code": code_cell,
             "data": data_cell,
-            "jetton_master_address": address,
+            "address": address,
             "state_init": state_init,
         }
 
@@ -122,7 +122,7 @@ class JobOfferContract(Contract):
     def get_deploy_message(self):
         state_init = self.create_state_init()
         data = {
-            "jetton_master_address": self.address.to_string(
+            "address": self.address.to_string(
                 is_user_friendly=False, is_test_only=True, is_bounceable=False
             ),
             "amount": str(to_nano(0.5, "ton")),

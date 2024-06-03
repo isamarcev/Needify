@@ -56,6 +56,7 @@ async def get_task(
         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
         status.HTTP_200_OK: {"model": TaskSchema},
     },
+    description="Create task, currency == currency symbol",
 )
 @inject
 async def create_task(

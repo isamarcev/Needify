@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
 from src.apps.currency.manager import CurrencyManager
+from src.apps.currency.schemas import CurrencySchema
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.exceptions import TaskNotFoundJsonException, TaskValidationJsonException
 from src.apps.tasks.rules import ChangeStatusTaskRule
@@ -18,6 +19,7 @@ from src.apps.tasks.schemas import (
 from src.apps.users.manager import UserManager
 from src.apps.utils.exceptions import JsonHTTPException
 from src.apps.wallets.manager import WalletManager
+from src.core.config import config
 from src.core.repository import BaseMongoRepository
 
 logger = logging.getLogger("root")
@@ -75,12 +77,48 @@ class TaskManager(BaseTaskManager):
         result = await self.repository.get_by_filter({"task_id": task_id})
         return TaskSchema(**result) if result else None
 
-    async def get_task(self, obj_id: str):
-        return await self.repository.get(obj_id)
+    async def get_task(self, task_id: int, raise_if_not_found: bool = True) -> TaskSchema | None:
+        result = await self.repository.get_by_filter({"task_id": task_id})
+        if not result and raise_if_not_found:
+            raise TaskNotFoundJsonException(task_id)
+        return TaskSchema(**result) if result else None
+        # return await self.repository.get(obj_id)
 
     @staticmethod
     def task_id_generator():
         return random.randint(1000000, 1000000000)
+
+    async def check_poster_balance_for_deploy(
+        self,
+        poster_address: str,
+        task_price: float,
+        task_currency: CurrencySchema,
+        native_currency: CurrencySchema,
+    ):
+        task_price_with_decimal = int(task_price * 10**task_currency.decimals)
+        native_price_with_decimal = int(
+            config.NATIVE_CURRENCY_PRICE_TO_DEPLOY * 10**native_currency.decimals
+        )
+        # TODO NEED TO CHECK TON BALANCE
+        if not all(
+            [
+                await self.currency_manager.is_enough_balance(
+                    task_currency, poster_address, task_price_with_decimal
+                ),
+                await self.currency_manager.is_enough_balance(
+                    native_currency, poster_address, native_price_with_decimal
+                ),
+            ]
+        ):
+            raise TaskValidationJsonException(
+                f"User wallet {poster_address} has not "
+                f"enough balance for transfer {task_price} {task_currency.symbol}"
+            )
+        else:
+            logger.info(
+                f"User wallet {poster_address} has enough balance"
+                f" for transfer {task_price} {task_currency.symbol}"
+            )
 
     async def create_task(self, data_to_create: PreCreateTaskSchema) -> TaskSchema:
         poster = await self.user_manager.get_user_by_telegram_id(data_to_create.poster_id)
@@ -90,28 +128,17 @@ class TaskManager(BaseTaskManager):
                 error_description="User has no wallet",
                 error_name="BAD_REQUEST",
             )
-        await self.category_manager.get(data_to_create.category)
-        await self.currency_manager.get(data_to_create.currency)
-        # is_enough_balance = await self.wallet_manager.is_enough_jettons_to_transfer(
-        #     currency, data_to_create.poster_address, data_to_create.price
-        # )
+        # await self.category_manager.get(data_to_create.category)
         native_currency = await self.currency_manager.get_native_currency()
-        # is_enough_native_balance = await self.wallet_manager.is_enough_jettons_to_transfer(
-        #     native_currency, data_to_create.poster_address, data_to_create.price
-        # )
-        # if not is_enough_balance:
-        #     descr = (f"User {data_to_create.poster_id} has not enough balance "
-        #              f"{data_to_create.poster_address} for transfer "
-        #              f"{data_to_create.price} {currency.symbol}")
-        #     logger.debug(descr)
-        #     raise TaskValidationJsonException(descr)
-        # if not is_enough_native_balance:
-        #     descr = (f"User {data_to_create.poster_id} has not enough balance "
-        #              f"{data_to_create.poster_address} for transfer "
-        #              f"{data_to_create.price} {native_currency.symbol}")
-        #     logger.debug(descr)
-        #     raise TaskValidationJsonException(descr)
+        task_currency: CurrencySchema = await self.currency_manager.get(data_to_create.currency)
+        if not task_currency:
+            raise TaskValidationJsonException(f"Currency {data_to_create.currency} not found")
 
+        # Check poster balance
+        poster_web3_address = poster.web3_wallet.address
+        await self.check_poster_balance_for_deploy(
+            poster_web3_address, data_to_create.price, task_currency, native_currency
+        )
         data_to_insert = data_to_create.dict()
         task_id = self.task_id_generator()
         data_to_insert["task_id"] = task_id

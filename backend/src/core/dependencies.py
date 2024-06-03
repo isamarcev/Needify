@@ -4,6 +4,7 @@ from TonTools.Providers.TonCenterClient import TonCenterClient
 
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
+from src.apps.job_offer.dependencies import JobOfferContainer
 from src.apps.tasks.dependencies import TaskContainer
 from src.apps.TONconnect.dependencies import TONConnectContainer
 from src.apps.users.dependencies import UserContainer
@@ -13,7 +14,7 @@ from src.apps.wallets.events import WalletTopicsEnum
 from src.core.config import BaseConfig
 from src.core.message_hub import MessageHub
 from src.core.producer import KafkaProducer
-from src.core.provider import get_ton_lib_client
+from src.core.provider import get_lite_client, get_ton_lib_client
 
 
 class CoreContainer(containers.DeclarativeContainer):
@@ -44,9 +45,16 @@ class CoreContainer(containers.DeclarativeContainer):
         ton_lib_client=ton_lib_client,
         config=config,
     )
+
+    lite_client = providers.Singleton(
+        get_lite_client,
+        liteserver_index=2,
+    )
+
     wallet_container = providers.Container(
         WalletContainer,
         config=config,
+        lite_client=lite_client,
     )
     category_container = providers.Container(
         CategoryContainer,
@@ -59,6 +67,16 @@ class CoreContainer(containers.DeclarativeContainer):
         wallet_manager=wallet_container.wallet_manager,
         user_manager=user_container.user_manager,
         category_manager=category_container.category_manager,
+    )
+
+    job_offer_container = providers.Container(
+        JobOfferContainer,
+        category_manager=category_container.category_manager,
+        wallet_manager=wallet_container.wallet_manager,
+        currency_manager=currency_container.currency_manager,
+        user_manager=user_container.user_manager,
+        task_manager=task_container.task_manager,
+        config=config,
     )
 
     kafka_consumer = providers.Singleton(

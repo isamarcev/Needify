@@ -3,9 +3,7 @@ from fastapi import APIRouter, Depends
 
 from src.apps.currency.dependencies import CurrencyContainer
 from src.apps.currency.manager import CurrencyManager
-from src.apps.currency.schemas import (
-    CurrencySchema,
-)
+from src.apps.currency.schemas import CurrencySchema, MintTokenSchema
 
 currency_router = APIRouter()
 
@@ -24,16 +22,14 @@ currency_router = APIRouter()
 #     return result
 #
 #
-# @currency_router.post("/mint")
-# @inject
-# async def mint_(
-#     schema: MintTokenSchema,
-#     currency_manager: CurrencyManager = Depends(
-#         Provide[CurrencyContainer.currency_manager]
-#     ),
-# ):
-#     result = await currency_manager.mint_tokens(schema)
-#     return result
+@currency_router.post("/mint")
+@inject
+async def mint_(
+    schema: MintTokenSchema,
+    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+):
+    result = await currency_manager.mint_tokens(schema)
+    return result
 
 
 @currency_router.get(
