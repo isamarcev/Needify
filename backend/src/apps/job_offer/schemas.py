@@ -68,4 +68,3 @@ class JobOfferDataDTO(TypedDict):
     appeal_address: NotRequired[str]
     mark: NotRequired[int]
     review: NotRequired[str]
-

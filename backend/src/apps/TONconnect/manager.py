@@ -48,9 +48,7 @@ class TONConnectManager:
         raise ValueError("Connection failed")
         # return
 
-    async def test_connect_by_task(
-        self, task: TaskSchema, messages: TONConnectMessageResponse
-    ):
+    async def test_connect_by_task(self, task: TaskSchema, messages: TONConnectMessageResponse):
         wallet_name = "Tonkeeper"
         # wallet_name = "Wallet"
         connector = self.get_connector(task.poster_id)

@@ -9,7 +9,7 @@ from tonsdk.contract import Contract
 from tonsdk.utils import Address, b64str_to_bytes, to_nano
 
 from src.apps.job_offer.enums import JobOfferOperationCodes
-from src.apps.job_offer.schemas import MessageDTO, JobOfferDataDTO
+from src.apps.job_offer.schemas import JobOfferDataDTO, MessageDTO
 from src.apps.job_offer.utils import decode_b64
 from src.core.config import BASE_DIR, config
 
@@ -285,12 +285,6 @@ class JobOfferContract(Contract):
         title = title.decode().split("\x01")[-1]
         # Description
         first_part_description = decode_b64(description)
-        # another_part_description = (
-        #     (Cell.one_from_boc(b64str_to_bytes(description[1]["bytes"])).bits.get_top_upped_array())
-        #     .decode()
-        #     .split("\x01")[-1]
-        # )
-        # total_description = first_part_description + another_part_description
         # State
         state = int(state[1], 16)
         # Price

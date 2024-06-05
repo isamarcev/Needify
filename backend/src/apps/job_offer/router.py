@@ -11,10 +11,10 @@ from src.apps.job_offer.schemas import (
     CompleteJob,
     ConfirmJob,
     GetJob,
-    TONConnectMessageResponse,
     JobOfferMessageResponseSchema,
     JobOfferMessageSchema,
     RevokeJob,
+    TONConnectMessageResponse,
 )
 from src.apps.tasks.dependencies import TaskContainer
 from src.apps.tasks.manager import TaskManager
