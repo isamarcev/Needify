@@ -64,6 +64,7 @@ def get_jetton_transfer_message(
     transfer_fee: int,
     jettons_amount: int,
     response_address: str = None,
+    forward_amount: int = 1,
 ) -> dict:
     data = {
         "address": jetton_wallet_address,
@@ -76,7 +77,7 @@ def get_jetton_transfer_message(
             .store_address(recipient_address)  # destination address
             .store_address(response_address or recipient_address)  # address send excess to
             .store_uint(0, 1)  # custom payload
-            .store_coins(1)  # forward amount
+            .store_coins(forward_amount)  # forward amount
             .store_uint(0, 1)  # forward payload
             .end_cell()  # end cell
             .to_boc()  # convert it to boc

@@ -1,3 +1,5 @@
+from typing import Any
+
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 from starlette import status
@@ -9,7 +11,7 @@ from src.apps.job_offer.schemas import (
     CompleteJob,
     ConfirmJob,
     GetJob,
-    JobOfferMessageDeployResponseSchema,
+    TONConnectMessageResponse,
     JobOfferMessageResponseSchema,
     JobOfferMessageSchema,
     RevokeJob,
@@ -23,11 +25,11 @@ job_offer_router = APIRouter()
 
 @job_offer_router.post(
     "/message/deploy",
-    response_model=JobOfferMessageDeployResponseSchema,
+    response_model=TONConnectMessageResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        status.HTTP_200_OK: {"model": JobOfferMessageDeployResponseSchema},
+        status.HTTP_200_OK: {"model": TONConnectMessageResponse},
     },
 )
 @inject
@@ -50,14 +52,14 @@ async def get_deploy_job_offer_message(
 @inject
 async def get_job_offer_message(
     data: GetJob,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ):
-    return await task_manager.get_user_tasks(data)
+    return await job_offer_manager.create_get_job_message(data)
 
 
 @job_offer_router.post(
     "/message/choose-doer",
-    response_model=JobOfferMessageResponseSchema,
+    response_model=TONConnectMessageResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
@@ -67,9 +69,9 @@ async def get_job_offer_message(
 @inject
 async def choose_doer_job_offer_message(
     data: ChooseDoerSchema,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ):
-    return await task_manager.get_user_tasks(data)
+    return await job_offer_manager.create_choose_doer_message(data)
 
 
 @job_offer_router.post(
@@ -84,9 +86,9 @@ async def choose_doer_job_offer_message(
 @inject
 async def complete_job_offer_message(
     data: CompleteJob,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ):
-    return await task_manager.get_user_tasks(data)
+    return await job_offer_manager.create_complete_message(data)
 
 
 @job_offer_router.post(
@@ -101,9 +103,9 @@ async def complete_job_offer_message(
 @inject
 async def confirm_job_offer_message(
     data: ConfirmJob,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ):
-    return await task_manager.get_user_tasks(data)
+    return await job_offer_manager.create_confirm_message(data)
 
 
 @job_offer_router.post(
@@ -136,5 +138,5 @@ async def revoke_job_offer_message(
 async def get_job_offer_chain_state(
     data: JobOfferMessageSchema,
     job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
-) -> dict:
+) -> Any:
     return await job_offer_manager.get_job_offer_chain_state(data)

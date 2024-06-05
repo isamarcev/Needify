@@ -4,13 +4,13 @@ from src.apps.tasks.schemas import TaskSchema
 
 
 class JobOfferFactory:
-    async def create_job_offer(
-        self,
+    @classmethod
+    async def get_job_offer_contract(
+        cls,
         task_schema: TaskSchema,
         native_currency: CurrencySchema,
         master_currency: CurrencySchema,
-        # provider: LiteClient,
-    ):
+    ) -> JobOfferContract:
         int_token_price = int(task_schema.price * 10**master_currency.decimals)
         job_offer = JobOfferContract(
             task_id=task_schema.task_id,

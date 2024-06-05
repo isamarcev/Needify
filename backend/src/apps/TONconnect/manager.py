@@ -6,7 +6,7 @@ from pytonconnect import TonConnect
 from pytonconnect.exceptions import UserRejectsError
 from pytoniq_core import Address
 
-from src.apps.job_offer.schemas import JobOfferMessageDeployResponseSchema
+from src.apps.job_offer.schemas import TONConnectMessageResponse
 from src.apps.tasks.schemas import TaskSchema
 from src.apps.TONconnect.schemas import ConnectDepositSchema
 from src.apps.TONconnect.ts_storage import TcStorage
@@ -49,7 +49,7 @@ class TONConnectManager:
         # return
 
     async def test_connect_by_task(
-        self, task: TaskSchema, messages: JobOfferMessageDeployResponseSchema
+        self, task: TaskSchema, messages: TONConnectMessageResponse
     ):
         wallet_name = "Tonkeeper"
         # wallet_name = "Wallet"

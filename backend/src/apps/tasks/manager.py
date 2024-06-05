@@ -82,7 +82,6 @@ class TaskManager(BaseTaskManager):
         if not result and raise_if_not_found:
             raise TaskNotFoundJsonException(task_id)
         return TaskSchema(**result) if result else None
-        # return await self.repository.get(obj_id)
 
     @staticmethod
     def task_id_generator():

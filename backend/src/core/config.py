@@ -42,7 +42,11 @@ class BaseConfig(BaseSettings):
     NATIVE_CURRENCY_PRICE_TO_DEPLOY: float = 100
 
     TON_AMOUNT_TO_DEPLOY: float = 0.5
-    FORWARD_TON_TRANSFER_AMOUNT: float = 1
+    TON_TRANSFER_AMOUNT: float = 0.3
+    JETTON_TRANSFER_FORWARD_FEE: float = 0.2
+
+    # TIME
+    TON_CONNECT_VALID_TIME: int = 3600
 
     # KAFKA
     KAFKA_BOOTSTRAP_SERVERS: list[str]
