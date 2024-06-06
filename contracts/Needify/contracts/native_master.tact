@@ -104,7 +104,7 @@ contract NativeMaster with Deployable {
             body: TakeWalletAddress{
                 query_id: msg.query_id,
                 wallet_address: wallet,
-                owner_address: owner_address
+                owner_address: beginCell().storeBool(true).storeAddress(msg.owner_address).endCell().asSlice()
             }.toCell()
         });
     }

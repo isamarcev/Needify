@@ -9,15 +9,14 @@ import { buildOnchainMetadata } from "../utils/jetton-helpers";
 import { TokenMaster, storeMint } from '../build/TokenMaster/tact_TokenMaster';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { NativeMaster } from '../build/TokenMaster/tact_NativeMaster';
-import { NativeWallet } from '../build/TokenMaster/tact_NativeWallet';
+import { NativeWallet } from '../build/NativeMaster/tact_NativeWallet';
 
 import { TonClient, TonClient4, WalletContractV4 } from '@ton/ton';
-import { randomUUID } from 'crypto';
-import { log } from 'console';
-import { content, native_content } from './deployMaster';
+import { content } from './deployMaster';
+import { native_content } from './deployNativeMaster';
+
 import { TokenWallet } from '../build/TokenMaster/tact_TokenWallet';
 import { storeDeposit } from '../wrappers/NativeMaster';
-// import { NativeWallet } from '../wrappers/NativeWallet';
 
 const jetton_master_deployer = process.env.DEPLOYER_MNEMONIC || "";
 const jetton_master_deployer_mnem = jetton_master_deployer?.split(" ");
@@ -148,14 +147,6 @@ export async function run(provider: NetworkProvider) {
         forward_payload: beginCell().endCell()
     })).endCell()
 
-    let NativeDepositMsg = beginCell().store(storeDeposit({
-        $$type: "Deposit",
-        query_id: 1n,
-        amount: PublicCost,
-        destination: JOInitAddress,
-        response_destination: poster_wallet_contract.address,
-        forward_ton_amount: toNano(0.2),
-    })).endCell()
     let NativeTransferMsg = beginCell().store(storeTransfer({
         $$type: "Transfer",
         query_id: 1n,
@@ -167,45 +158,49 @@ export async function run(provider: NetworkProvider) {
         forward_payload: beginCell().endCell()
     })).endCell()
     let seqno = await poster_wallet_contract.getSeqno();
-    // await poster_wallet_contract.sendTransfer({
-    //     seqno,
-    //     secretKey: secretKeyPoster,
-    //     messages: [
-    //         internal({
-    //             to: JOInitAddress,
-    //             value: deployAmount * 2n,
-    //             bounce: false,
-    //             init: {
-    //                 code: JOInit.code,
-    //                 data: JOInit.data,
-    //             },
-    //             body: deploy_msg,
-    //         }),
-    //         internal({
-    //             to: poster_native_wallet.address,
-    //             value: deployAmount * 2n,
-    //             bounce: false,
-    //             // init: {
-    //             //     code: JOJN.init?.code,
-    //             //     data: JOJN.init?.data,
-    //             // },
-    //             body: NativeTransferMsg,
-    //         }),
-    //         internal({
-    //             to: poster_jetton_wallet.address,
-    //             value: deployAmount * 2n,
-    //             bounce: false,
-    //             // init: {
-    //             //     code: JOJW.init?.code,
-    //             //     data: JOJW.init?.data,
-    //             // },
-    //             body: TokenTransferMsg,
-    //         }),
-    //     ],})
+    await poster_wallet_contract.sendTransfer({
+        seqno,
+        secretKey: secretKeyPoster,
+        messages: [
+            internal({
+                to: JOInitAddress,
+                value: deployAmount * 2n,
+                bounce: false,
+                init: {
+                    code: JOInit.code,
+                    data: JOInit.data,
+                },
+                body: deploy_msg,
+            }),
+            internal({
+                to: poster_native_wallet.address,
+                value: deployAmount * 2n,
+                bounce: false,
+                // init: {
+                //     code: JOJN.init?.code,
+                //     data: JOJN.init?.data,
+                // },
+                body: NativeTransferMsg,
+            }),
+            internal({
+                to: poster_jetton_wallet.address,
+                value: deployAmount * 2n,
+                bounce: false,
+                // init: {
+                //     code: JOJW.init?.code,
+                //     data: JOJW.init?.data,
+                // },
+                body: TokenTransferMsg,
+            }),
+        ],})
 
 
-    let JOstate = await job_offer.getJobData()
-    log("Job offer state: ", JOstate)
+    // let JOstate = await job_offer.getJobData()
+    // log("Job offer state: ", JOstate)
+
+
+
+
 
     // // Revoke 
     // let msg_revoke = beginCell().store(storeRevoke({

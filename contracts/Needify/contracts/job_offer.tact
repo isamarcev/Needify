@@ -2,13 +2,12 @@ import "./messages";
 import "@stdlib/ownable";
 import "@stdlib/deploy";
 
-const forwardTonAmount: Int = 1;
 const notificationAmount: Int = 1;
 const minTonStorage: Int = ton("0.3");
 const minGasCunsumption: Int = ton("0.1");
 const simple_message_request: Int = ton("0.05");
 
-const PlatformAddress: Address = address("UQBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8Itwbjl1");
+const PlatformAddress: Address = address("0QCMXPXy0VYOSWtukH5UTP4QT4BojXMEbxWQPoFGJNogK-so");
 const jetton_transer_value: Int = ton("0.06");
 
 
@@ -260,10 +259,9 @@ contract JobOffer with Deployable, Ownable {
             }.toCell(),
         });
         send(SendParameters{
-            to: PlatformAddress, // sending message back to the sender
-            value: 1, 
-            body: "Order was deployed. ".asComment(),
-            mode: SendPayGasSeparately
+            to: sender(), // sending message back to the sender
+            value: remaining_value,
+            body: self.order.asComment(),
         });
     }
 
@@ -293,7 +291,8 @@ contract JobOffer with Deployable, Ownable {
         if (!self.tryPublish() && myBalance() > ton("0.1")) {
             send(SendParameters{
                 to: myAddress(), 
-                value: simple_message_request, 
+                value: 0, 
+                mode: SendPayGasSeparately,
                 body: CheckPublish{
                     query_id: 0
                 }.toCell(),
@@ -312,7 +311,8 @@ contract JobOffer with Deployable, Ownable {
         if (self.state == self.OfferPrePublished || self.state == self.OfferCreated) {
             send(SendParameters{
             to: myAddress(), 
-            value: simple_message_request, 
+            value: 0, 
+            mode: SendPayGasSeparately,
             body: CheckPublish{
                 query_id: 0
             }.toCell(),

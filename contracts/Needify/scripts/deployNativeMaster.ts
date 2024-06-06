@@ -1,11 +1,9 @@
 import dotenv from 'dotenv'; 
 dotenv.config()
-import { Address, internal, fromNano, beginCell, toNano } from '@ton/core';
-import { TokenMaster, storeDeploy, storeMint } from '../build/TokenMaster/tact_TokenMaster';
-
+import { beginCell, fromNano, internal, toNano } from '@ton/core';
+import { NativeMaster, storeMint } from '../wrappers/NativeMaster';
 import { NetworkProvider } from '@ton/blueprint';
 import { buildOnchainMetadata } from "../utils/jetton-helpers";
-
 
 
 import { mnemonicToPrivateKey } from "ton-crypto";
@@ -13,28 +11,21 @@ import { WalletContractV4 } from '@ton/ton';
 import { storeTransfer } from '../wrappers/JobOffer';
 import { log } from 'console';
 
-const jettonParams = {
-    name: "TRUE",
-    description: "This is True description",
-    symbol: "TRUE",
-    image: "https://play-lh.googleusercontent.com/ahJtMe0vfOlAu1XJVQ6rcaGrQBgtrEZQefHy7SXB7jpijKhu1Kkox90XDuH8RmcBOXNn",
-};
-export let content = buildOnchainMetadata(jettonParams);
-
 const NativejettonParams = {
-    name: "The Open Needs",
-    description: "This is True description",
+    name: "Needify",
+    description: "NEED is a token for the Needify platform. It is used to pay for services and goods on the platform.",
     symbol: "NEED",
-    image: "https://play-lh.googleusercontent.com/ahJtMe0vfOlAu1XJVQ6rcaGrQBgtrEZQefHy7SXB7jpijKhu1Kkox90XDuH8RmcBOXNn",
+    image: "https://i.ibb.co/Bf38Vcp/Needify-logo.png",
 };
-export let native_content = buildOnchainMetadata(NativejettonParams);
+const native_decimals = 9n;
 
+function toTokenNano(value: bigint) {
+    return value * 10n ** native_decimals;
+}
+
+export let native_content = buildOnchainMetadata(NativejettonParams);
 const deploy_mnemonics_array = process.env.DEPLOYER_MNEMONIC || "";
 const mnemonic = deploy_mnemonics_array?.split(" ");
-
-const poster_mnemonics_array = process.env.POSTER_MNEMONIC || "";
-const poster_mnemonic = poster_mnemonics_array?.split(" ");
-
 export async function run(provider: NetworkProvider) {
     let client = provider
     
@@ -46,32 +37,19 @@ export async function run(provider: NetworkProvider) {
         publicKey: DeloyerkeyPair.publicKey,
     });
     let wallet_contract = client.open(deployer_wallet);
-    const master = client.open(await TokenMaster.fromInit(
-        deployer_wallet.address, content
+    const master = client.open(await NativeMaster.fromInit(
+        deployer_wallet.address, native_content
     ))
-
+    
     let seqno: number = await wallet_contract.getSeqno();
     let balance: bigint = await wallet_contract.getBalance();
     // ========================================
     console.log("Current deployment wallet balance: ", fromNano(balance).toString(), "💎TON");
     console.log("\n🛠️ Calling To JettonWallet:\n" + master.address + "\n");
 
-    let transferMessagePkg = beginCell().store(
-        storeTransfer({
-            $$type: "Transfer",
-            query_id: 1n,
-            amount: toNano(199),
-            destination: deployer_wallet.address,
-            response_destination: deployer_wallet.address,
-            custom_payload: beginCell().endCell(),
-            forward_ton_amount: toNano(0.4),
-            forward_payload: beginCell().endCell(),
-        })
-        )
-        .endCell()
     let ming_message = beginCell().store(
         storeMint({
-            amount: toNano(1000),
+            amount: toTokenNano(100_000n),
             receiver: deployer_wallet.address,
             $$type: "Mint"
         })
@@ -88,7 +66,8 @@ export async function run(provider: NetworkProvider) {
                 data: master.init?.data,
                 code: master.init?.code
             }
-        })],
+        }),
+        ],
         
     });
 
