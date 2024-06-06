@@ -7,7 +7,10 @@ from src.core.config import config
 
 
 def create_state_init_jetton(
-    minter_class: Type[JettonMinter] = JettonMinter, wallet_class: Type[JettonWallet] = JettonWallet
+    minter_class: Type[JettonMinter] = JettonMinter,
+    wallet_class: Type[JettonWallet] = JettonWallet,
+    admin_address: str = config.HD_WALLET_ADDRESS,
+    jetton_content_uri: str = config.NATIVE_JETTON_CONTENT_URL,
 ):
     minter = minter_class(
         admin_address=Address(config.HD_WALLET_ADDRESS),

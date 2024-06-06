@@ -4,6 +4,7 @@ import logging
 
 from dependency_injector.wiring import inject
 from fastapi import APIRouter, FastAPI
+from pytoniq import LiteClient
 
 from src.core.config import config
 from src.core.database import async_mongo, setup_database
@@ -45,6 +46,10 @@ async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
     core_container.ton_lib_client()
+
+    lite_client: LiteClient = core_container.lite_client()
+    await lite_client.connect()
+
     message_hub = core_container.message_hub()
     asyncio.create_task(message_hub.consume())
     openapi_data = fastapi_app.openapi()
@@ -53,6 +58,13 @@ async def startup_event():
         json.dump(openapi_data, file)
 
     await setup_database(async_mongo)
+
+
+@fastapi_app.on_event("shutdown")
+async def shutdown_event():
+    core_container = fastapi_app.core_container
+    lite_client: LiteClient = core_container.lite_client()
+    await lite_client.close()
 
 
 @fastapi_app.get("/")

@@ -2,6 +2,7 @@ from base64 import urlsafe_b64encode
 
 from pytoniq_core import begin_cell
 from tonsdk.boc import Builder, Cell, Slice
+from tonsdk.utils import Address
 
 
 def read_string_tail(string_slice: Slice):
@@ -58,26 +59,25 @@ def string_as_comment(text: str):
 
 
 def get_jetton_transfer_message(
-    jetton_wallet_address: str,
+    jetton_wallet_address: str | Address,
     recipient_address: str,
     transfer_fee: int,
     jettons_amount: int,
     response_address: str = None,
+    forward_amount: int = 1,
 ) -> dict:
     data = {
-        "jetton_master_address": jetton_wallet_address,
+        "address": jetton_wallet_address,
         "amount": str(transfer_fee),
         "payload": urlsafe_b64encode(
             begin_cell()
             .store_uint(0xF8A7EA5, 32)  # op code for jetton transfer message
             .store_uint(0, 64)  # query_id
             .store_coins(jettons_amount)
-            .store_address(recipient_address)  # destination jetton_master_address
-            .store_address(
-                response_address or recipient_address
-            )  # jetton_master_address send excess to
+            .store_address(recipient_address)  # destination address
+            .store_address(response_address or recipient_address)  # address send excess to
             .store_uint(0, 1)  # custom payload
-            .store_coins(1)  # forward amount
+            .store_coins(forward_amount)  # forward amount
             .store_uint(0, 1)  # forward payload
             .end_cell()  # end cell
             .to_boc()  # convert it to boc
@@ -87,6 +87,5 @@ def get_jetton_transfer_message(
     return data
 
 
-def get_ton_transfer_message(
-) -> dict:
+def get_ton_transfer_message() -> dict:
     raise NotImplementedError()

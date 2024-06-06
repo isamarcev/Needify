@@ -12,7 +12,7 @@ formatters:
 handlers:
   console:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: simple
     stream: ext://sys.stdout
   debug:
@@ -30,7 +30,7 @@ handlers:
 
 loggers:
   root:
-    level: DEBUG
+    level: INFO
     handlers: [ debug, console ]
     propagate: no
 
