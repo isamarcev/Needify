@@ -10,10 +10,10 @@ USDT_JETTON_METADATA = {
 
 NEED_JETTON_METADATA = {
     # "address": "0:ea2d11f27d511e993f9914492900242eb53ba3e364b3aefa0f909f179ebbb166",
-    "address": "kQBmGlCKQKiKSfJR-DRRFLlL5QmKLM7HUYtzNcJOa_foNqVP",
+    "address": "kQCMTsrz3MuiLN7tIpBaFveYgounQygNfCjnmCV4dMtWhJMX",
     "name": "Needify",
     "symbol": "NEED",
     "decimals": "9",
-    "image": "https://cache.tonapi.io/imgproxy/vMTmNOZokpHcjd3ytX3UE2heFeELCp0xQtoBW800I7I/rs:fill:200:200:1/g:no/aHR0cHM6Ly9pYmIuY28vc1Z6OVRwNw.webp",  # noqa
+    "image": "https://cache.tonapi.io/imgproxy/K-IEe6oub2BE6ISa6F8P6tUxLytwnajXjeBkALjIYyY/rs:fill:200:200:1/g:no/aHR0cHM6Ly9pLmliYi5jby9CZjM4VmNwL05lZWRpZnktbG9nby5wbmc.webp",  # noqa
     "description": "NEED is a token for the Needify platform. It is used to pay for services and goods on the platform.",  # noqa
 }
