@@ -14,18 +14,19 @@ import { storeTransfer } from '../wrappers/JobOffer';
 import { log } from 'console';
 
 const jettonParams = {
-    name: "TRUE",
+    name: "THE TEST USDT",
     description: "This is True description",
-    symbol: "TRUE",
-    image: "https://play-lh.googleusercontent.com/ahJtMe0vfOlAu1XJVQ6rcaGrQBgtrEZQefHy7SXB7jpijKhu1Kkox90XDuH8RmcBOXNn",
+    symbol: "TUSDT",
+    image: "https://ibb.co/8YFKv25",
+    decimals: "6",
 };
 export let content = buildOnchainMetadata(jettonParams);
 
 const NativejettonParams = {
-    name: "The Open Needs",
-    description: "This is True description",
+    name: "Needify",
+    description: "NEED is a token for the Needify platform. It is used to pay for services and goods on the platform.",
     symbol: "NEED",
-    image: "https://play-lh.googleusercontent.com/ahJtMe0vfOlAu1XJVQ6rcaGrQBgtrEZQefHy7SXB7jpijKhu1Kkox90XDuH8RmcBOXNn",
+    image: "https://ibb.co/sVz9Tp7",
 };
 export let native_content = buildOnchainMetadata(NativejettonParams);
 
@@ -50,25 +51,16 @@ export async function run(provider: NetworkProvider) {
         deployer_wallet.address, content
     ))
 
+    const native_master = client.open(await TokenMaster.fromInit(
+        deployer_wallet.address, native_content
+    ))
+
     let seqno: number = await wallet_contract.getSeqno();
     let balance: bigint = await wallet_contract.getBalance();
     // ========================================
     console.log("Current deployment wallet balance: ", fromNano(balance).toString(), "💎TON");
     console.log("\n🛠️ Calling To JettonWallet:\n" + master.address + "\n");
 
-    let transferMessagePkg = beginCell().store(
-        storeTransfer({
-            $$type: "Transfer",
-            query_id: 1n,
-            amount: toNano(199),
-            destination: deployer_wallet.address,
-            response_destination: deployer_wallet.address,
-            custom_payload: beginCell().endCell(),
-            forward_ton_amount: toNano(0.4),
-            forward_payload: beginCell().endCell(),
-        })
-        )
-        .endCell()
     let ming_message = beginCell().store(
         storeMint({
             amount: toNano(1000),
@@ -88,7 +80,18 @@ export async function run(provider: NetworkProvider) {
                 data: master.init?.data,
                 code: master.init?.code
             }
-        })],
+        }),
+            internal({
+                to: native_master.address,
+                value: "0.65",
+                body: ming_message,
+                bounce: false,
+                init: {
+                    data: native_master.init?.data,
+                    code: native_master.init?.code
+                }
+            })
+        ],
         
     });
 
