@@ -108,26 +108,6 @@ class CurrencyManager(BaseCurrencyManager):
         )
         return int(data["stack"][0][1], 16)
 
-    async def deploy_jUSDT_minter(self):
-        state_init, jetton_address = create_state_init_jetton(
-            minter_class=jUSDTMinter, wallet_class=jUSDTWallet
-        )
-        hd_wallet_info = get_wallet_info_by_mnemonic(
-            config.hd_wallet_mnemonic_list,
-            config.WORKCHAIN,
-            is_testnet=config.IS_TESTNET,
-        )
-        seqno = await self.get_seqno(hd_wallet_info.get("wallet_address"))
-        wallet = hd_wallet_info.get("wallet")
-        query = wallet.create_transfer_message(
-            to_addr=jetton_address,
-            amount=to_nano(config.AMOUNT_TON_TO_DEPLOY, "ton"),
-            seqno=seqno,
-            state_init=state_init,
-        )
-        result = await self.ton_lib_client.raw_send_message(query["message"].to_boc(False))
-        return result
-
     async def mint_tokens(self, mint_data: MintTokenSchema):
         jetton_master = await self.get_currency_by_address(mint_data.address)
         if jetton_master is None or not jetton_master.is_active:
