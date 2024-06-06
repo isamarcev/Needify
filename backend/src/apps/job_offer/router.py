@@ -16,8 +16,6 @@ from src.apps.job_offer.schemas import (
     RevokeJob,
     TONConnectMessageResponse,
 )
-from src.apps.tasks.dependencies import TaskContainer
-from src.apps.tasks.manager import TaskManager
 from src.core.schemas import BaseErrorResponse
 
 job_offer_router = APIRouter()
@@ -120,9 +118,9 @@ async def confirm_job_offer_message(
 @inject
 async def revoke_job_offer_message(
     data: RevokeJob,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ):
-    return await task_manager.get_user_tasks(data)
+    return await job_offer_manager.create_revoke_message(data)
 
 
 @job_offer_router.post(

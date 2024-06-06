@@ -81,6 +81,7 @@ class CreateTaskSchema(PreCreateTaskSchema):
     status: TaskStatusEnum = TaskStatusEnum.PRE_CREATED
     native_currency: str
     created_at: datetime = Field(default_factory=datetime.now)
+    poster_address: str
 
 
 class UserHistoryResponseSchema(BaseModel):

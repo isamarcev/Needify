@@ -6,7 +6,6 @@ from tonsdk.utils import to_nano
 from TonTools.Contracts.Jetton import Jetton, JettonWallet
 from TonTools.Providers.TonCenterClient import GetMethodError, TonCenterClient
 
-from src.apps.currency.custom_minter import jUSDTMinter, jUSDTWallet
 from src.apps.currency.exceptions import (
     CurrencyAddressNotFoundJsonException,
     CurrencyNotFoundJsonException,
@@ -15,7 +14,7 @@ from src.apps.currency.jetton_metadata import NEED_JETTON_METADATA
 from src.apps.currency.mint_bodies import create_state_init_jetton, increase_supply
 from src.apps.currency.schemas import CreateCurrencySchema, CurrencySchema, MintTokenSchema
 from src.apps.utils.exceptions import JsonHTTPException
-from src.apps.utils.wallet import get_sdk_wallet_by_mnemonic, get_wallet_info_by_mnemonic
+from src.apps.utils.wallet import get_sdk_wallet_by_mnemonic
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
 

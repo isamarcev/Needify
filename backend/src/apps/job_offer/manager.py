@@ -18,6 +18,7 @@ from src.apps.job_offer.schemas import (
     ConfirmJob,
     GetJob,
     JobOfferMessageSchema,
+    RevokeJob,
     TONConnectMessageResponse,
 )
 from src.apps.tasks.enums import TaskStatusEnum
@@ -166,14 +167,13 @@ class JobOfferManager:
 
     async def try_ton_connect(self, task, response):
         wallet_name = "Tonkeeper"
-        print(wallet_name)
-        # connector = self.ton_connect_manager.get_connector(task.poster_id)
-        # await self.ton_connect_manager.connect_wallet(connector, wallet_name)
-        # connected = await connector.restore_connection()
-        # if not connected:
-        #     raise ValueError("Connection failed")
-        # transaction = response.dict()
-        # await self.ton_connect_manager.send_transaction(transaction, connector)
+        connector = self.ton_connect_manager.get_connector(task.poster_id)
+        await self.ton_connect_manager.connect_wallet(connector, wallet_name)
+        connected = await connector.restore_connection()
+        if not connected:
+            raise ValueError("Connection failed")
+        transaction = response.dict()
+        await self.ton_connect_manager.send_transaction(transaction, connector)
         return
 
     async def get_task_currencies(self, task: TaskSchema) -> Tuple[CurrencySchema, CurrencySchema]:
@@ -250,6 +250,25 @@ class JobOfferManager:
         response = TONConnectMessageResponse(
             valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[job_offer_confirm_message],
+        )
+        await self.try_ton_connect(task, response)
+        return response
+
+    async def create_revoke_message(self, data: RevokeJob):
+        task: TaskSchema = await self.task_manager.get_task(data.task_id)
+        user: UserSchema = await self.user_manager.get_user_by_telegram_id(data.action_by_user)
+        require400(task.poster_id == user.telegram_id, "You are not the owner of this task")
+        require400(user.web3_wallet.address is not None, "You did not connected web3 wallet")
+        # TODO check statuses before operation
+        # require400(task.status == TaskStatusEnum.PUBLISHED, "Task is not published")
+        nat_curr, task_curr = await self.get_task_currencies(task)
+        job_offer: JobOfferContract = await self.job_offer_factory.get_job_offer_contract(
+            task, nat_curr, task_curr
+        )
+        job_offer_revoke_message = job_offer.get_revoke_message()
+        response = TONConnectMessageResponse(
+            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            messages=[job_offer_revoke_message],
         )
         await self.try_ton_connect(task, response)
         return response
