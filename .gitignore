@@ -30,9 +30,10 @@ coverage.xml
 cover/
 report.html
 venv/
+logs
 
 # env files
 .env
 tbot/.env
 build/
-contracts/TheOpenTimes/temp
+contracts/Needify/temp
