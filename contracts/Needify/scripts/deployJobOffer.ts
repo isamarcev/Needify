@@ -9,15 +9,14 @@ import { buildOnchainMetadata } from "../utils/jetton-helpers";
 import { TokenMaster, storeMint } from '../build/TokenMaster/tact_TokenMaster';
 import { mnemonicToPrivateKey } from 'ton-crypto';
 import { NativeMaster } from '../build/TokenMaster/tact_NativeMaster';
-import { NativeWallet } from '../build/TokenMaster/tact_NativeWallet';
+import { NativeWallet } from '../build/NativeMaster/tact_NativeWallet';
 
 import { TonClient, TonClient4, WalletContractV4 } from '@ton/ton';
-import { randomUUID } from 'crypto';
-import { log } from 'console';
-import { content, native_content } from './deployMaster';
+import { content } from './deployMaster';
+import { native_content } from './deployNativeMaster';
+
 import { TokenWallet } from '../build/TokenMaster/tact_TokenWallet';
 import { storeDeposit } from '../wrappers/NativeMaster';
-// import { NativeWallet } from '../wrappers/NativeWallet';
 
 const jetton_master_deployer = process.env.DEPLOYER_MNEMONIC || "";
 const jetton_master_deployer_mnem = jetton_master_deployer?.split(" ");
