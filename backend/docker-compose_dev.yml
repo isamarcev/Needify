@@ -19,6 +19,9 @@ services:
     ports:
       - "8000:8000"
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
+    depends_on:
+      - mongo_needify
+      - redis_needify
 
   mongo_needify:
     image: mongo:6
@@ -29,8 +32,16 @@ services:
     command: mongod --port 27018
     ports:
       - "27018:27018"
-    depends_on:
-      - python
+
+  redis_needify:
+    image: redis:6.2
+    container_name: redis_needify
+    restart: unless-stopped
+    volumes:
+      - ./Volumes/Redis:/data
+    ports:
+      - "6379:6379"
+
 
 
   kafka-ui:
@@ -70,6 +81,6 @@ services:
       timeout: 5s
       retries: 15
 
-networks:
-  default:
-    name: crypto
+#networks:
+#  default:
+#    name: crypto
