@@ -138,3 +138,20 @@ async def get_job_offer_chain_state(
     job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
 ) -> Any:
     return await job_offer_manager.get_job_offer_chain_state(data)
+
+
+@job_offer_router.get(
+    "/message/get-job-offer-test-state/{data}",
+    # response_model=JobOfferMessageResponseSchema,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+        # status.HTTP_200_OK: {"model": JobOfferMessageResponseSchema},
+    },
+)
+@inject
+async def get_job_offer_chain_state(
+    data: str,
+    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+) -> Any:
+    return await job_offer_manager.get_job_vacancies(data)
