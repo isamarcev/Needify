@@ -22,9 +22,11 @@ export default function Home() {
         The Open Times
       </Typography>
       <Box className={styles.menuWrapper}>
-        <Button className={styles.menuItem} variant="outlined">
-          Profile
-        </Button>
+        <Link href="/profile" passHref>
+          <Button className={styles.menuItem} variant="outlined">
+            Profile
+          </Button>
+        </Link>
         <Link href="/my-tasks" passHref>
           <Button
             className={styles.menuItem}
