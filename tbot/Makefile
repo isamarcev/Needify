@@ -1,0 +1,3 @@
+
+r:
+	python bot.py
