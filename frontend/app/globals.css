@@ -35,7 +35,7 @@
   body {
     margin: 0 auto;
     color: rgb(var(--text-color));
-    background: var(--mui-palette-secondary-main);
+    background: #000000;
   }
 
   a {
