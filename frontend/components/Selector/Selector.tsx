@@ -6,10 +6,10 @@ import {
   Select,
   SelectChangeEvent,
 } from '@mui/material';
-import styles from './selector.module.css';
 import { ISelector } from '@/components/Selector/types';
+import styles from './Selector.module.css';
 
-export const Selector: FC<ISelector<string>> = ({
+export const Selector: FC<ISelector> = ({
   onChange,
   options,
   label,
@@ -27,19 +27,8 @@ export const Selector: FC<ISelector<string>> = ({
   );
 
   return (
-    <FormControl fullWidth variant="outlined">
-      <InputLabel
-        id={`${label}-label`}
-        sx={{
-          top: '-1vh',
-          '&.MuiInputLabel-shrink': {
-            top: 0,
-            transform: 'translate(3px, -9px) scale(0.7)',
-          },
-        }}
-      >
-        {label}
-      </InputLabel>
+    <FormControl fullWidth variant="filled">
+      <InputLabel id={`${label}-label`}>{label}</InputLabel>
       <Select
         className={styles.selector}
         labelId={`${label}-label`}
@@ -48,9 +37,9 @@ export const Selector: FC<ISelector<string>> = ({
         label={label}
         onChange={handleChange}
       >
-        {options.map((name) => (
-          <MenuItem className={styles.menuItem} key={name} value={name}>
-            {name}
+        {options.map(({ id, label }) => (
+          <MenuItem key={id} value={label} className={styles.menuItem}>
+            {label}
           </MenuItem>
         ))}
       </Select>

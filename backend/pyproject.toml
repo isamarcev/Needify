@@ -1,0 +1,98 @@
+[tool.poetry]
+name = "the open times"
+version = "0.1.0"
+description = ""
+authors = ["Ihor Samartsev <isamarcev1994@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.110.2"
+pymongo = "^4.7.0"
+motor = "^3.4.0"
+redis = "^5.0.4"
+uvicorn = "^0.29.0"
+pyjwt = "^2.8.0"
+python-multipart = "^0.0.9"
+tonsdk = { git = "https://github.com/isamarcev/tonsdk_hd", branch = "master" }
+requests = "^2.31.0"
+tonlib = "^0.1"
+tontools = "^2.1.2"
+python-dotenv = "^1.0.1"
+pytonlib = "^0.0.58"
+dependency-injector = "^4.41.0"
+aioredis = "^2.0.1"
+aiokafka = "^0.10.0"
+celery = "^5.4.0"
+pytest-env = "^1.1.3"
+pytoniq = "^0.1.38"
+pytonconnect = "^0.3.1"
+colorlog = "^6.8.2"
+python-json-logger = "^2.0.7"
+gunicorn = "^22.0.0"
+pyyaml = "^6.0.1"
+ruff = "^0.4.7"
+
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.6"
+pytest-mock = "^3.14.0"
+pytest-dotenv = "^0.5.2"
+pre-commit = "^3.6.0"
+isort = "5.12.0"
+black = "22.6.0"
+flake8 = "5.0.3"
+
+
+
+[tool.ruff]
+exclude = [
+    "__pypackages__",
+    "migrations/versions/",
+    "src/apps/utils/database.py",
+]
+line-length = 100
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
+fixable = ["ALL"]
+
+ignore = [
+    "B008",
+    "UP035",
+    "SIM105",
+    "SIM118",
+    "SIM117",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"./migrations/versions/*.py" = [
+    "UP035",
+    "UP007",
+    "I001"
+]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

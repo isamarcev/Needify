@@ -25,12 +25,6 @@
     rgba(255, 255, 255, 0)
   );
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
   html,
   body {
     overflow-x: hidden;
@@ -41,7 +35,7 @@
   body {
     margin: 0 auto;
     color: rgb(var(--text-color));
-    background: var(--mui-palette-secondary-main);
+    background: #000000;
   }
 
   a {
