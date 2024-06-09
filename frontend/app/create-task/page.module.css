@@ -1,0 +1,12 @@
+.form {
+  display: grid;
+  margin-top: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 24px;
+}
+
+.wholeLine {
+  grid-column: span 2;
+}
+
+

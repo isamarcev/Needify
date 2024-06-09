@@ -1,95 +1,66 @@
-import Image from 'next/image';
+'use client';
 import styles from './page.module.css';
+import { useTelegram } from '@/providers/TelegramContext';
+import { Box, Button, CircularProgress } from '@mui/material';
+import { Selector } from '@/components/Selector';
+import { TaskCard } from '@/widgets/TaskCard';
+import Link from 'next/link';
+import { cardsShortData } from '@/tests/mockData';
+import { getOptionsFromEnum } from '@/helpers';
+import { ECategory } from '@/app/task-detail/[id]/types';
+import Image from 'next/image';
 
 export default function Home() {
-  return (
+  const { isLoading } = useTelegram();
+
+  return isLoading ? (
+    <Box className={styles.loader}>
+      <CircularProgress />
+    </Box>
+  ) : (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <Image
+        className={styles.logo}
+        src="./images/needify-text.svg"
+        alt="logo"
+        width="164"
+        height="32"
+      />
+      <Box className={styles.menuWrapper}>
+        <Button className={styles.menuItem} variant="outlined">
+          Profile
+        </Button>
+        <Link href="/my-tasks" passHref>
+          <Button
+            className={styles.menuItem}
+            variant="contained"
+            component="span"
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+            My tasks
+          </Button>
+        </Link>
+      </Box>
+      <Box className={styles.category}>
+        <Selector
+          label="Category"
+          options={getOptionsFromEnum(ECategory)}
+          onChange={() => {}}
         />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+      </Box>
+      <Box className={styles.cards}>
+        {cardsShortData.map((data) => (
+          <TaskCard key={data.id} {...data} />
+        ))}
+      </Box>
+      <Link href="/create-task">
+        <Button
+          className={styles.createOrder}
+          variant="contained"
+          component="div"
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+          Create task
+        </Button>
+      </Link>
     </main>
   );
 }
