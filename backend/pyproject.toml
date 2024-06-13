@@ -32,6 +32,7 @@ python-json-logger = "^2.0.7"
 gunicorn = "^22.0.0"
 pyyaml = "^6.0.1"
 ruff = "^0.4.7"
+poetry-plugin-export = "^1.8.0"
 
 
 
