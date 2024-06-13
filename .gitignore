@@ -30,7 +30,7 @@ coverage.xml
 cover/
 report.html
 venv/
-logs
+logs/*
 
 # env files
 .env
