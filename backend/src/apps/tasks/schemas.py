@@ -33,8 +33,7 @@ class JobOfferSchema(BaseModel):
     job_offer_address: str
     jetton_master_address: str
     jetton_native_address: str
-    state: str
-    stateInit: str
+    state: str | None = None
     owner: str
     doer: str | None = None
     vacancies: List[VacancySchema]

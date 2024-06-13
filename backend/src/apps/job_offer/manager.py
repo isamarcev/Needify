@@ -3,6 +3,7 @@ import time
 from typing import Tuple
 
 from pytoniq import LiteClient
+from pytoniq_core import Transaction
 from pytonlib import TonlibClient
 from tonsdk.utils import to_nano
 from TonTools.Contracts.Jetton import JettonWallet
@@ -135,6 +136,18 @@ class JobOfferManager:
         job_offer = await self.job_offer_factory.get_job_offer_contract(
             task, native_currency, task_currency
         )
+        job_offer_address = job_offer.address.to_string()
+        job_offer_data = {
+            "job_offer_address": job_offer_address,
+            "jetton_master_address": task_currency.address,
+            "jetton_native_address": native_currency.address,
+            "owner": task.poster_address,
+            "vacancies": [],
+        }
+        await self.task_manager.update_task(task.task_id, {
+            "job_offer": job_offer_data,
+            "status": TaskStatusEnum.PRE_DEPLOYING,
+        })
         job_offer_deploy_message = job_offer.get_deploy_message()
         task_currency_transfer_message = get_jetton_transfer_message(
             jetton_wallet_address=user_task_wallet.address,
@@ -166,6 +179,7 @@ class JobOfferManager:
         return response
 
     async def try_ton_connect(self, task, response):
+        """ This is for testing purpose without application of real transactions"""
         return
         wallet_name = "Tonkeeper"
         connector = self.ton_connect_manager.get_connector(task.poster_id)
@@ -273,3 +287,6 @@ class JobOfferManager:
         )
         await self.try_ton_connect(task, response)
         return response
+
+    async def process_job_offer_transaction(self, transaction: Transaction, task: TaskSchema):
+        pass

@@ -3,12 +3,14 @@ from src.core.enums import StrEnum
 
 class TaskStatusEnum(StrEnum):
     PRE_CREATED = "PRE_CREATED"
+    PRE_DEPLOYING = "PRE_DEPLOYING"
     DEPLOYING = "DEPLOYING"
     PUBLISHED = "PUBLISHED"
     CLOSED = "CLOSED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
     CONFIRMED = "CONFIRMED"
+    FINISHED = "FINISHED"
 
     @classmethod
     def choices(cls):

@@ -6,6 +6,7 @@ from dependency_injector.wiring import inject
 from fastapi import APIRouter, FastAPI
 from pytoniq import LiteClient
 
+from src.apps.scanner.service import BlockScanner
 from src.core.config import config
 from src.core.database import async_mongo, setup_database
 from src.core.dependencies import CoreContainer
@@ -58,6 +59,8 @@ async def startup_event():
         json.dump(openapi_data, file)
 
     await setup_database(async_mongo)
+    scanner_service: BlockScanner = await core_container.scanner_service()
+    asyncio.create_task(scanner_service.run())
 
 
 @fastapi_app.on_event("shutdown")

@@ -2,6 +2,8 @@ import logging
 import random
 from abc import ABC, abstractmethod
 
+from pytoniq_core import Address
+
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
 from src.apps.currency.manager import CurrencyManager
@@ -182,6 +184,12 @@ class TaskManager(BaseTaskManager):
 
     async def delete_task(self, task_id: str):
         return await self.repository.delete(task_id)
+
+    async def get_task_by_job_offer_address(self, job_offer_address: Address) -> TaskSchema | None:
+        result = await self.repository.get_by_filter({"job_offer.job_offer_address": job_offer_address.to_str()})
+        if result:
+            logger.info(f"Detected task by job_offer_address: {result}")
+        return TaskSchema(**result) if result else None
 
     async def get_user_tasks(self, user_id: int) -> UserHistoryResponseSchema:
         published_tasks = await self.repository.get_list(
