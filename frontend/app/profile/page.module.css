@@ -1,0 +1,9 @@
+.top {
+    margin: 24px 0;
+    display: flex;
+}
+
+.name {
+    max-width: 50%;
+    margin-right: auto;
+}
