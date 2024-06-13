@@ -186,7 +186,9 @@ class TaskManager(BaseTaskManager):
         return await self.repository.delete(task_id)
 
     async def get_task_by_job_offer_address(self, job_offer_address: Address) -> TaskSchema | None:
-        result = await self.repository.get_by_filter({"job_offer.job_offer_address": job_offer_address.to_str()})
+        result = await self.repository.get_by_filter(
+            {"job_offer.job_offer_address": job_offer_address.to_str()}
+        )
         if result:
             logger.info(f"Detected task by job_offer_address: {result}")
         return TaskSchema(**result) if result else None

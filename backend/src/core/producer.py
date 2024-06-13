@@ -1,12 +1,11 @@
 import json
 import logging
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
 from typing import Type
 
 from aiokafka import AIOKafkaProducer
-from bson import ObjectId
 
 logger = logging.getLogger("root")
 

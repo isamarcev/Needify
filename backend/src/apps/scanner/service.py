@@ -5,8 +5,8 @@ from pytoniq.liteclient import LiteClient
 from pytoniq_core import Address, Transaction
 from pytoniq_core.tl import BlockIdExt
 
-from src.apps.tasks.manager import TaskManager
 from src.apps.job_offer.manager import JobOfferManager
+from src.apps.tasks.manager import TaskManager
 from src.core.local_storage import LocalStorage
 from src.core.producer import BaseProducer
 

@@ -38,7 +38,6 @@ def get_lite_client(liteserver_index: int = 0) -> LiteClient:
         config=ls_config, ls_i=liteserver_index, trust_level=2, timeout=15
     )
 
-
     return client
 
 
@@ -54,8 +53,6 @@ def get_ton_client(liteserver_index: int = 0) -> TonlibClient:
         tonlib_timeout=25,
     )
     return client
-
-
 
 
 async def get_toncenter_client() -> TonCenterClient:

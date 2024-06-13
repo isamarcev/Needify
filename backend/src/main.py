@@ -46,7 +46,7 @@ def app_factory():
 async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
-    core_container.ton_lib_client()
+    # core_container.ton_lib_client()
 
     lite_client: LiteClient = core_container.lite_client()
     await lite_client.connect()

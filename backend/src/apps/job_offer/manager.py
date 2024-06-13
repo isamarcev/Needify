@@ -130,7 +130,7 @@ class JobOfferManager:
         user_native_wallet: JettonWallet = await self.currency_manager.get_jetton_wallet(
             native_currency.address, task.poster_address
         )
-        await self.task_manager.check_poster_balance_for_deploy(
+        await self.check_poster_balance_for_deploy(
             task.poster_address, task.price, task_currency, native_currency
         )
         job_offer = await self.job_offer_factory.get_job_offer_contract(
@@ -144,10 +144,13 @@ class JobOfferManager:
             "owner": task.poster_address,
             "vacancies": [],
         }
-        await self.task_manager.update_task(task.task_id, {
-            "job_offer": job_offer_data,
-            "status": TaskStatusEnum.PRE_DEPLOYING,
-        })
+        await self.task_manager.update_task(
+            task.task_id,
+            {
+                "job_offer": job_offer_data,
+                "status": TaskStatusEnum.PRE_DEPLOYING,
+            },
+        )
         job_offer_deploy_message = job_offer.get_deploy_message()
         task_currency_transfer_message = get_jetton_transfer_message(
             jetton_wallet_address=user_task_wallet.address,
@@ -179,7 +182,7 @@ class JobOfferManager:
         return response
 
     async def try_ton_connect(self, task, response):
-        """ This is for testing purpose without application of real transactions"""
+        """This is for testing purpose without application of real transactions"""
         return
         wallet_name = "Tonkeeper"
         connector = self.ton_connect_manager.get_connector(task.poster_id)
@@ -195,6 +198,17 @@ class JobOfferManager:
         native_currency: CurrencySchema = await self.currency_manager.get_native_currency()
         task_currency: CurrencySchema = await self.currency_manager.get(task.currency)
         return native_currency, task_currency
+
+    async def check_poster_balance_for_deploy(
+        self,
+        poster_address: str,
+        task_price: float,
+        task_currency: CurrencySchema,
+        native_currency: CurrencySchema,
+    ):
+        await self.task_manager.check_poster_balance_for_deploy(
+            poster_address, task_price, task_currency, native_currency
+        )
 
     async def create_get_job_message(self, data: GetJob):
         task: TaskSchema = await self.task_manager.get_task(data.task_id)

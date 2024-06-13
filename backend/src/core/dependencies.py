@@ -1,7 +1,7 @@
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from dependency_injector import containers, providers
-from TonTools.Providers.TonCenterClient import TonCenterClient
 from redis.asyncio import Redis
+from TonTools.Providers.TonCenterClient import TonCenterClient
 
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
@@ -11,6 +11,7 @@ from src.apps.tasks.dependencies import TaskContainer
 from src.apps.TONconnect.dependencies import TONConnectContainer
 from src.apps.users.dependencies import UserContainer
 from src.apps.users.events import UserEventsEnum
+from src.apps.utils.database import ThreadMongoSingleton
 from src.apps.wallets.dependencies import WalletContainer
 from src.apps.wallets.events import WalletTopicsEnum
 from src.core.config import BaseConfig
@@ -24,6 +25,14 @@ class CoreContainer(containers.DeclarativeContainer):
     config: BaseConfig = providers.Configuration("config")
     config.from_pydantic(BaseConfig())
 
+    producer = providers.Singleton(
+        KafkaProducer,
+        producer_class=AIOKafkaProducer,
+        bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
+    )
+    async_mongo = providers.Singleton(
+        ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME
+    )
     ton_center_client = providers.Singleton(
         TonCenterClient, base_url=config.TON_CENTER_URL, key=config.TON_CENTER_API_KEY
     )
@@ -40,6 +49,7 @@ class CoreContainer(containers.DeclarativeContainer):
     user_container = providers.Container(
         UserContainer,
         config=config,
+        producer=producer,
     )
 
     currency_container = providers.Container(
@@ -58,6 +68,8 @@ class CoreContainer(containers.DeclarativeContainer):
         WalletContainer,
         config=config,
         lite_client=lite_client,
+        producer=producer,
+        async_mongo=async_mongo,
     )
     category_container = providers.Container(
         CategoryContainer,
@@ -70,6 +82,7 @@ class CoreContainer(containers.DeclarativeContainer):
         wallet_manager=wallet_container.wallet_manager,
         user_manager=user_container.user_manager,
         category_manager=category_container.category_manager,
+        async_mongo=async_mongo,
     )
 
     job_offer_container = providers.Container(
@@ -90,12 +103,6 @@ class CoreContainer(containers.DeclarativeContainer):
         *WalletTopicsEnum.topics_list(),
         bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
         group_id="the_open_times_group",
-    )
-
-    producer = providers.Singleton(
-        KafkaProducer,
-        producer_class=AIOKafkaProducer,
-        bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
     )
 
     lts_client = providers.Factory(
