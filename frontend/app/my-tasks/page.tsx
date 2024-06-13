@@ -1,11 +1,13 @@
-'use client';
 import { Box, Typography } from '@mui/material';
 import styles from './page.module.css';
 import { TaskCard } from '@/widgets/TaskCard';
 import { cardsFullData } from '@/tests/mockData';
 import { InnerPage } from '@/components/InnerPage';
+import { getTasks } from '@/services/api';
 
-export default function Page() {
+export default async function Page() {
+  const tasks = await getTasks();
+  console.log(tasks);
   return (
     <InnerPage title="My tasks">
       <Typography className={styles.subtitle} variant="h2">
