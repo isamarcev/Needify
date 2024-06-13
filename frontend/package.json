@@ -19,7 +19,6 @@
     "@tonconnect/sdk": "^3.0.3",
     "@tonconnect/ui-react": "^2.0.3",
     "@types/telegram-web-app": "^7.2.1",
-    "axios": "^1.7.2",
     "date-fns": "^3.6.0",
     "next": "14.2.3",
     "react": "^18",
