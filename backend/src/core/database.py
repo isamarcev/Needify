@@ -1,6 +1,9 @@
+import logging
+
 from aioredis import from_url
 from dependency_injector.providers import ThreadLocalSingleton
 from pymongo import ASCENDING, IndexModel
+from redis.asyncio import Redis
 
 from src.apps.currency.jetton_metadata import NEED_JETTON_METADATA, USDT_JETTON_METADATA
 from src.apps.utils.database import ThreadMongoSingleton
@@ -11,6 +14,12 @@ redis_database = ThreadLocalSingleton(from_url, config.REDIS_URL).provided
 
 
 async def insert_default_currency():
+    redis = Redis.from_url(config.REDIS_URL)
+    await redis.set("jetton:usdt:address", USDT_JETTON_METADATA["address"])
+    test = await redis.get("jetton:usdt:address")
+    logging.info(f"Test redis: {test}")
+    # USDT CURRENCY
+
     USDT_CURRENCY = {
         "name": USDT_JETTON_METADATA["name"],
         "symbol": USDT_JETTON_METADATA["symbol"],
