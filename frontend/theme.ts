@@ -10,17 +10,23 @@ const theme = extendTheme({
     h1: {
       fontSize: 28,
       fontWeight: 700,
+      color: '#FFFFFF',
     },
     h2: {
       fontSize: 24,
       fontWeight: 700,
+      color: '#FFFFFF',
     },
     h3: {
       fontSize: 16,
       fontWeight: 700,
+      color: 'rgba(255,255,255,0.7)',
+    },
+    body1: {
+      color: '#FFFFFF',
     },
     body2: {
-      color: '#1E233780',
+      color: '#FFFFFF',
     },
   },
   colorSchemes: {
@@ -30,8 +36,19 @@ const theme = extendTheme({
           main: '#0098EA',
         },
         secondary: {
-          main: '#F7F9FB',
+          main: '#FFFFFF',
+          dark: 'rgba(255,255,255,0.1)',
         },
+        text: {
+          primary: '#FFFFFF',
+        },
+        background: {
+          paper: '#3b3d3e',
+        },
+      },
+      //@ts-expect-error
+      shape: {
+        borderRadius: 10,
       },
     },
     dark: {

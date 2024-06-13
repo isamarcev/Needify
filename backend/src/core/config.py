@@ -37,8 +37,6 @@ class BaseConfig(BaseSettings):
     TON_CENTER_URL: str
     TON_CENTER_API_KEY: str
 
-    JETTON_USDT_ADDRESS: str
-
     NATIVE_CURRENCY_PRICE_TO_DEPLOY: float = 100
 
     TON_AMOUNT_TO_DEPLOY: float = 0.5

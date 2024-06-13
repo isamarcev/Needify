@@ -7,6 +7,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { ISelector } from '@/components/Selector/types';
+import styles from './Selector.module.css';
 
 export const Selector: FC<ISelector> = ({
   onChange,
@@ -26,9 +27,10 @@ export const Selector: FC<ISelector> = ({
   );
 
   return (
-    <FormControl fullWidth variant="outlined">
+    <FormControl fullWidth variant="filled">
       <InputLabel id={`${label}-label`}>{label}</InputLabel>
       <Select
+        className={styles.selector}
         labelId={`${label}-label`}
         id={label}
         value={value}
@@ -36,7 +38,7 @@ export const Selector: FC<ISelector> = ({
         onChange={handleChange}
       >
         {options.map(({ id, label }) => (
-          <MenuItem key={id} value={label}>
+          <MenuItem key={id} value={label} className={styles.menuItem}>
             {label}
           </MenuItem>
         ))}

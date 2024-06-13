@@ -28,6 +28,7 @@ coverage.xml
 cover/
 report.html
 venv/
+logs/*
 
 # env files
 .env

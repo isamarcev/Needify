@@ -1,13 +1,14 @@
 'use client';
 import styles from './page.module.css';
 import { useTelegram } from '@/providers/TelegramContext';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import { Selector } from '@/components/Selector';
 import { TaskCard } from '@/widgets/TaskCard';
 import Link from 'next/link';
 import { cardsShortData } from '@/tests/mockData';
 import { getOptionsFromEnum } from '@/helpers';
 import { ECategory } from '@/app/task-detail/[id]/types';
+import Image from 'next/image';
 
 export default function Home() {
   const { isLoading } = useTelegram();
@@ -18,9 +19,13 @@ export default function Home() {
     </Box>
   ) : (
     <main className={styles.main}>
-      <Typography variant="h1" align="center">
-        The Open Times
-      </Typography>
+      <Image
+        className={styles.logo}
+        src="./images/needify-text.svg"
+        alt="logo"
+        width="164"
+        height="32"
+      />
       <Box className={styles.menuWrapper}>
         <Link href="/profile" passHref>
           <Button className={styles.menuItem} variant="outlined">
