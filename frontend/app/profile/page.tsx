@@ -34,8 +34,6 @@ const defaultValues: IProfileValues = {
   name: '',
 };
 
-axios.get('http://206.189.57.147/');
-
 export default function Page() {
   return (
     <InnerPage title="Profile">
