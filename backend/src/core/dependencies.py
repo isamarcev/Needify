@@ -25,6 +25,14 @@ class CoreContainer(containers.DeclarativeContainer):
     config: BaseConfig = providers.Configuration("config")
     config.from_pydantic(BaseConfig())
 
+    wiring_config = containers.WiringConfiguration(
+        modules=[
+            "src.apps.scanner.router",
+            "src.apps.job_offer.router",
+            "src.apps.tasks.router",
+        ]
+    )
+
     producer = providers.Singleton(
         KafkaProducer,
         producer_class=AIOKafkaProducer,
@@ -51,17 +59,16 @@ class CoreContainer(containers.DeclarativeContainer):
         config=config,
         producer=producer,
     )
-
+    lite_client = providers.Singleton(
+        get_lite_client,
+        liteserver_index=2,
+    )
     currency_container = providers.Container(
         CurrencyContainer,
         ton_center_client=ton_center_client,
         ton_lib_client=ton_lib_client,
         config=config,
-    )
-
-    lite_client = providers.Singleton(
-        get_lite_client,
-        liteserver_index=2,
+        lite_client=lite_client,
     )
 
     wallet_container = providers.Container(

@@ -21,6 +21,18 @@ class CurrencyNotFoundJsonException(JsonHTTPException):
         )
 
 
+class JettonWalletInActiveOrNotEnoughBalanceJsonException(JsonHTTPException):
+    def __init__(self, address: str):
+        description = (
+            f"Jetton Wallet {address} is not active or has not enough balance for deploy this offer"
+        )
+        super().__init__(
+            status_code=400,
+            error_name="Bad Request",
+            error_description=description,
+        )
+
+
 class CurrencyAddressNotFoundJsonException(JsonHTTPException):
     def __init__(self, address: str, description: str = None):
         if not description:

@@ -67,12 +67,17 @@ def core_container(event_loop):
 
 
 @pytest.fixture(scope="function", autouse=True)
-async def create_poster(core_container):
+def create_poster(core_container, event_loop):
     user_manager = core_container.user_container.user_manager()
-    await user_manager.create_user(CreateUserSchema(**POSTER))
-    user = await user_manager.get_user_by_telegram_id(POSTER["telegram_id"])
-    assert user.telegram_id == POSTER["telegram_id"]
-    await user_manager.add_wallet(
-        user.telegram_id, UserWeb3WalletSchema(address=POSTER["web3_wallet"])
-    )
+
+    async def create_user():
+        await user_manager.create_user(CreateUserSchema(**POSTER))
+        user = await user_manager.get_user_by_telegram_id(POSTER["telegram_id"])
+        assert user.telegram_id == POSTER["telegram_id"]
+        await user_manager.add_wallet(
+            user.telegram_id, UserWeb3WalletSchema(address=POSTER["web3_wallet"])
+        )
+        return user
+
+    user = event_loop.run_until_complete(create_user())
     print(user)

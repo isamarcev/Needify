@@ -11,6 +11,7 @@ class TaskStatusEnum(StrEnum):
     COMPLETED = "COMPLETED"
     CONFIRMED = "CONFIRMED"
     FINISHED = "FINISHED"
+    REVOKED = "REVOKED"
 
     @classmethod
     def choices(cls):
@@ -20,39 +21,14 @@ class TaskStatusEnum(StrEnum):
     def values(cls):
         return [key.value for key in cls]
 
-    # @classmethod
-    # def mapping_rules_to_update_by_doer(cls) -> dict:
-    #     return {
-    #         cls.WAIT_FOR_EXECUTOR.value: [cls.IN_PROGRESS.value],
-    #         cls.IN_PROGRESS.value: [cls.COMPLETED.value],
-    #     }
-
-    # @classmethod
-    # def customer_active_statuses(cls) -> list[str]:
-    #     return [
-    #         cls.CREATED.value,
-    #         cls.PRE_CREATED.value,
-    #         cls.WAIT_FOR_EXECUTOR.value,
-    #         cls.COMPLETED.value,
-    #         cls.IN_PROGRESS.value,
-    #     ]
-    #
-    # @classmethod
-    # def doer_active_statuses(cls) -> list[str]:
-    #     return [cls.IN_PROGRESS.value, cls.COMPLETED.value, cls.CONFIRMED.value]
-    #
-    # @classmethod
-    # def done_statuses(cls) -> list[str]:
-    #     return [cls.CONFIRMED.value, cls.FINISHED.value, cls.CANCELLED.value]
-    #
-    # @classmethod
-    # def mapping_rules_to_update_by_customer(cls) -> dict:
-    #     return {
-    #         cls.PRE_CREATED.value: [cls.CREATED.value],
-    #         cls.CREATED.value: [cls.CANCELLED.value],
-    #         cls.WAIT_FOR_EXECUTOR.value: [cls.CANCELLED.value],
-    #         cls.COMPLETED.value: [cls.CONFIRMED.value],
-    #     }
+    @classmethod
+    def could_be_revoked(cls) -> list[str]:
+        return [
+            cls.PRE_CREATED.value,
+            cls.PRE_DEPLOYING.value,
+            cls.DEPLOYING.value,
+            cls.PUBLISHED.value,
+        ]
 
 
 class JobOfferMessagesEnum(StrEnum):

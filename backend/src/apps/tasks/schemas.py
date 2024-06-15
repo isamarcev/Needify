@@ -27,6 +27,7 @@ class TaskDescription(str):
 class VacancySchema(BaseModel):
     doer: str
     telegram_id: int
+    is_chosen: bool = False
 
 
 class JobOfferSchema(BaseModel):
@@ -36,7 +37,7 @@ class JobOfferSchema(BaseModel):
     state: str | None = None
     owner: str
     doer: str | None = None
-    vacancies: List[VacancySchema]
+    vacancies: List[VacancySchema] = []
     mark: int | None = None
     review: str | None = None
 

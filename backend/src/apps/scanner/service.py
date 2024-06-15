@@ -47,37 +47,35 @@ class BlockScanner:
         )
         shards = await self.lite_client.get_all_shards_info(master_blk)
         for shard in shards:
-            await self.handle_block(shard)
+            await self.handle_block(shard, master_blk.seqno)
 
     async def run(self):
         logging.info("Starting scanner")
-        # return
         if not self.lite_client.inited:
             raise Exception("should init client first")
         while True:
             try:
-                logging.error("Scanning...")
                 master_blk = await self.get_master_block_for_scan()
-                logging.error(f"{master_blk=}")
+                logging.info(f"Master block scanning: {master_blk.seqno}")
                 if master_blk is None:
                     await asyncio.sleep(1)
                     continue
                 shards = await self.lite_client.get_all_shards_info(master_blk)
                 for shard in shards:
                     try:
-                        await self.handle_block(shard)
+                        await self.handle_block(shard, master_blk.seqno)
                     except Exception as e:
                         logging.error(f"Error handling block: {e}")
                 await self.local_storage.set_last_scanned_block(master_blk.seqno)
-                logging.error(f"Scanned block {master_blk.seqno}")
+                logging.info(f"Scanned block {master_blk.seqno}")
             except Exception as e:
-                logging.error(f"Error scanning: {e}")
+                logging.info(f"Error scanning: {e}")
 
     @staticmethod
     def mc_info_to_tl_blk(info: dict):
         return BlockIdExt.from_dict(info["last"])
 
-    async def handle_block(self, block: BlockIdExt):
+    async def handle_block(self, block: BlockIdExt, masterchain_seqno: int):
         if block.workchain == -1:  # skip masterchain blocks
             return
         transactions = await self.lite_client.raw_get_block_transactions_ext(block)
@@ -87,7 +85,9 @@ class BlockScanner:
                 Address(f"0:{tx.account_addr_hex}")
             )
             if task_ is not None:
-                await self.job_offer_manager.process_job_offer_transaction(tx, task_)
+                await self.job_offer_manager.process_job_offer_transaction(
+                    tx, task_, masterchain_seqno
+                )
                 logging.info(f"Detected task for job offer address: 0:{tx.account_addr_hex}")
         logging.info(
             f"Block workchain: {block.workchain}, shard {block.shard}, {block.seqno=} handled"

@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 
 from dependency_injector.wiring import inject
@@ -47,16 +46,21 @@ async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
     # core_container.ton_lib_client()
+    config = core_container.config
+    if config.UPDATE_LAST_SCANNED_BLOCK:
+        logging.info("Resetting last scanned block")
+        local_storage = core_container.local_storage()
+        await local_storage.reset_last_scanned_block()
 
     lite_client: LiteClient = core_container.lite_client()
     await lite_client.connect()
 
     message_hub = core_container.message_hub()
     asyncio.create_task(message_hub.consume())
-    openapi_data = fastapi_app.openapi()
-    # Change "openapi.json" to desired filename
-    with open("openapi.json", "w") as file:
-        json.dump(openapi_data, file)
+    # openapi_data = fastapi_app.openapi()
+    # # Change "openapi.json" to desired filename
+    # with open("openapi.json", "w") as file:
+    #     json.dump(openapi_data, file)
 
     await setup_database(async_mongo)
     scanner_service: BlockScanner = await core_container.scanner_service()

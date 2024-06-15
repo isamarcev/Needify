@@ -45,6 +45,11 @@ loggers:
     formatter: simple
     propagate: no
 
+  LiteClient:
+    level: ERROR
+    handlers: [ debug, console ]
+    propagate: no
+
   multipart.multipart:
     level: CRITICAL
 

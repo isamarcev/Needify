@@ -51,6 +51,8 @@ class BaseConfig(BaseSettings):
 
     MANIFEST_URL: str
 
+    UPDATE_LAST_SCANNED_BLOCK: bool = False
+
     class Config:
         env_file = ".env"
 
