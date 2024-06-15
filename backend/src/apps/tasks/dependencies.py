@@ -1,7 +1,6 @@
 from dependency_injector import containers, providers
 
 from src.apps.tasks.manager import TaskManager
-from src.apps.utils.database import ThreadMongoSingleton
 from src.core.config import BaseConfig
 from src.core.repository import BaseMongoRepository
 
@@ -18,8 +17,7 @@ class TaskContainer(containers.DeclarativeContainer):
     wallet_manager = providers.Dependency()
     currency_manager = providers.Dependency()
     user_manager = providers.Dependency()
-
-    async_mongo = providers.Factory(ThreadMongoSingleton, config.MONGO_DB_URL, config.MONGO_DB_NAME)
+    async_mongo = providers.Dependency()
 
     task_database = providers.Factory(
         BaseMongoRepository, mongo_client=async_mongo, collection_name="tasks"

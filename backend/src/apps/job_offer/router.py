@@ -1,5 +1,3 @@
-from typing import Any
-
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 from starlette import status
@@ -123,18 +121,36 @@ async def revoke_job_offer_message(
     return await job_offer_manager.create_revoke_message(data)
 
 
-@job_offer_router.post(
-    "/message/get-job-offer-chain-state",
-    # response_model=JobOfferMessageResponseSchema,
-    responses={
-        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        # status.HTTP_200_OK: {"model": JobOfferMessageResponseSchema},
-    },
-)
-@inject
-async def get_job_offer_chain_state(
-    data: JobOfferMessageSchema,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
-) -> Any:
-    return await job_offer_manager.get_job_offer_chain_state(data)
+# @job_offer_router.post(
+#     "/message/get-job-offer-chain-state",
+#     # response_model=JobOfferMessageResponseSchema,
+#     responses={
+#         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+#         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+#         # status.HTTP_200_OK: {"model": JobOfferMessageResponseSchema},
+#     },
+# )
+# @inject
+# async def get_job_offer_chain_state(
+#     data: JobOfferMessageSchema,
+#     job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+# ) -> Any:
+#     return await job_offer_manager.get_job_offer_chain_state(task_id=data.task_id)
+#
+#
+# @job_offer_router.get(
+#     "/vacancies",
+#     # response_model=JobOfferMessageResponseSchema,
+#     responses={
+#         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+#         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+#         # status.HTTP_200_OK: {"model": JobOfferMessageResponseSchema},
+#     },
+# )
+# @inject
+# async def test_job_offer_vacancies(
+#     address: str,
+#     job_offer_manager: JobOfferManager =
+#     Depends(Provide["job_offer_container.job_offer_manager"]),
+# ):
+#     return await job_offer_manager.get_job_vacancies(job_offer_address=address)

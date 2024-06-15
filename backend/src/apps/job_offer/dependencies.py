@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 from src.apps.job_offer.factory import JobOfferFactory
 from src.apps.job_offer.manager import JobOfferManager
 from src.apps.TONconnect.manager import TONConnectManager
+from src.apps.transaction.service import TransactionService
 from src.core.config import BaseConfig
 
 
@@ -29,6 +30,10 @@ class JobOfferContainer(containers.DeclarativeContainer):
         TONConnectManager,
     )
 
+    transaction_service = providers.Singleton(
+        TransactionService,
+    )
+
     job_offer_manager = providers.Factory(
         JobOfferManager,
         category_manager=category_manager,
@@ -40,4 +45,5 @@ class JobOfferContainer(containers.DeclarativeContainer):
         ton_connect_manager=ton_connect_manager,
         lite_client=lite_client,
         ton_lib_client=ton_lib_client,
+        transaction_service=transaction_service,
     )

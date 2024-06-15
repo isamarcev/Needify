@@ -2,7 +2,6 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from src.apps.tasks.dependencies import TaskContainer
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.manager import TaskManager
 from src.apps.tasks.schemas import PreCreateTaskSchema, TaskSchema, UserHistoryResponseSchema
@@ -23,8 +22,8 @@ task_router = APIRouter()
 @inject
 async def get_list_tasks(
     category: str | None = None,
-    status_: TaskStatusEnum | None = TaskStatusEnum.PUBLISHED,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    status_: TaskStatusEnum | None = None,
+    task_manager: TaskManager = Depends(Provide["task_container.task_manager"]),
 ):
     tasks = await task_manager.get_tasks(category=category, status=status_)
     return tasks
@@ -42,7 +41,7 @@ async def get_list_tasks(
 @inject
 async def get_task(
     task_id: int,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    task_manager: TaskManager = Depends(Provide["task_container.task_manager"]),
 ):
     task = await task_manager.get_by_task_id(task_id)
     return task
@@ -61,7 +60,7 @@ async def get_task(
 @inject
 async def create_task(
     data_to_create: PreCreateTaskSchema,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    task_manager: TaskManager = Depends(Provide["task_container.task_manager"]),
 ):
     return await task_manager.create_task(data_to_create)
 
@@ -79,7 +78,7 @@ async def create_task(
 # @inject
 # async def update_task_status(
 #     task_id: int,
-#     data_to_update: UpdateStatusTaskSchema,
+#     # data_to_update: ,
 #     task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
 # ):
 #     return await task_manager.update_task_status(task_id, data_to_update)
@@ -97,6 +96,6 @@ async def create_task(
 @inject
 async def get_tasks_by_user_id(
     user_id: int,
-    task_manager: TaskManager = Depends(Provide[TaskContainer.task_manager]),
+    task_manager: TaskManager = Depends(Provide["task_container.task_manager"]),
 ):
     return await task_manager.get_user_tasks(user_id)
