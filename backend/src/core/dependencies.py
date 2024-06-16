@@ -15,6 +15,8 @@ from src.core.config import BaseConfig
 from src.core.message_hub import MessageHub
 from src.core.producer import KafkaProducer
 from src.core.provider import get_lite_client, get_ton_lib_client
+from src.apps.notificator.dependencies import NotificatorContainer
+from telebot.async_telebot import AsyncTeleBot
 
 
 class CoreContainer(containers.DeclarativeContainer):
@@ -117,3 +119,15 @@ class CoreContainer(containers.DeclarativeContainer):
         consumer=kafka_consumer,
         handlers=handlers,
     )
+    
+    bot = providers.Singleton(
+        AsyncTeleBot,
+        token=config.BOT_TOKEN,
+    )
+
+    notificator_container = providers.Container(
+        NotificatorContainer,
+        config=config,
+        bot=bot,
+    )
+
