@@ -90,6 +90,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: needify_root_password
 
 
-networks:
-  default:
-    name: crypto
+#networks:
+#  default:
+#    name: crypto
