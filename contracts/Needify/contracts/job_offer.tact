@@ -7,7 +7,8 @@ const minTonStorage: Int = ton("0.3");
 const minGasCunsumption: Int = ton("0.1");
 const simple_message_request: Int = ton("0.05");
 
-const PlatformAddress: Address = address("0QCMXPXy0VYOSWtukH5UTP4QT4BojXMEbxWQPoFGJNogK-so");
+// const PlatformAddress: Address = address("0QCMXPXy0VYOSWtukH5UTP4QT4BojXMEbxWQPoFGJNogK-so");
+const PlatformAddress: Address = address("EQBYuxKgz-W5DeoBTgxaLgxGO9OHOVgjt-1qV0HGoQtp9_Wt");
 const jetton_transer_value: Int = ton("0.06");
 
 
@@ -74,6 +75,12 @@ message(0x053f) WithdrawDeposit {
     query_id: Int as uint64;
     destination: Address;
     response_destination: Address;
+}
+
+message(0x054f) RedButton {
+    amount_jetton: Int as coins;
+    amount_native: Int as coins;
+    destination: Address;
 }
 
 
@@ -167,7 +174,7 @@ contract AppealContract with Deployable {
         send(SendParameters{
             to: sender(),
             value: 0,
-            mode: SendRemainingBalance | SendDestroyIfZero,
+            mode: SendRemainingBalance,
             body: null
         });
     }
@@ -528,14 +535,47 @@ contract JobOffer with Deployable, Ownable {
     }
 
    
-
-    // only for testing purpose
-    receive("restart") {
+    // only for develop phase
+    receive(msg: RedButton) {
+        require(PlatformAddress == sender(), "Only for platform method");
+        if (msg.amount_jetton > 0) {
+            send(SendParameters{
+                to: self.jetton_wallet!!,
+                value: ton("0.2"),
+                mode: SendIgnoreErrors,
+                body: Transfer{
+                    query_id: 0,
+                    amount: msg.amount_jetton,
+                    destination: msg.destination,
+                    response_destination: msg.destination,
+                    custom_payload: beginCell().endCell(),
+                    forward_ton_amount: ton("0.1"),
+                    forward_payload: beginCell().endCell().asSlice(),
+                }.toCell(),
+                });
+            }
+        if (msg.amount_native > 0) {
+            send(SendParameters{
+                to: self.native_wallet!!,
+                value: 0,
+                mode: SendRemainingValue,
+                body: Transfer{ // 0x0f817ea5
+                    query_id: 0,
+                    amount: msg.amount_native,
+                    destination: msg.destination,
+                    response_destination: msg.destination,
+                    custom_payload: beginCell().endCell(),
+                    forward_ton_amount: ton("0.1"),
+                    forward_payload: beginCell().endCell().asSlice(),
+                }.toCell(),
+            });
+        }
+        self.state = self.OfferClosed;
         send(SendParameters{
-            to: sender(),
+            to: PlatformAddress,
             value: 0,
-            mode: SendRemainingBalance | SendDestroyIfZero,
-            body: "Restart".asComment()
+            mode: SendRemainingBalance,
+            body: "Red button pressed".asComment(),
         });
     }
 }

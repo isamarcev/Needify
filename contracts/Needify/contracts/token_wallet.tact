@@ -33,7 +33,7 @@ contract TokenWallet with Deployable {
         require(ctx.value > final, "Invalid value"); 
         // Update balance
         self.balance = self.balance - msg.amount; 
-        // require(self.balance >= 0, "Invalid balance");
+        require(self.balance >= 0, "Invalid balance");
         let init: StateInit = initOf TokenWallet(msg.destination, self.master);
         let to: Address = contractAddress(init);
         send(SendParameters {
