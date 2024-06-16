@@ -33,6 +33,7 @@ gunicorn = "^22.0.0"
 pyyaml = "^6.0.1"
 ruff = "^0.4.7"
 telebot = "^0.0.5"
+poetry-plugin-export = "^1.8.0"
 
 
 [tool.poetry.group.dev.dependencies]
