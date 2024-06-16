@@ -120,7 +120,6 @@ async def revoke_job_offer_message(
 ):
     return await job_offer_manager.create_revoke_message(data)
 
-
 # @job_offer_router.post(
 #     "/message/get-job-offer-chain-state",
 #     # response_model=JobOfferMessageResponseSchema,
