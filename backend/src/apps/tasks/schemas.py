@@ -27,17 +27,17 @@ class TaskDescription(str):
 class VacancySchema(BaseModel):
     doer: str
     telegram_id: int
+    is_chosen: bool = False
 
 
 class JobOfferSchema(BaseModel):
     job_offer_address: str
     jetton_master_address: str
     jetton_native_address: str
-    state: str
-    stateInit: str
+    state: str | None = None
     owner: str
     doer: str | None = None
-    vacancies: List[VacancySchema]
+    vacancies: List[VacancySchema] = []
     mark: int | None = None
     review: str | None = None
 

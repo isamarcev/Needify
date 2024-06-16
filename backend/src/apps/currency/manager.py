@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
+from pytoniq import LiteClient
 from pytonlib import TonlibClient
 from tonsdk.utils import to_nano
 from TonTools.Contracts.Jetton import Jetton, JettonWallet
@@ -33,10 +34,12 @@ class CurrencyManager(BaseCurrencyManager):
         ton_lib_client: TonlibClient,
         repository: BaseMongoRepository,
         ton_center_client: TonCenterClient,
+        lite_client: LiteClient,
     ):
         self.ton_lib_client = ton_lib_client
         self.ton_center_client = ton_center_client
         self.repository = repository
+        self.lite_client = lite_client
 
     async def get_currencies(self) -> list[CurrencySchema]:
         native_currency = await self.get_native_currency()
@@ -66,6 +69,10 @@ class CurrencyManager(BaseCurrencyManager):
             res = await self.ton_center_client.get_jetton_wallet_address(
                 jetton_master_address, owner
             )
+            jetton_wallet_state = await self.lite_client.get_account_state(res)
+            if jetton_wallet_state.state.type_ != "active":
+                raise CurrencyNotFoundJsonException(jetton_master_address)
+            logger.info(f"Jetton Wallet state: {jetton_wallet_state}")
             wallet = await self.ton_center_client.get_jetton_wallet(res)
         except GetMethodError as e:
             logger.error(f"Error: {e}")

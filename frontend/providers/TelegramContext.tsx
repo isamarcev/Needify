@@ -25,6 +25,8 @@ export const TelegramProvider = ({
     if (app) {
       app.WebApp.ready();
       app.WebApp.expand();
+      app.WebApp.setHeaderColor('#000');
+      app.WebApp.setBackgroundColor('#000');
       setWebApp(app);
       setLoading(false);
     }

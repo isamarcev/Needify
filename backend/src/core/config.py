@@ -38,8 +38,6 @@ class BaseConfig(BaseSettings):
     TON_CENTER_URL: str
     TON_CENTER_API_KEY: str
 
-    JETTON_USDT_ADDRESS: str
-
     NATIVE_CURRENCY_PRICE_TO_DEPLOY: float = 100
 
     TON_AMOUNT_TO_DEPLOY: float = 0.5
@@ -53,6 +51,8 @@ class BaseConfig(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: list[str]
 
     MANIFEST_URL: str
+
+    UPDATE_LAST_SCANNED_BLOCK: bool = False
 
     class Config:
         env_file = ".env"

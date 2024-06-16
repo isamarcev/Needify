@@ -4,10 +4,10 @@ volumes:
   static:
   media:
   web-root:
-  mongo-volume:
+
 
 services:
-  python:
+  base_api:
     build:
       context: .
       dockerfile: docker/python/Dockerfile
@@ -23,63 +23,15 @@ services:
       - mongo_needify
       - redis_needify
 
-  mongo_needify:
-    image: mongo
-    container_name: mongo_needify
-    restart: always
-    volumes:
-      - ./Volumes/Mongo:/data/db
-    command: mongod --port 27018
+  nginx:
+    build:
+      context: deploy/nginx/
+      dockerfile: Dockerfile
     ports:
-      - "27018:27018"
-
-  redis_needify:
-    image: redis:6.2
-    container_name: redis_needify
-    restart: unless-stopped
-    volumes:
-      - ./Volumes/Redis:/data
-    ports:
-      - "6379:6379"
-
-
-
-  kafka-ui:
-    image: provectuslabs/kafka-ui
-    container_name: kafka-ui
-    ports:
-      - "8080:8080"
-    restart: always
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-
-  zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    restart: always
-
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    restart: always
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092"
-      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://kafka:9092"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      - "80:80"
     depends_on:
-      - zookeeper
-    healthcheck:
-      test: [ "CMD", "nc", "-z", "localhost", "9092" ]
-      interval: 10s
-      timeout: 5s
-      retries: 15
+      - base_api
+
 
 #networks:
 #  default:

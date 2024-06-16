@@ -28,7 +28,7 @@ class MongoConfig(BaseSettings):
         env_file=PROJECT_DIR / ".env", env_file_encoding="utf-8", extra="allow"
     )
     mongo_db_url: str
-    mongo_db_name: str = "tbot_the_times"
+    mongo_db_name: str = "needify_tbot"
 
 
 class Config(BaseSettings):

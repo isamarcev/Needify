@@ -1,8 +1,5 @@
 version: '3.8'
 
-volumes:
-  mongo-volume:
-
 services:
   python:
     build:
@@ -11,22 +8,6 @@ services:
       - ./logs:/usr/src/the_times/logs
     command: python bot.py
 
-  mongo_tbot:
-      image: mongo:6
-      container_name: mongo_tbot
-      restart: always
-      volumes:
-        - ./Volumes/Mongo:/data/db
-      ports:
-        - "27017:27017"
-      depends_on:
-        - python
-
-  redis_tbot:
-    image: redis:6.2
-    container_name: redis_tbot
-    restart: unless-stopped
-    volumes:
-      - ./Volumes/Redis:/data
-    ports:
-      - "6379:6379"
+networks:
+  default:
+    name: crypto
