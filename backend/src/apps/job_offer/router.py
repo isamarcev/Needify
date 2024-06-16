@@ -31,7 +31,7 @@ job_offer_router = APIRouter()
 @inject
 async def get_deploy_job_offer_message(
     data: JobOfferMessageSchema,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_deploy_message(data)
 
@@ -48,7 +48,7 @@ async def get_deploy_job_offer_message(
 @inject
 async def get_job_offer_message(
     data: GetJob,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_get_job_message(data)
 
@@ -65,7 +65,7 @@ async def get_job_offer_message(
 @inject
 async def choose_doer_job_offer_message(
     data: ChooseDoerSchema,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_choose_doer_message(data)
 
@@ -82,7 +82,7 @@ async def choose_doer_job_offer_message(
 @inject
 async def complete_job_offer_message(
     data: CompleteJob,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_complete_message(data)
 
@@ -99,7 +99,7 @@ async def complete_job_offer_message(
 @inject
 async def confirm_job_offer_message(
     data: ConfirmJob,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_confirm_message(data)
 
@@ -116,7 +116,7 @@ async def confirm_job_offer_message(
 @inject
 async def revoke_job_offer_message(
     data: RevokeJob,
-    job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_revoke_message(data)
 

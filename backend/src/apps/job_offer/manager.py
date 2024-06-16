@@ -198,7 +198,7 @@ class JobOfferManager:
 
     async def try_ton_connect(self, task, response):
         """This is for testing purpose without application of real transactions"""
-        return
+        # return
         wallet_name = "Tonkeeper"
         connector = self.ton_connect_manager.get_connector(task.poster_id)
         await self.ton_connect_manager.connect_wallet(connector, wallet_name)

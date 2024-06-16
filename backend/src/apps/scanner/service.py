@@ -56,10 +56,10 @@ class BlockScanner:
         while True:
             try:
                 master_blk = await self.get_master_block_for_scan()
-                logging.info(f"Master block scanning: {master_blk.seqno}")
                 if master_blk is None:
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(2)
                     continue
+                logging.info(f"Master block scanning: {master_blk.seqno}")
                 shards = await self.lite_client.get_all_shards_info(master_blk)
                 for shard in shards:
                     try:
@@ -78,7 +78,11 @@ class BlockScanner:
     async def handle_block(self, block: BlockIdExt, masterchain_seqno: int):
         if block.workchain == -1:  # skip masterchain blocks
             return
-        transactions = await self.lite_client.raw_get_block_transactions_ext(block)
+        try:
+            transactions = await self.lite_client.raw_get_block_transactions_ext(block)
+        except Exception as e:
+            logging.error(f"Error getting transactions: {e}")
+            return
         for tx in transactions:
             tx: Transaction
             task_ = await self.task_manager.get_task_by_job_offer_address(
