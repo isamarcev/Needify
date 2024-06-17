@@ -3,11 +3,11 @@ from fastapi import APIRouter
 from src.apps.category.routes import category_router
 from src.apps.currency.router import currency_router
 from src.apps.job_offer.router import job_offer_router
+from src.apps.notificator.router import notificator_router
 from src.apps.scanner.router import scanner_router
 from src.apps.tasks.router import task_router
 from src.apps.TONconnect.router import ton_connect
 from src.apps.users.router import user_router
-from src.apps.notificator.router import notificator_router
 
 # from src.apps.wallets.router import jetton_router
 

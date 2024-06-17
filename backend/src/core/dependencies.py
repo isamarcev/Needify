@@ -1,11 +1,13 @@
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from dependency_injector import containers, providers
 from redis.asyncio import Redis
+from telebot.async_telebot import AsyncTeleBot
 from TonTools.Providers.TonCenterClient import TonCenterClient
 
 from src.apps.category.dependencies import CategoryContainer
 from src.apps.currency.dependencies import CurrencyContainer
 from src.apps.job_offer.dependencies import JobOfferContainer
+from src.apps.notificator.dependencies import NotificatorContainer
 from src.apps.scanner.service import BlockScanner
 from src.apps.tasks.dependencies import TaskContainer
 from src.apps.TONconnect.dependencies import TONConnectContainer
@@ -19,8 +21,6 @@ from src.core.local_storage import RedisStorage
 from src.core.message_hub import MessageHub
 from src.core.producer import KafkaProducer
 from src.core.provider import get_lite_client, get_ton_lib_client
-from src.apps.notificator.dependencies import NotificatorContainer
-from telebot.async_telebot import AsyncTeleBot
 
 
 class CoreContainer(containers.DeclarativeContainer):
@@ -146,7 +146,7 @@ class CoreContainer(containers.DeclarativeContainer):
         consumer=kafka_consumer,
         handlers=handlers,
     )
-    
+
     bot = providers.Singleton(
         AsyncTeleBot,
         token=config.BOT_TOKEN,
@@ -157,4 +157,3 @@ class CoreContainer(containers.DeclarativeContainer):
         config=config,
         bot=bot,
     )
-
