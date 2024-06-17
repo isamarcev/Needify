@@ -33,11 +33,7 @@ class UserContainer(containers.DeclarativeContainer):
         ],
     )
 
-    producer = providers.Singleton(
-        KafkaProducer,
-        producer_class=AIOKafkaProducer,
-        bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
-    )
+    producer = providers.Dependency()
 
     user_database = providers.Factory(
         MongoDBUserRepository,

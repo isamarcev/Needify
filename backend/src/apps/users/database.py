@@ -35,6 +35,10 @@ class BaseUserDatabase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    async def get_user_by_filter(self, *args, **kwargs):
+        raise NotImplementedError()
+
+    @abstractmethod
     async def setup_indexes(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -64,6 +68,9 @@ class MongoDBUserRepository(BaseUserDatabase):
 
     async def get_user_by_username(self, username: str) -> dict | None:
         return await self.collection.find_one({"username": username})
+
+    async def get_user_by_filter(self, filter_: dict) -> dict | None:
+        return await self.collection.find_one(filter_)
 
     async def update_user(self, telegram_id: int, dict_to_update: dict) -> None:
         result = await self.collection.update_one(

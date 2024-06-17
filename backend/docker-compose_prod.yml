@@ -18,8 +18,6 @@ services:
       - .:/usr/src/needify/
     env_file:
       - ./.env
-    ports:
-      - "8000:8000"
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
     depends_on:
       - redis
@@ -90,6 +88,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: needify_root_password
 
 
-networks:
-  default:
-    name: crypto
+#networks:
+#  default:
+#    name: crypto
