@@ -31,7 +31,12 @@ handlers:
 loggers:
   root:
     level: INFO
-    handlers: [ debug, console ]
+    handlers: [ debug ]
+    propagate: no
+
+  root.error:
+    level: ERROR
+    handlers: [ error ]
     propagate: no
 
   uvicorn.access:

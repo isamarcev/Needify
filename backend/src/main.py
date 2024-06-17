@@ -55,8 +55,9 @@ async def startup_event():
     lite_client: LiteClient = core_container.lite_client()
     await lite_client.connect()
 
-    message_hub = core_container.message_hub()
-    asyncio.create_task(message_hub.consume())
+    # CLOSE KAFKA NOW
+    # message_hub = core_container.message_hub()
+    # asyncio.create_task(message_hub.consume())
     # openapi_data = fastapi_app.openapi()
     # # Change "openapi.json" to desired filename
     # with open("openapi.json", "w") as file:
