@@ -1,6 +1,6 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
-from starlette import status
+from starlette import status as starlette_status
 
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.manager import TaskManager
@@ -11,21 +11,21 @@ task_router = APIRouter()
 
 
 @task_router.get(
-    "/",
+    "",
     response_model=list[TaskSchema],
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        status.HTTP_200_OK: {"model": TaskSchema},
+        starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+        starlette_status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+        starlette_status.HTTP_200_OK: {"model": TaskSchema},
     },
 )
 @inject
 async def get_list_tasks(
     category: str | None = None,
-    status_: TaskStatusEnum | None = None,
+    status: TaskStatusEnum | None = None,
     task_manager: TaskManager = Depends(Provide["task_container.task_manager"]),
 ):
-    tasks = await task_manager.get_tasks(category=category, status=status_)
+    tasks = await task_manager.get_tasks(category=category, status=status)
     return tasks
 
 
@@ -33,9 +33,12 @@ async def get_list_tasks(
     "/{task_id}",
     response_model=TaskSchema,
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        status.HTTP_200_OK: {"model": TaskSchema},
+        200: {
+            "description": "Examples of response",
+            "content": TaskSchema.Config.schema_extra["response_example"],
+        },
+        starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+        starlette_status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
     },
 )
 @inject
@@ -48,12 +51,12 @@ async def get_task(
 
 
 @task_router.post(
-    "/",
+    "",
     response_model=TaskSchema,
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        status.HTTP_200_OK: {"model": TaskSchema},
+        starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+        starlette_status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+        starlette_status.HTTP_200_OK: {"model": TaskSchema},
     },
     description="Create task, currency == currency symbol",
 )
@@ -88,9 +91,9 @@ async def create_task(
     "/{user_id}/tasks",
     response_model=UserHistoryResponseSchema,
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-        status.HTTP_200_OK: {"model": UserHistoryResponseSchema},
+        starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+        starlette_status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+        starlette_status.HTTP_200_OK: {"model": UserHistoryResponseSchema},
     },
 )
 @inject
