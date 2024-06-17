@@ -55,6 +55,10 @@ async def startup_event():
     lite_client: LiteClient = core_container.lite_client()
     await lite_client.connect()
 
+    # setup categories
+    category_manager = core_container.category_container.category_manager()
+    await category_manager.on_startup()
+
     # CLOSE KAFKA NOW
     # message_hub = core_container.message_hub()
     # asyncio.create_task(message_hub.consume())

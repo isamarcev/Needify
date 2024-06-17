@@ -1,5 +1,6 @@
 import logging
 
+from src.apps.category.examples import categories
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.shema import CategorySchema
 from src.apps.utils.exceptions import JsonHTTPException
@@ -45,3 +46,9 @@ class CategoryManager:
                 result = await self.create(category)
                 categories_to_response.append(result)
         return categories_to_response
+
+    async def on_startup(self):
+        for category in categories:
+            if not await self.get(category["title"], raise_if_not_exist=False):
+                await self.create(CategorySchema(**category))
+        logger.info("Categories checked created")

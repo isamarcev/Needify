@@ -50,19 +50,47 @@ class TaskSchema(BaseModel):
     category: str
     price: PositiveFloat
     currency: str
-
     status: TaskStatusEnum = TaskStatusEnum.PRE_CREATED
     poster_id: PositiveInt
     poster_address: str
-
     doer_id: int | None = None
     doer_address: str | None = None
-
     job_offer: JobOfferSchema | None = None
-
     deadline: datetime
     created_at: datetime
     updated_at: datetime | None = None
+
+    class Config:
+        schema_extra = {
+            "response_example": {
+                "task_id": 1,
+                "title": "Some title",
+                "description": "Some description",
+                "images": ["https://someimage.com"],
+                "category": "Some category",
+                "price": 100.0,
+                "currency": "USD",
+                "status": "PRE_CREATED",
+                "poster_id": 1,
+                "poster_address": "0QBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8ItwboL_",
+                "doer_id": 2,
+                "doer_address": "0QBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8ItwboL_",
+                "job_offer": {
+                    "job_offer_address": "0QBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8ItwboL_",
+                    "jetton_master_address": "0QBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8ItwboL_",
+                    "jetton_native_address": "0QBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8ItwboL_",
+                    "state": "Some state",
+                    "owner": "Some owner",
+                    "doer": "Some doer",
+                    "vacancies": [{"doer": "Some doer", "telegram_id": 1, "is_chosen": False}],
+                    "mark": 1,
+                    "review": "Some review",
+                },
+                "deadline": "2021-09-01T00:00:00",
+                "created_at": "2021-09-01T00:00:00",
+                "updated_at": "2021-09-01T00:00:00",
+            }
+        }
 
 
 class PreCreateTaskSchema(BaseModel):

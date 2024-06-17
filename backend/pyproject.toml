@@ -92,6 +92,9 @@ ignore = [
     "UP007",
     "I001"
 ]
+"./src/apps/category/examples.py" = [
+    "E501",
+]
 
 
 [build-system]
