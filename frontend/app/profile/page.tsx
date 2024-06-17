@@ -1,8 +1,8 @@
 'use client';
-import axios from 'axios';
-import { TonConnectButton } from '@tonconnect/ui-react';
+import { useState, useEffect } from 'react';
 import styles from './page.module.css';
-import { IProfileValues } from './types';
+import { TonConnectButton } from '@tonconnect/ui-react';
+import { TonConnect } from '@tonconnect/sdk';
 import { InnerPage } from '@/components/InnerPage';
 import {
   FormContainer,
@@ -21,66 +21,116 @@ import {
   OutlinedInput,
   Box,
   Chip,
+  Avatar,
 } from '@mui/material';
-import { getOptionsFromEnum } from '@/helpers';
-import { ECurrency } from '@/app/task-detail/[id]/types';
-//
-// const connector = new TonConnect();
-//
-// console.log(connector);
-// connector.restoreConnection();
-
-const defaultValues: IProfileValues = {
-  name: '',
-};
+import { editUser, getUser } from '@/services/api';
+import { useTelegram } from '@/providers/TelegramContext';
 
 export default function Page() {
+  const webApp = useTelegram();
+  const id = 847057842;
+
+  const [defaultValues, setDefaultValues] = useState({});
+
+  const [isLoadingUser, setLoadingUser] = useState(true);
+  const [avatar, setAvatar] = useState('');
+  // const [categories, setCategories] = useState([]);
+  // const [isLoadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    getUser(id).then((res) => {
+      setDefaultValues((prevState) => ({
+        ...prevState,
+        first_name: res.first_name,
+        last_name: res.last_name,
+      }));
+      setLoadingUser(false);
+      setAvatar(res.image);
+    });
+    // getCategories().then((res) => {
+    //   console.log(res);
+    //   setCategories(res);
+    //   setLoadingCategories(false);
+    // });
+  }, []);
+
+  function submitForm(data) {
+    const body = {
+      ...data,
+      image: avatar,
+    };
+    editUser(id, body);
+  }
+
+  function changeAvatar(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  if (isLoadingUser) return <></>;
+
   return (
     <InnerPage title="Profile">
-      <FormContainer
-        defaultValues={defaultValues}
-        onSuccess={(data) => {
-          console.log(data);
-        }}
-      >
+      <FormContainer defaultValues={defaultValues} onSuccess={submitForm}>
         <div className={styles.top}>
           <TextFieldElement
-            className={styles.name}
-            name="name"
-            label="Name"
+            className={styles.first_name}
+            name="first_name"
+            placeholder="Name"
             required
             fullWidth
           />
           <TonConnectButton />
         </div>
-        <div className={styles.avatar}></div>
         <TextFieldElement
+          className={styles.last_name}
+          name="last_name"
+          placeholder="Last name"
           fullWidth
-          name="photo"
-          label="Photo"
-          type="file"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{
-            accept: 'image/*',
-          }}
         />
-        <div className={styles.expert}>
-          <FormControlLabel
-            control={<Switch defaultChecked />}
-            name="isExpert"
-            label="Expert profile"
+        <div className={styles.avatar}>
+          <Avatar
+            className={styles.avatar_image}
+            sx={{
+              width: 108,
+              height: 108,
+              bgcolor: '#0098EA',
+            }}
+            src={avatar}
+          ></Avatar>
+          <TextFieldElement
+            fullWidth
+            label="Photo"
+            name="image"
+            type="file"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              accept: 'image/*',
+            }}
+            onChange={changeAvatar}
           />
         </div>
-        <TextareaAutosizeElement
-          fullWidth
-          className={styles.wholeLine}
-          name="about"
-          label="About me"
-          required
-          rows={5}
-        />
+
+        {/*<div className={styles.expert}>*/}
+        {/*  <FormControlLabel control={<Switch />} label="Expert profile" />*/}
+        {/*</div>*/}
+        {/*<TextareaAutosizeElement*/}
+        {/*  fullWidth*/}
+        {/*  className={styles.about}*/}
+        {/*  name="about"*/}
+        {/*  label="About me"*/}
+        {/*  required*/}
+        {/*  rows={5}*/}
+        {/*/>*/}
         {/*<FormControl sx={{ m: 1, width: 300 }}>*/}
         {/*  <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>*/}
         {/*  <Select*/}
@@ -110,7 +160,7 @@ export default function Page() {
         {/*    ))}*/}
         {/*  </Select>*/}
         {/*</FormControl>*/}
-        <Button variant="contained" type="submit">
+        <Button className={styles.button} variant="contained" type="submit">
           Save
         </Button>
       </FormContainer>

@@ -1,4 +1,3 @@
-'use client';
 import type { Metadata } from 'next';
 import './globals.css';
 import { TelegramProvider } from '@/providers/TelegramContext';
@@ -13,11 +12,11 @@ import { Inter } from 'next/font/google';
 import { DateFnsProvider } from '@/providers/DateFnsProvider';
 import { TonConnectProvider } from '@/providers/TonConnectProvider';
 
-// export const metadata: Metadata = {
-//   title: 'The Open Times',
-//   description:
-//     'A platform that helps people assist each other and exchange their TIME for more efficient economic growth, enabling them to live and work during their free time',
-// };
+export const metadata: Metadata = {
+  title: 'The Open Times',
+  description:
+    'A platform that helps people assist each other and exchange their TIME for more efficient economic growth, enabling them to live and work during their free time',
+};
 
 const inter = Inter({ subsets: ['latin'] });
 

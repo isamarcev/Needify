@@ -8,7 +8,8 @@ export function TonConnectProvider({
   children: React.ReactNode;
 }) {
   return (
-    <TonConnectUIProvider manifestUrl="https://">
+    // https://tot-omega.vercel.app
+    <TonConnectUIProvider manifestUrl="http://localhost:3000/tonconnect-manifest.json">
       {children}
     </TonConnectUIProvider>
   );

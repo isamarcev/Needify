@@ -3,7 +3,27 @@
     display: flex;
 }
 
-.name {
+.first_name {
     max-width: 50%;
     margin-right: auto;
+}
+
+.last_name {
+    margin-bottom: 24px;
+}
+
+.about {
+    margin-bottom: 24px;
+}
+
+.avatar {
+    margin-bottom: 24px;
+}
+
+.avatar_image {
+    margin-bottom: 24px;
+}
+
+.button {
+    width: 100%;
 }
