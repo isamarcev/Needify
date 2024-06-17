@@ -22,18 +22,18 @@ currency_router = APIRouter()
 #     return result
 #
 #
-@currency_router.post("/mint")
-@inject
-async def mint_(
-    schema: MintTokenSchema,
-    currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
-):
-    result = await currency_manager.mint_tokens(schema)
-    return result
+# @currency_router.post("/mint")
+# @inject
+# async def mint_(
+#     schema: MintTokenSchema,
+#     currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
+# ):
+#     result = await currency_manager.mint_tokens(schema)
+#     return result
 
 
 @currency_router.get(
-    "/",
+    "",
     response_model=list[CurrencySchema],
 )
 @inject
