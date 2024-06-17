@@ -7,7 +7,7 @@ const minTonStorage: Int = ton("0.3");
 const minGasCunsumption: Int = ton("0.1");
 const simple_message_request: Int = ton("0.05");
 
-const PlatformAddress: Address = address("0QCMXPXy0VYOSWtukH5UTP4QT4BojXMEbxWQPoFGJNogK-so");
+const PlatformAddress: Address = address("0QBVxO80__1rBGqrWzJjbMf5ZLmk0zyh3cps4vhl8ItwboL_");
 // const PlatformAddress: Address = address("EQBYuxKgz-W5DeoBTgxaLgxGO9OHOVgjt-1qV0HGoQtp9_Wt");
 const jetton_transer_value: Int = ton("0.06");
 
@@ -319,7 +319,7 @@ contract JobOffer with Deployable, Ownable {
             send(SendParameters{
             to: myAddress(), 
             value: 0, 
-            mode: SendPayGasSeparately,
+            mode: SendRemainingValue,
             body: CheckPublish{
                 query_id: 0
             }.toCell(),
