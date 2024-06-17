@@ -87,7 +87,11 @@ class JobOfferManager:
         result = await self.ton_lib_client.raw_run_method(
             address=job_offer_address, method="vacancies", stack_data=[]
         )
-        base64_str = result["stack"][0][1]["bytes"]
+        try:
+            base64_str = result["stack"][0][1]["bytes"]
+        except KeyError as e:
+            logging.error(f"Error in get_job_vacancies: {e}")
+            return []
         byte_data = base64.b64decode(base64_str)
         cell = Cell.one_from_boc(byte_data)
         hash_map = HashMap.from_cell(cell, 267)
@@ -198,7 +202,7 @@ class JobOfferManager:
 
     async def try_ton_connect(self, task, response):
         """This is for testing purpose without application of real transactions"""
-        return
+        # return
         wallet_name = "Tonkeeper"
         connector = self.ton_connect_manager.get_connector(task.poster_id)
         await self.ton_connect_manager.connect_wallet(connector, wallet_name)
