@@ -5,13 +5,27 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import { Selector } from '@/components/Selector';
 import { TaskCard } from '@/widgets/TaskCard';
 import Link from 'next/link';
-import { cardsShortData } from '@/tests/mockData';
-import { getOptionsFromEnum } from '@/helpers';
-import { ECategory } from '@/app/task-detail/[id]/types';
+import { categoriesRawToOptions, tasksRawToShortCards } from '@/helpers';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { getCategories, getTasks } from '@/services/api';
+import { IOption } from '@/components/Selector/types';
+import { ITaskShortCard } from '@/widgets/TaskCard/types';
 
 export default function Home() {
   const { isLoading } = useTelegram();
+  const [categoriesOptions, setCategoriesOptions] = useState<IOption[]>([]);
+  const [tasks, setTasks] = useState<ITaskShortCard[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const categoriesList = await getCategories();
+      setCategoriesOptions(categoriesRawToOptions(categoriesList));
+
+      const tasksList = await getTasks();
+      setTasks(tasksRawToShortCards(tasksList));
+    })();
+  }, []);
 
   return isLoading ? (
     <Box className={styles.loader}>
@@ -45,12 +59,12 @@ export default function Home() {
       <Box className={styles.category}>
         <Selector
           label="Category"
-          options={getOptionsFromEnum(ECategory)}
+          options={categoriesOptions}
           onChange={() => {}}
         />
       </Box>
       <Box className={styles.cards}>
-        {cardsShortData.map((data) => (
+        {tasks.map((data) => (
           <TaskCard key={data.id} {...data} />
         ))}
       </Box>

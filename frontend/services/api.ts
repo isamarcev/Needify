@@ -1,4 +1,9 @@
-import { AddUserWalletParams, EditUserParams } from '@/services/types';
+import {
+  AddUserWalletParams,
+  EditUserParams,
+  ICategoryRaw,
+  ITaskRaw,
+} from '@/services/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -57,7 +62,7 @@ export async function addUserWallet(params: AddUserWalletParams) {
 // Currency
 
 // Task
-export async function getTasks() {
+export async function getTasks(): Promise<ITaskRaw[]> {
   const res = await fetch(`${BASE_URL}/v1/task`);
 
   if (!res.ok) {
@@ -76,16 +81,18 @@ export async function getTask(id: number) {
 
   return res.json();
 }
+
 // Job-offer
 
 // Category
-export async function getCategories() {
+export async function getCategories(): Promise<ICategoryRaw[]> {
   const res = await fetch(`${BASE_URL}/v1/category`);
 
   if (!res.ok) {
-    throw new Error('Failed to get tasks');
+    throw new Error('Failed to get categories');
   }
 
   return res.json();
 }
+
 // Ton-connect
