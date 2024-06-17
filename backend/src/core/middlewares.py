@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException
@@ -18,6 +19,14 @@ async def catch_exceptions_middleware(request: Request, call_next):
 
     except JsonHTTPException as exc:
         return exc.response()
+
+    except Exception as exc:
+        logging.exception(exc)
+        return JsonHTTPException(
+            status_code=500,
+            error_name="INTERNAL_SERVER_ERROR",
+            error_description="Internal server error",
+        ).response()
 
 
 def setup_middlewares(app: FastAPI):

@@ -38,7 +38,6 @@ class BlockScanner:
                 wc=-1, shard=-9223372036854775808, seqno=last_scanned_block + 1
             )
             return master_blk
-        logging.info("No new blocks to scan")
         return None
 
     async def manual_scan(self, mc_seqno: int):
@@ -67,7 +66,6 @@ class BlockScanner:
                     except Exception as e:
                         logging.error(f"Error handling block: {e}")
                 await self.local_storage.set_last_scanned_block(master_blk.seqno)
-                logging.info(f"Scanned block {master_blk.seqno}")
             except Exception as e:
                 logging.info(f"Error scanning: {e}")
 
@@ -93,6 +91,3 @@ class BlockScanner:
                     tx, task_, masterchain_seqno
                 )
                 logging.info(f"Detected task for job offer address: 0:{tx.account_addr_hex}")
-        logging.info(
-            f"Block workchain: {block.workchain}, shard {block.shard}, {block.seqno=} handled"
-        )
