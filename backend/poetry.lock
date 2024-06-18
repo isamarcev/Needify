@@ -1192,6 +1192,20 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "faker"
+version = "25.8.0"
+description = "Faker is a Python package that generates fake data for you."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "Faker-25.8.0-py3-none-any.whl", hash = "sha256:4c40b34a9c569018d4f9d6366d71a4da8a883d5ddf2b23197be5370f29b7e1b6"},
+    {file = "Faker-25.8.0.tar.gz", hash = "sha256:bdec5f2fb057d244ebef6e0ed318fea4dcbdf32c3a1a010766fc45f5d68fc68d"},
+]
+
+[package.dependencies]
+python-dateutil = ">=2.4"
+
+[[package]]
 name = "fastapi"
 version = "0.110.3"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -3348,4 +3362,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "484932fff18af22ec327739320e6423a278d07fee773efe96b23268df50ff95c"
+content-hash = "30f507a3e1174c0481b0807f834c3989a38d4f6c23b22200de1e24c1c8cebe29"
