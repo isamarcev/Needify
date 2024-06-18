@@ -19,7 +19,7 @@ NUMBER_OF_FAKE_TASKS = 10
 async def main():
     config = BaseConfig()
     async_mongo = ThreadMongoSingleton(config.MONGO_DB_URL, config.MONGO_DB_NAME)
-    tasks_repository = BaseMongoRepository(mongo_client=async_mongo, collection_name="taskss")
+    tasks_repository = BaseMongoRepository(mongo_client=async_mongo, collection_name="tasks")
     users_repository = MongoDBUserRepository(
         config.MONGO_DB_URL, config.MONGO_DB_NAME, collection_name="users"
     )
