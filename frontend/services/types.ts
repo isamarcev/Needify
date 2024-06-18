@@ -5,7 +5,6 @@ export interface EditUserParams {
 }
 
 export interface AddUserWalletParams {
-  telegramId: number;
   address: string;
 }
 

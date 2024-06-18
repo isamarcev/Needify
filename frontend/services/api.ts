@@ -31,6 +31,9 @@ export async function getUser(id: number) {
 export async function editUser(id: number, params: EditUserParams) {
   const res = await fetch(`${BASE_URL}/v1/users/${id}`, {
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(params),
   });
 
@@ -41,16 +44,15 @@ export async function editUser(id: number, params: EditUserParams) {
   return res.json();
 }
 
-export async function addUserWallet(params: AddUserWalletParams) {
-  const res = await fetch(
-    `${BASE_URL}/v1/users/wallet/add?telegram_id=${params.telegramId}`,
-    {
-      method: 'POST',
-      body: {
-        address: params.address,
-      },
+export async function addUserWallet(id: number, params: AddUserWalletParams) {
+  const res = await fetch(`${BASE_URL}/v1/users/wallet/add?telegram_id=${id}`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
     },
-  );
+    body: JSON.stringify(params),
+  });
 
   if (!res.ok) {
     throw new Error('Failed to add user wallet');

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { TonConnectButton } from '@tonconnect/ui-react';
-import { TonConnect } from '@tonconnect/sdk';
+import { useTonWallet } from '@tonconnect/ui-react';
 import { InnerPage } from '@/components/InnerPage';
 import {
   FormContainer,
@@ -23,13 +23,21 @@ import {
   Chip,
   Avatar,
 } from '@mui/material';
-import { editUser, getUser } from '@/services/api';
+import { addUserWallet, editUser, getUser } from '@/services/api';
 import { useTelegram } from '@/providers/TelegramContext';
 
 export default function Page() {
   const webApp = useTelegram();
-  const id = 847057842;
-
+  const wallet = useTonWallet();
+  const address = wallet?.account?.address;
+  console.log(wallet);
+  const telegramId = webApp?.initDataUnsafe?.user.id;
+  const id = telegramId || 0;
+  if (address) {
+    addUserWallet(id, {
+      address,
+    });
+  }
   const [defaultValues, setDefaultValues] = useState({});
 
   const [isLoadingUser, setLoadingUser] = useState(true);
