@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from src.apps.currency.dependencies import CurrencyContainer
 from src.apps.currency.manager import CurrencyManager
-from src.apps.currency.schemas import CurrencySchema, MintTokenSchema
+from src.apps.currency.schemas import CurrencySchema
 
 currency_router = APIRouter()
 
