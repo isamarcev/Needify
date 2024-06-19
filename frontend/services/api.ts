@@ -1,6 +1,7 @@
 import {
   AddUserWalletParams,
   EditUserParams,
+  ETaskStatus,
   ICategoryRaw,
   ITaskRaw,
 } from '@/services/types';
@@ -64,8 +65,13 @@ export async function addUserWallet(id: number, params: AddUserWalletParams) {
 // Currency
 
 // Task
-export async function getTasks(): Promise<ITaskRaw[]> {
-  const res = await fetch(`${BASE_URL}/v1/task`);
+export async function getTasks(params: {
+  category: string;
+  status?: ETaskStatus;
+}): Promise<ITaskRaw[]> {
+  const searchParams = new URLSearchParams(params);
+
+  const res = await fetch(`${BASE_URL}/v1/task?${searchParams}`);
 
   if (!res.ok) {
     throw new Error('Failed to get tasks');
