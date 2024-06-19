@@ -5,27 +5,43 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import { Selector } from '@/components/Selector';
 import { TaskCard } from '@/widgets/TaskCard';
 import Link from 'next/link';
-import { categoriesRawToOptions, tasksRawToShortCards } from '@/helpers';
+import { tasksRawToShortCards } from '@/helpers';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { getCategories, getTasks } from '@/services/api';
+import { useCallback, useEffect, useState } from 'react';
+import { getTasks } from '@/services/api';
 import { IOption } from '@/components/Selector/types';
 import { ITaskShortCard } from '@/widgets/TaskCard/types';
+import { ETaskStatus } from '@/services/types';
 
 export default function Home() {
   const { isLoading } = useTelegram();
+
+  const [currCategory, setCurrCategory] = useState('');
   const [categoriesOptions, setCategoriesOptions] = useState<IOption[]>([]);
   const [tasks, setTasks] = useState<ITaskShortCard[]>([]);
 
+  const handleCategoryChange = useCallback((value: string) => {
+    setCurrCategory(value);
+  }, []);
+
   useEffect(() => {
     (async () => {
-      const categoriesList = await getCategories();
-      setCategoriesOptions(categoriesRawToOptions(categoriesList));
+      const tasksList = await getTasks({
+        category: currCategory,
+        status: ETaskStatus.PUBLISHED,
+      });
 
-      const tasksList = await getTasks();
       setTasks(tasksRawToShortCards(tasksList));
+
+      if (!categoriesOptions.length) {
+        const categoriesList = tasksList.map(({ category }) => ({
+          id: category,
+          label: category,
+        }));
+        setCategoriesOptions([{ id: '', label: '' }, ...categoriesList]);
+      }
     })();
-  }, []);
+  }, [currCategory]);
 
   return isLoading ? (
     <Box className={styles.loader}>
@@ -60,7 +76,7 @@ export default function Home() {
         <Selector
           label="Category"
           options={categoriesOptions}
-          onChange={() => {}}
+          onChange={handleCategoryChange}
         />
       </Box>
       <Box className={styles.cards}>
