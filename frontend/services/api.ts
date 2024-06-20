@@ -32,7 +32,7 @@ export async function getUser(id: number) {
 }
 
 export async function createUser(params: EditUserParams) {
-  const res = await fetch(`${BASE_URL}/v1/users/${id}`, {
+  const res = await fetch(`${BASE_URL}/v1/users`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export async function createUser(params: EditUserParams) {
   });
 
   if (!res.ok) {
-    throw new Error('Failed to get users');
+    throw new Error('Failed to create user');
   }
 
   return res.json();
