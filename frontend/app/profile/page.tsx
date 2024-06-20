@@ -2,34 +2,36 @@
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { TonConnectButton } from '@tonconnect/ui-react';
-import { TonConnect } from '@tonconnect/sdk';
+import { useTonWallet } from '@tonconnect/ui-react';
 import { InnerPage } from '@/components/InnerPage';
 import {
   FormContainer,
-  SelectElement,
-  TextareaAutosizeElement,
+  // SelectElement,
+  // TextareaAutosizeElement,
   TextFieldElement,
 } from 'react-hook-form-mui';
 import {
   Button,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  Switch,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Box,
-  Chip,
+  // FormControl,
+  // FormControlLabel,
+  // InputLabel,
+  // Switch,
+  // Select,
+  // MenuItem,
+  // OutlinedInput,
+  // Box,
+  // Chip,
   Avatar,
 } from '@mui/material';
-import { editUser, getUser } from '@/services/api';
+import { addUserWallet, editUser, getUser } from '@/services/api';
 import { useTelegram } from '@/providers/TelegramContext';
 
 export default function Page() {
   const webApp = useTelegram();
-  const id = 847057842;
-
+  const telegramId = webApp?.initDataUnsafe?.user.id;
+  const id = telegramId || 0;
+  const wallet = useTonWallet();
+  const address = wallet?.account?.address;
   const [defaultValues, setDefaultValues] = useState({});
 
   const [isLoadingUser, setLoadingUser] = useState(true);
@@ -39,6 +41,11 @@ export default function Page() {
 
   useEffect(() => {
     getUser(id).then((res) => {
+      if (res?.web3_wallet?.address && address) {
+        addUserWallet(id, {
+          address,
+        });
+      }
       setDefaultValues((prevState) => ({
         ...prevState,
         first_name: res.first_name,
