@@ -1,5 +1,5 @@
 import { IOption } from '@/components/Selector/types';
-import { ICategoryRaw, ITaskRaw } from '@/services/types';
+import { ICategoryRaw, ICurrency, ITaskRaw } from '@/services/types';
 import { ITaskShortCard } from '@/widgets/TaskCard/types';
 import { format } from 'date-fns';
 
@@ -22,3 +22,6 @@ export const tasksRawToShortCards = (tasksRaw: ITaskRaw[]): ITaskShortCard[] =>
       price,
     };
   });
+
+export const currenciesRawToOptions = (currenciesRaw: ICurrency[]): IOption[] =>
+  currenciesRaw.map(({ symbol }) => ({ id: symbol, label: symbol }));

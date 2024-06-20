@@ -61,3 +61,24 @@ export interface ITaskRaw {
   created_at: string;
   updated_at: string | null;
 }
+
+export interface ICreateTaskData {
+  title: string;
+  description: string;
+  category: string;
+  images: string[];
+  price: number;
+  currency: string;
+  poster_id: number;
+  deadline: string;
+}
+
+export interface ICurrency {
+  address: string;
+  decimals: 6;
+  symbol: string;
+  name: string;
+  image: string;
+  is_active: boolean;
+  description: string;
+}

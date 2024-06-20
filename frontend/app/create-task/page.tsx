@@ -5,27 +5,47 @@ import styles from './page.module.css';
 import {
   FormContainer,
   SelectElement,
+  SubmitHandler,
   TextareaAutosizeElement,
   TextFieldElement,
 } from 'react-hook-form-mui';
-import { getOptionsFromEnum } from '@/helpers';
-import { ECategory, ECurrency } from '@/app/task-detail/[id]/types';
+import { categoriesRawToOptions, currenciesRawToOptions } from '@/helpers';
 import { DatePickerElement } from 'react-hook-form-mui/date-pickers';
 import { SubComponent } from './components/SubmitForm';
+import { useCallback, useEffect, useState } from 'react';
+import { IOption } from '@/components/Selector/types';
+import { createTask, getCategories, getCurrencies } from '@/services/api';
+import { ICreateTaskData } from '@/services/types';
 
 const defaultValues: ICreateTaskValues = {
   title: '',
 };
 
 export default function Page() {
+  const [categoriesOptions, setCategoriesOptions] = useState<IOption[]>([]);
+  const [currenciesOptions, setCurrenciesOptions] = useState<IOption[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const categoriesList = await getCategories();
+      setCategoriesOptions(categoriesRawToOptions(categoriesList));
+
+      const currenciesList = await getCurrencies();
+      setCurrenciesOptions(currenciesRawToOptions(currenciesList));
+    })();
+  }, []);
+
+  const handleSubmit: SubmitHandler<ICreateTaskData> = useCallback(
+    async (data) => {
+      // TODO: add poster_id
+      await createTask({ ...data, poster_id: 847057842 });
+    },
+    [],
+  );
+
   return (
     <InnerPage title="Create task">
-      <FormContainer
-        defaultValues={defaultValues}
-        onSuccess={(data) => {
-          console.log(data);
-        }}
-      >
+      <FormContainer defaultValues={defaultValues} onSuccess={handleSubmit}>
         <div className={styles.form}>
           <TextFieldElement
             className={styles.wholeLine}
@@ -38,10 +58,11 @@ export default function Page() {
             name="description"
             label="Description"
             rows={3}
+            required
           />
           <TextFieldElement
             className={styles.wholeLine}
-            name="photo"
+            name="images"
             label="Photo"
             type="file"
             InputLabelProps={{
@@ -56,18 +77,21 @@ export default function Page() {
             className={styles.wholeLine}
             label="Category"
             name="category"
-            options={getOptionsFromEnum(ECategory)}
+            options={categoriesOptions}
+            required
           />
-          <TextFieldElement name="price" label="Price" type="number" />
+          <TextFieldElement name="price" label="Price" type="number" required />
           <SelectElement
             label="Currency"
             name="currency"
-            options={getOptionsFromEnum(ECurrency)}
+            options={currenciesOptions}
+            required
           />
           <DatePickerElement
             className={styles.wholeLine}
             name="deadline"
             label="Deadline"
+            required
           />
         </div>
         <SubComponent />

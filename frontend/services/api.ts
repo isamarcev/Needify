@@ -3,6 +3,8 @@ import {
   EditUserParams,
   ETaskStatus,
   ICategoryRaw,
+  ICreateTaskData,
+  ICurrency,
   ITaskRaw,
 } from '@/services/types';
 
@@ -62,6 +64,16 @@ export async function addUserWallet(params: AddUserWalletParams) {
 
 // Currency
 
+export async function getCurrencies(): Promise<ICurrency[]> {
+  const res = await fetch(`${BASE_URL}/v1/currency`);
+
+  if (!res.ok) {
+    throw new Error('Failed to get currencies');
+  }
+
+  return res.json();
+}
+
 // Task
 export async function getTasks(params: {
   category: string;
@@ -83,6 +95,21 @@ export async function getTask(id: number) {
 
   if (!res.ok) {
     throw new Error('Failed to get task');
+  }
+
+  return res.json();
+}
+
+export async function createTask(data: ICreateTaskData): Promise<ITaskRaw> {
+  const res = await fetch(`${BASE_URL}/v1/task`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    mode: 'no-cors',
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to post task');
   }
 
   return res.json();

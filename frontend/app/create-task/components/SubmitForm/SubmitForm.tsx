@@ -4,6 +4,10 @@ import { Alert, Button, Stack } from '@mui/material';
 export const SubComponent = () => {
   const fields = useWatch();
 
+  const isDisabled = Object.entries(fields)
+    .filter(([key, _]) => key !== 'images')
+    .some(([_, value]) => !value);
+
   return (
     <>
       <Stack spacing={3} marginTop={2}>
@@ -11,7 +15,7 @@ export const SubComponent = () => {
           type="submit"
           color="primary"
           variant="contained"
-          disabled={!fields.title}
+          disabled={isDisabled}
         >
           Submit
         </Button>

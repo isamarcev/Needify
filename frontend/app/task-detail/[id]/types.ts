@@ -32,4 +32,5 @@ export enum ECurrency {
   USDT = 'USDT',
   NOT = 'NOT',
   ETH = 'ETH',
+  TUSDT = 'TUSDT',
 }
