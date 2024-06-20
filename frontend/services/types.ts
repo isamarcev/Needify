@@ -1,3 +1,11 @@
+export interface CreateUserParams {
+  telegram_id: number;
+  first_name: string;
+  username?: string;
+  last_name?: string;
+  image?: string;
+}
+
 export interface EditUserParams {
   first_name: string;
   last_name?: string;
@@ -5,7 +13,6 @@ export interface EditUserParams {
 }
 
 export interface AddUserWalletParams {
-  telegramId: number;
   address: string;
 }
 

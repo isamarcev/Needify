@@ -1,6 +1,7 @@
 'use client';
-
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
+
+const MANIFEST_URL = process.env.MANIFEST_URL;
 
 export function TonConnectProvider({
   children,
@@ -8,7 +9,9 @@ export function TonConnectProvider({
   children: React.ReactNode;
 }) {
   return (
-    <TonConnectUIProvider manifestUrl="https://tot-omega.vercel.app/tonconnect-manifest.json">
+    <TonConnectUIProvider
+      manifestUrl={`${MANIFEST_URL}/tonconnect-manifest.json`}
+    >
       {children}
     </TonConnectUIProvider>
   );

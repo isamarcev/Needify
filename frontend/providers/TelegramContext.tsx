@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { usePathname, useRouter } from 'next/navigation';
+import { createUser } from '@/services/api';
 
 export const TelegramContext = createContext<{
   telegramApp?: Telegram;
@@ -42,6 +43,12 @@ export const TelegramProvider = ({
       }
     }
   }, [webApp, pathname, router]);
+
+  useEffect(() => {
+    if (webApp) {
+      createUser(webApp.WebApp.initData.user);
+    }
+  }, [webApp]);
 
   return (
     <TelegramContext.Provider value={{ telegramApp: webApp, isLoading }}>
