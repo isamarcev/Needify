@@ -2,7 +2,9 @@ import asyncio
 import logging
 
 from dependency_injector.wiring import inject
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pytoniq import LiteClient
 
 from src.apps.scanner.service import BlockScanner
@@ -26,6 +28,31 @@ fastapi_app = FastAPI(
     **FASTAPI_CONFIG,
 )
 
+def create_readable_error_detail(errors):
+    readable_errors = []
+    for error in errors:
+        loc = " -> ".join(error['loc'])
+        msg = error['msg']
+        error_type = error['type']
+        readable_errors.append(f"Field '{loc}' error: {msg} (type: {error_type})")
+    return readable_errors
+
+@fastapi_app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    readable_errors = create_readable_error_detail(exc.errors())
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": {
+                "name": "VALIDATION_ERROR",
+                "description": "Validation failed for one or more fields.",
+                "code": 400,
+                "meta": {
+                    "errors": readable_errors
+                }
+            }
+        }
+    )
 
 async def setup_containers():
     core_container = CoreContainer()
@@ -58,14 +85,6 @@ async def startup_event():
     # setup categories
     category_manager = core_container.category_container.category_manager()
     await category_manager.on_startup()
-
-    # CLOSE KAFKA NOW
-    # message_hub = core_container.message_hub()
-    # asyncio.create_task(message_hub.consume())
-    # openapi_data = fastapi_app.openapi()
-    # # Change "openapi.json" to desired filename
-    # with open("openapi.json", "w") as file:
-    #     json.dump(openapi_data, file)
 
     await setup_database(async_mongo)
     scanner_service: BlockScanner = await core_container.scanner_service()

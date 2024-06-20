@@ -15,7 +15,7 @@ from src.apps.utils.exceptions import JsonHTTPException
 user_router = APIRouter()
 
 
-@user_router.get("/list")
+@user_router.get("/list/")
 @inject
 async def get_users(
     user_manager: UserManager = Depends(Provide[UserContainer.user_manager]),
@@ -24,7 +24,7 @@ async def get_users(
     return users
 
 
-@user_router.get("/{telegram_id}")
+@user_router.get("/{telegram_id}/")
 @inject
 async def get_user(
     telegram_id: int,
@@ -40,7 +40,7 @@ async def get_user(
     return user
 
 
-@user_router.post("", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
+@user_router.post("/", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
 @inject
 async def create_user(
     user_schema: CreateUserSchema,
@@ -50,7 +50,7 @@ async def create_user(
     return created_user
 
 
-@user_router.put("/{telegram_id}", response_model=UserSchema, status_code=status.HTTP_200_OK)
+@user_router.put("/{telegram_id}/", response_model=UserSchema, status_code=status.HTTP_200_OK)
 @inject
 async def update_user(
     telegram_id: int,
@@ -61,7 +61,7 @@ async def update_user(
     return updated_user
 
 
-@user_router.delete("/{telegram_id}", status_code=status.HTTP_204_NO_CONTENT)
+@user_router.delete("/{telegram_id}/", status_code=status.HTTP_204_NO_CONTENT)
 @inject
 async def delete_user(
     telegram_id: int,
@@ -71,7 +71,7 @@ async def delete_user(
     return {"message": "User deleted successfully"}
 
 
-@user_router.post("/wallet/add", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
+@user_router.post("/wallet/add/", response_model=UserSchema, status_code=status.HTTP_201_CREATED)
 @inject
 async def add_wallet_user(
     wallet_data: UserWeb3WalletSchema,

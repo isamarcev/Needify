@@ -19,7 +19,7 @@ job_offer_router = APIRouter()
 
 
 @job_offer_router.post(
-    "/message/deploy",
+    "/message/deploy/",
     response_model=TONConnectMessageResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -36,7 +36,7 @@ async def get_deploy_job_offer_message(
 
 
 @job_offer_router.post(
-    "/message/get-job",
+    "/message/get-job/",
     response_model=JobOfferMessageResponseSchema,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -53,7 +53,7 @@ async def get_job_offer_message(
 
 
 @job_offer_router.post(
-    "/message/choose-doer",
+    "/message/choose-doer/",
     response_model=TONConnectMessageResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -70,7 +70,7 @@ async def choose_doer_job_offer_message(
 
 
 @job_offer_router.post(
-    "/message/complete",
+    "/message/complete/",
     response_model=JobOfferMessageResponseSchema,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -87,7 +87,7 @@ async def complete_job_offer_message(
 
 
 @job_offer_router.post(
-    "/message/confirm",
+    "/message/confirm/",
     response_model=JobOfferMessageResponseSchema,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -104,7 +104,7 @@ async def confirm_job_offer_message(
 
 
 @job_offer_router.post(
-    "/message/revoke",
+    "/message/revoke/",
     response_model=JobOfferMessageResponseSchema,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},

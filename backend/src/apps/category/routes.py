@@ -8,7 +8,7 @@ from src.apps.category.shema import CategorySchema
 category_router = APIRouter()
 
 
-@category_router.get("", response_model=list[CategorySchema])
+@category_router.get("/", response_model=list[CategorySchema])
 @inject
 async def get_categories(
     category_manager: CategoryManager = Depends(Provide[CategoryContainer.category_manager]),

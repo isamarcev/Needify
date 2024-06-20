@@ -9,7 +9,7 @@ from src.apps.scanner.service import BlockScanner
 scanner_router = APIRouter()
 
 
-@scanner_router.get("/manual_scan")
+@scanner_router.get("/manual_scan/")
 @inject
 async def get_last_masterchain_block(
     block_: int,

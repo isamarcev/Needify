@@ -11,7 +11,7 @@ task_router = APIRouter()
 
 
 @task_router.get(
-    "",
+    "/",
     response_model=list[TaskSchema],
     responses={
         starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -30,7 +30,7 @@ async def get_list_tasks(
 
 
 @task_router.get(
-    "/{task_id}",
+    "/{task_id}/",
     response_model=TaskSchema,
     responses={
         200: {
@@ -51,7 +51,7 @@ async def get_task(
 
 
 @task_router.post(
-    "",
+    "/",
     response_model=TaskSchema,
     responses={
         starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
@@ -88,7 +88,7 @@ async def create_task(
 
 
 @task_router.get(
-    "/{user_id}/tasks",
+    "/{user_id}/tasks/",
     response_model=UserHistoryResponseSchema,
     responses={
         starlette_status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},

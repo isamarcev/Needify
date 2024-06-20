@@ -33,7 +33,7 @@ currency_router = APIRouter()
 
 
 @currency_router.get(
-    "",
+    "/",
     response_model=list[CurrencySchema],
 )
 @inject
@@ -45,7 +45,7 @@ async def get_list_currencies(
 
 
 @currency_router.get(
-    "/native-currency",
+    "/native-currency/",
     response_model=CurrencySchema,
 )
 @inject
