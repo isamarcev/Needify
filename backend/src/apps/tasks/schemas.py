@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
 
@@ -46,7 +46,7 @@ class TaskSchema(BaseModel):
     task_id: int
     title: TaskTitle
     description: TaskDescription
-    images: list[str] = []
+    images: Optional[List[str]] = []
     category: str
     price: PositiveFloat
     currency: str
@@ -97,7 +97,9 @@ class PreCreateTaskSchema(BaseModel):
     title: TaskTitle
     description: TaskDescription
     category: str
-    images: List[str] = Field(..., description="Image in string format")
+    images: Optional[List[str]] = Field(
+        ..., description="Image in string format", default_factory=list
+    )
     price: PositiveFloat
     currency: str = Field(..., description="Currency symbol")
     poster_id: PositiveInt = Field(..., description="Customer telegram ID")
