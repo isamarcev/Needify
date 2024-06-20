@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 
 from dependency_injector.wiring import inject
 from fastapi import APIRouter, FastAPI, Request
@@ -20,6 +21,10 @@ FASTAPI_CONFIG = {
     "version": "1.0.0",
     "description": "This is a service for Needify app",
 }
+
+
+lock_file_path = "/tmp/fastapi_startup.lock"  # because of multiple workers
+
 
 setup_logging()
 
@@ -73,8 +78,8 @@ async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
     # core_container.ton_lib_client()
-    config = core_container.config
-    if config.UPDATE_LAST_SCANNED_BLOCK:
+    config_ = core_container.config
+    if config_.UPDATE_LAST_SCANNED_BLOCK:
         logging.info("Resetting last scanned block")
         local_storage = core_container.local_storage()
         await local_storage.reset_last_scanned_block()
@@ -83,8 +88,11 @@ async def startup_event():
     await lite_client.connect()
 
     # setup categories
-    category_manager = core_container.category_container.category_manager()
-    await category_manager.on_startup()
+    if not os.path.exists(lock_file_path):
+        with open(lock_file_path, "w") as lock_file:
+            lock_file.write("initialized")
+        category_manager = core_container.category_container.category_manager()
+        await category_manager.on_startup()
 
     await setup_database(async_mongo)
     scanner_service: BlockScanner = await core_container.scanner_service()
