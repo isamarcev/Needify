@@ -98,7 +98,7 @@ class PreCreateTaskSchema(BaseModel):
     description: TaskDescription
     category: str
     images: Optional[List[str]] = Field(
-        ..., description="Image in string format", default_factory=list
+        ..., description="Image in string format"
     )
     price: PositiveFloat
     currency: str = Field(..., description="Currency symbol")
