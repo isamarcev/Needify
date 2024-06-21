@@ -122,8 +122,10 @@ export async function createTask(data: ICreateTaskData): Promise<ITaskRaw> {
   const res = await fetch(`${BASE_URL}/v1/task`, {
     method: 'POST',
     body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
   });
 
   if (!res.ok) {

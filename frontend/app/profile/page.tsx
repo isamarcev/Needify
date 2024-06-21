@@ -1,34 +1,16 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './page.module.css';
-import { TonConnectButton } from '@tonconnect/ui-react';
-import { useTonWallet } from '@tonconnect/ui-react';
+import { TonConnectButton, useTonWallet } from '@tonconnect/ui-react';
 import { InnerPage } from '@/components/InnerPage';
-import {
-  FormContainer,
-  // SelectElement,
-  // TextareaAutosizeElement,
-  TextFieldElement,
-} from 'react-hook-form-mui';
-import {
-  Button,
-  // FormControl,
-  // FormControlLabel,
-  // InputLabel,
-  // Switch,
-  // Select,
-  // MenuItem,
-  // OutlinedInput,
-  // Box,
-  // Chip,
-  Avatar,
-} from '@mui/material';
+import { FormContainer, TextFieldElement } from 'react-hook-form-mui';
+import { Avatar, Button } from '@mui/material';
 import { addUserWallet, editUser, getUser } from '@/services/api';
 import { useTelegram } from '@/providers/TelegramContext';
 
 export default function Page() {
-  const webApp = useTelegram();
-  const telegramId = webApp?.initDataUnsafe?.user.id;
+  const { telegram } = useTelegram();
+  const telegramId = telegram?.WebApp.initDataUnsafe?.user?.id;
   const id = telegramId || 0;
   const wallet = useTonWallet();
   const address = wallet?.account?.address;
