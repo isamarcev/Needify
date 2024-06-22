@@ -9,8 +9,6 @@ from src.core.repository import BaseMongoRepository
 logger = logging.getLogger("root")
 
 
-created_categories = False
-
 class CategoryManager:
     def __init__(self, repository: BaseMongoRepository):
         self.repository = repository
@@ -50,11 +48,7 @@ class CategoryManager:
         return categories_to_response
 
     async def on_startup(self):
-        global created_categories
-        if created_categories:
-            return
         for category in categories:
             if not await self.get(category["title"], raise_if_not_exist=False):
                 await self.create(CategorySchema(**category))
-        created_categories = True
         logger.info("Categories checked created")
