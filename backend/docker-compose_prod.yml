@@ -19,9 +19,9 @@ services:
     env_file:
       - ./.env
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
-    depends_on:
-      - redis
-      - mongo_needify
+#    depends_on:
+#      - redis
+#      - mongo_needify
 
   nginx:
     build:
@@ -29,8 +29,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    depends_on:
-      - base_api
+#    depends_on:
+#      - base_api
 #  kafka-ui:
 #    image: provectuslabs/kafka-ui
 #    container_name: kafka-ui
