@@ -45,7 +45,7 @@ export const TelegramProvider = ({
   }, [webApp, pathname, router]);
 
   useEffect(() => {
-    if (webApp) {
+    if (webApp && webApp.WebApp.initData.user) {
       createUser(webApp.WebApp.initData.user);
     }
   }, [webApp]);
