@@ -18,6 +18,7 @@ class TaskContainer(containers.DeclarativeContainer):
     currency_manager = providers.Dependency()
     user_manager = providers.Dependency()
     async_mongo = providers.Dependency()
+    notificator_manager = providers.Dependency()
 
     task_database = providers.Factory(
         BaseMongoRepository, mongo_client=async_mongo, collection_name="tasks"
@@ -30,4 +31,5 @@ class TaskContainer(containers.DeclarativeContainer):
         wallet_manager=wallet_manager,
         currency_manager=currency_manager,
         user_manager=user_manager,
+        notificator_manager=notificator_manager,
     )

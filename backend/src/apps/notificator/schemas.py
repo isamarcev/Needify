@@ -3,4 +3,6 @@ from pydantic import BaseModel, PositiveInt
 
 class SendNotificationSchema(BaseModel):
     user_telegram_id: PositiveInt
-    text: str
+    task_id: PositiveInt
+    task_title: str
+    new_task_status: str

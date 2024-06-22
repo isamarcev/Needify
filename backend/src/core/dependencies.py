@@ -84,6 +84,18 @@ class CoreContainer(containers.DeclarativeContainer):
         CategoryContainer,
         config=config,
     )
+
+    bot = providers.Singleton(
+        AsyncTeleBot,
+        token=config.BOT_TOKEN,
+    )
+
+    notificator_container = providers.Container(
+        NotificatorContainer,
+        config=config,
+        bot=bot,
+    )
+
     task_container = providers.Container(
         TaskContainer,
         config=config,
@@ -92,6 +104,7 @@ class CoreContainer(containers.DeclarativeContainer):
         user_manager=user_container.user_manager,
         category_manager=category_container.category_manager,
         async_mongo=async_mongo,
+        notificator_manager=notificator_container.notificator_manager,
     )
 
     job_offer_container = providers.Container(
@@ -147,13 +160,4 @@ class CoreContainer(containers.DeclarativeContainer):
         handlers=handlers,
     )
 
-    bot = providers.Singleton(
-        AsyncTeleBot,
-        token=config.BOT_TOKEN,
-    )
 
-    notificator_container = providers.Container(
-        NotificatorContainer,
-        config=config,
-        bot=bot,
-    )

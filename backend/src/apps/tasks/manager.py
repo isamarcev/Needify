@@ -22,6 +22,7 @@ from src.apps.utils.exceptions import JsonHTTPException
 from src.apps.wallets.manager import WalletManager
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
+from src.apps.notificator.manager import NotificatorManager
 
 logger = logging.getLogger("root")
 
@@ -34,6 +35,7 @@ class TaskManager:
         wallet_manager: WalletManager,
         currency_manager: CurrencyManager,
         user_manager: UserManager,
+        notificator_manager: NotificatorManager,
     ):
         self.repository = task_repository
         self.category_manager = category_manager
@@ -41,6 +43,7 @@ class TaskManager:
         self.currency_manager = currency_manager
         self.user_manager = user_manager
         self.publisher = None
+        self.notificator_manager = notificator_manager
 
     async def get_tasks(
         self, category: str | None = None, status: TaskStatusEnum | None = None
@@ -145,6 +148,9 @@ class TaskManager:
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
+        if 'status' in data_to_update:
+            await self.notificator_manager.send_notification(task.poster_id, task_id, task.title, data_to_update['status'])
+            
         task = await self.repository.get_by_filter({"task_id": task_id})
         result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None

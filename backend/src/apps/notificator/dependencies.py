@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
-
+from src.apps.notificator.manager import NotificatorManager
 from src.core.config import BaseConfig
-
+from telebot.async_telebot import AsyncTeleBot, types
 
 class NotificatorContainer(containers.DeclarativeContainer):
     config: BaseConfig = providers.Configuration("config")
@@ -12,4 +12,10 @@ class NotificatorContainer(containers.DeclarativeContainer):
         ],
     )
 
-    bot = providers.Dependency()
+    bot: AsyncTeleBot = providers.Dependency()
+    
+    notificator_manager = providers.Factory(
+        NotificatorManager,
+        bot=bot,
+        config=config,
+    )
