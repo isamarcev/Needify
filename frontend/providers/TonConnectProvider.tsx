@@ -1,7 +1,7 @@
 'use client';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
-const MANIFEST_URL = process.env.MANIFEST_URL;
+const MANIFEST_URL = process.env.NEXT_PUBLIC_MANIFEST_URL;
 
 export function TonConnectProvider({
   children,
