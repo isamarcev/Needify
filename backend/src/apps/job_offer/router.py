@@ -1,6 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 from starlette import status
+from starlette.responses import RedirectResponse
 
 from src.apps.job_offer.manager import JobOfferManager
 from src.apps.job_offer.schemas import (
@@ -118,6 +119,14 @@ async def revoke_job_offer_message(
     job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
 ):
     return await job_offer_manager.create_revoke_message(data)
+
+
+@job_offer_router.get("/video-preview")
+@inject
+async def redirect(
+    configuration: dict = Depends(Provide["config"]),
+):
+    return RedirectResponse(url=configuration["VIDEO_PREVIEW_URL"])
 
 
 # @job_offer_router.post(

@@ -54,6 +54,8 @@ class BaseConfig(BaseSettings):
 
     UPDATE_LAST_SCANNED_BLOCK: bool = False
 
+    VIDEO_PREVIEW_URL: str
+
     class Config:
         env_file = ".env"
 

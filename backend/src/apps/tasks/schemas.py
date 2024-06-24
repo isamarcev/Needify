@@ -46,9 +46,7 @@ class TaskSchema(BaseModel):
     task_id: int
     title: TaskTitle
     description: TaskDescription
-    images: Optional[List[str]] = Field(
-        ..., description="Image in string format"
-    )
+    images: Optional[List[str]] = Field(..., description="Image in string format")
     category: str
     price: PositiveFloat
     currency: str
