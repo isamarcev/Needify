@@ -25,6 +25,21 @@ services:
     expose:
       - "6380"
 
+  mongo_needify_bot:
+    image: mongo:6
+    container_name: mongo_needify_bot
+    restart: always
+    volumes:
+      - ./Volumes/Mongo:/data/prod_bot_db
+    command: mongod --port 27018
+    ports:
+      - "27018:27018"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: needify_root
+      MONGO_INITDB_ROOT_PASSWORD: needify_root_password
+    networks:
+      - the_times_default
+
 networks:
   the_times_default:
     external: false
