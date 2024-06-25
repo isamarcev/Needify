@@ -10,3 +10,7 @@ lint-fix:
 	@ruff format .
 	@ruff check . --fix
 	@echo "Linting is complete"
+
+
+pup:
+	docker compose -f docker-compose_prod.yml up --build --force-recreate

@@ -21,7 +21,8 @@ load_dotenv(BASE_DIR / ".env")
 
 
 class BaseConfig(BaseSettings):
-    # BOT_TOKEN: str
+    BOT_TOKEN: str
+    WEB_APP_URL: str
     REDIS_URL: str
     MONGO_DB_URL: str
     MONGO_DB_NAME: str
@@ -52,6 +53,8 @@ class BaseConfig(BaseSettings):
     MANIFEST_URL: str
 
     UPDATE_LAST_SCANNED_BLOCK: bool = False
+
+    VIDEO_PREVIEW_URL: str
 
     class Config:
         env_file = ".env"

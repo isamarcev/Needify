@@ -124,6 +124,7 @@ class TaskManager:
         native_currency = await self.currency_manager.get_native_currency()
         task_currency: CurrencySchema = await self.currency_manager.get(data_to_create.currency)
         if not task_currency:
+            logging.error(f"Currency {data_to_create.currency} not found")
             raise TaskValidationJsonException(f"Currency {data_to_create.currency} not found")
 
         # Check poster balance

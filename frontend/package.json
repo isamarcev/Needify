@@ -16,6 +16,8 @@
     "@mui/material": "^5.15.15",
     "@mui/material-nextjs": "^5.15.11",
     "@mui/x-date-pickers": "^7.5.1",
+    "@tonconnect/sdk": "^3.0.3",
+    "@tonconnect/ui-react": "^2.0.3",
     "@types/telegram-web-app": "^7.2.1",
     "date-fns": "^3.6.0",
     "next": "14.2.3",

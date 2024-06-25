@@ -2,7 +2,7 @@ export interface ITaskDetail {
   id: number;
   title: string;
   description: string;
-  price: string;
+  price: number;
   status: ETaskStatus;
   deadline: string;
   doer: string;

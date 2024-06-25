@@ -10,6 +10,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import theme from '@/theme';
 import { Inter } from 'next/font/google';
 import { DateFnsProvider } from '@/providers/DateFnsProvider';
+import { TonConnectProvider } from '@/providers/TonConnectProvider';
 
 export const metadata: Metadata = {
   title: 'The Open Times',
@@ -30,7 +31,9 @@ export default function RootLayout({
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <DateFnsProvider>
             <CssVarsProvider theme={theme}>
-              <TelegramProvider>{children}</TelegramProvider>
+              <TonConnectProvider>
+                <TelegramProvider>{children}</TelegramProvider>
+              </TonConnectProvider>
               <CssBaseline />
             </CssVarsProvider>
           </DateFnsProvider>

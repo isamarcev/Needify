@@ -19,6 +19,9 @@ services:
     ports:
       - "8000:8000"
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
+    depends_on:
+      - mongo_needify
+      - redis_needify
 
   nginx:
     build:
@@ -30,6 +33,6 @@ services:
       - base_api
 
 
-networks:
-  default:
-    name: crypto
+#networks:
+#  default:
+#    name: crypto
