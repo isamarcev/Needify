@@ -1,5 +1,8 @@
 version: '3.8'
 
+volumes:
+    redis_data:
+
 services:
   python:
     build:
@@ -7,7 +10,21 @@ services:
     volumes:
       - ./logs:/usr/src/the_times/logs
     command: python bot.py
+    networks:
+      - the_times_default
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_data:/prod_data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - the_times_default
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    expose:
+      - "6380"
 
 networks:
-  default:
-    name: crypto
+  the_times_default:
+    external: false
