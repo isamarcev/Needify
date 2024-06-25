@@ -55,6 +55,7 @@ class BaseConfig(BaseSettings):
     UPDATE_LAST_SCANNED_BLOCK: bool = False
 
     VIDEO_PREVIEW_URL: str
+    ADMIN_TELEGRAM_ID: int
 
     class Config:
         env_file = ".env"
