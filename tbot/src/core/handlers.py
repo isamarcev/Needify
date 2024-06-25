@@ -2,7 +2,7 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup
+from aiogram.types import KeyboardButton, Message, ReplyKeyboardMarkup, WebAppInfo
 
 from src.core.config import env_config
 from src.core.messages import get_welcome_keyboard, get_welcome_message
@@ -26,10 +26,12 @@ async def command_start(message: Message, state: FSMContext) -> None:
                 referral_link = get_referral_link(
                     user=message.from_user, channel_name=env_config.telegram.BOT_NICKNAME
                 )
+                user = await user_manager.get_user(message.from_user.id)
                 await message.answer(
                     f"Welcome {message.from_user.first_name}!,"
                     " Your friend already got reward. You can too. \n"
-                    f"Your referral link: {referral_link}",
+                    f"Your referral link: {referral_link}. \n"
+                    f"You current balance is {user.balance} NEED. \n",
                     reply_markup=ReplyKeyboardMarkup(
                         keyboard=[[KeyboardButton(text="Invite friends", url=referral_link)]],
                         resize_keyboard=True,
@@ -47,11 +49,14 @@ async def command_start(message: Message, state: FSMContext) -> None:
         referral_link = get_referral_link(
             user=message.from_user, channel_name=env_config.telegram.BOT_NICKNAME
         )
+        user = await user_manager.get_user(message.from_user.id)
         await message.answer(
-            "You are already in our system. You can invite friends and get rewards. "
-            f"Your referral link to invite friends: {referral_link}.",
+            "You are already in our system. You can invite friends and get rewards. \n"
+            f"You balance: {user.balance} NEED. \n"
+            f"Your referral link to invite friends: {referral_link}. \n"
+            f"You can browse our app and progress in by the button below. ",
             reply_markup=ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text="Open App", url=env_config.telegram.WEB_APP_URL)]],
+                keyboard=[[KeyboardButton(text="Open App", web_app=WebAppInfo(url=env_config.telegram.WEB_APP_URL))]],
                 resize_keyboard=True,
             ),
         )
