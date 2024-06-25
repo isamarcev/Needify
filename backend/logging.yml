@@ -31,7 +31,7 @@ handlers:
 loggers:
   root:
     level: INFO
-    handlers: [ debug ]
+    handlers: [ debug, console ]
     propagate: no
 
   root.error:
