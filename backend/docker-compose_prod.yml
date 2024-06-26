@@ -17,6 +17,8 @@ services:
     env_file:
       - ./.env
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
+    networks:
+      - the_needify_default
 
   nginx:
     build:
@@ -26,3 +28,12 @@ services:
       - "80:80"
     depends_on:
       - base_api
+    networks:
+        - the_needify_default
+
+
+networks:
+  the_needify_default:
+    name: needify
+  the_needify_bot:
+    name: needify_bot

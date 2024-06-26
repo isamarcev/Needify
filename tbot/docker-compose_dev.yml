@@ -11,35 +11,8 @@ services:
       - ./logs:/usr/src/the_times/logs
     command: python bot.py
     networks:
-      - the_times_default
-
-  redis:
-    image: redis:alpine
-    restart: always
-    volumes:
-      - redis_data:/prod_data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-    networks:
-      - the_times_default
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
-    expose:
-      - "6380"
-
-  mongo_needify_bot:
-    image: mongo:6
-    container_name: mongo_needify_bot
-    restart: always
-    volumes:
-      - ./Volumes/Mongo:/data/prod_bot_db
-    command: mongod --port 27019
-    ports:
-      - "27019:27019"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: needify_root
-      MONGO_INITDB_ROOT_PASSWORD: needify_root_password
-    networks:
-      - the_times_default
+      - the_needify_bot
 
 networks:
-  the_times_default:
-    external: false
+    the_needify_bot:
+      name: needify_bot

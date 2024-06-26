@@ -6,10 +6,14 @@ volumes:
 
 services:
   redis:
+    container_name: redis_needify
     image: redis:alpine
     restart: always
     volumes:
       - redis_data:/prod_data
+    networks:
+        - the_needify_default
+        - the_needify_bot
 
   mongo_needify:
     image: mongo:6
@@ -23,3 +27,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: needify_root
       MONGO_INITDB_ROOT_PASSWORD: needify_root_password
+    networks:
+        - the_needify_default
+        - the_needify_bot
+
+
+networks:
+  the_needify_default:
+    name: needify
+  the_needify_bot:
+    name: needify_bot
