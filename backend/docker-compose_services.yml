@@ -20,7 +20,7 @@ services:
     container_name: mongo_needify
     restart: always
     volumes:
-      - ./Volumes/Mongo:/data/prod_db
+      - mongo_data:/data/prod_db
     command: mongod --port 27018
     ports:
       - "27018:27018"
