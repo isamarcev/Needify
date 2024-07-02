@@ -34,7 +34,7 @@ class BaseConfig(BaseSettings):
 
     AMOUNT_TON_TO_DEPLOY: float = 0.05
     NATIVE_JETTON_CONTENT_URL: str
-    LITESERVER_INDEX: int = 2
+    LITESERVER_INDEX: int = 3
     TON_CENTER_URL: str
     TON_CENTER_API_KEY: str
 

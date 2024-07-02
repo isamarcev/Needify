@@ -12,6 +12,14 @@ export interface EditUserParams {
   image?: string;
 }
 
+export interface CreateUserParams {
+  telegram_id: number;
+  first_name: string;
+  username?: string;
+  last_name?: string;
+  image?: string;
+}
+
 export interface AddUserWalletParams {
   address: string;
 }
@@ -67,4 +75,26 @@ export interface ITaskRaw {
   deadline: string;
   created_at: string;
   updated_at: string | null;
+}
+
+export interface CreateTaskParams {
+  title: string;
+  description: string;
+  category: string;
+  images?: string[];
+  price: number;
+  currency: string;
+  poster_id: number;
+  deadline: string;
+}
+
+export interface getMessageParams {
+  task_id: number;
+  action_by_user: number;
+}
+
+export interface getChooseDoerMessageParams {
+  task_id: number;
+  action_by_user: number;
+  doer: string;
 }

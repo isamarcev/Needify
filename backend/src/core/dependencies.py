@@ -63,7 +63,7 @@ class CoreContainer(containers.DeclarativeContainer):
     )
     lite_client = providers.Singleton(
         get_lite_client,
-        liteserver_index=2,
+        liteserver_index=3,
     )
     currency_container = providers.Container(
         CurrencyContainer,

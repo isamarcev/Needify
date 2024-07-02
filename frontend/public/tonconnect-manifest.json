@@ -1,5 +1,5 @@
 {
-  "url": "https://tot-omega.vercel.app",
+  "url": "https://127.0.0.1:3000",
   "name": "The Needify",
-  "iconUrl": "https://tot-omega.vercel.app/logo.jpg"
+  "iconUrl": "https://127.0.0.1:3000/logo.jpg"
 }

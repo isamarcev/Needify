@@ -29,7 +29,7 @@ import { useTelegram } from '@/providers/TelegramContext';
 export default function Page() {
   const webApp = useTelegram();
   const telegramId = webApp?.initDataUnsafe?.user.id;
-  const id = telegramId || 0;
+  const id = telegramId;
   const wallet = useTonWallet();
   const address = wallet?.account?.address;
   const [defaultValues, setDefaultValues] = useState({});

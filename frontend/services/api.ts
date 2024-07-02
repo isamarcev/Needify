@@ -4,6 +4,10 @@ import {
   ETaskStatus,
   ICategoryRaw,
   ITaskRaw,
+  CreateTaskParams,
+  CreateUserParams,
+  getMessageParams,
+  getChooseDoerMessageParams
 } from '@/services/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -22,16 +26,12 @@ export async function getUsers() {
 export async function getUser(id: number) {
   const res = await fetch(`${BASE_URL}/v1/users/${id}`);
 
-  if (!res.ok) {
-    throw new Error('Failed to get users');
-  }
-
   return res.json();
 }
 
-export async function createUser(params: EditUserParams) {
-  const res = await fetch(`${BASE_URL}/v1/users/${id}`, {
-    method: 'PUT',
+export async function createUser(params: CreateUserParams) {
+  const res = await fetch(`${BASE_URL}/v1/users`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -106,7 +106,119 @@ export async function getTask(id: number) {
   return res.json();
 }
 
+export async function getUserTasks(id: number) {
+
+  const res = await fetch(`${BASE_URL}/v1/task/${id}/tasks`);
+
+  if (!res.ok) {
+    throw new Error('Failed to get tasks');
+  }
+
+  return res.json();
+}
+
+export async function createTask(params: CreateTaskParams) {
+  const res = await fetch(`${BASE_URL}/v1/task`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to create task');
+  }
+
+  return res.json();
+}
+
 // Job-offer
+export async function getDeployMessage(params: getMessageParams) {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/deploy`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get categories');
+  }
+
+  return res.json();
+}
+
+export async function getRevokeMessage(params: getMessageParams) {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/revoke`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get categories');
+  }
+
+  return res.json();
+}
+
+export async function getCompleteMessage(params: getMessageParams) {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/revoke`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get categories');
+  }
+
+  return res.json();
+}
+
+export async function getGetJobMessage(params: getMessageParams) {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/get-job`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get categories');
+  }
+
+  return res.json();
+}
+
+export async function getChooseDoerMessage(params: getChooseDoerMessageParams) {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/choose-doer`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get categories');
+  }
+
+  return res.json();
+}
 
 // Category
 export async function getCategories(): Promise<ICategoryRaw[]> {
