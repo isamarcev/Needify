@@ -50,7 +50,7 @@ export const TelegramProvider = ({
         if (webApp?.WebApp.initDataUnsafe?.user) {
           const user = await getUser(webApp.WebApp.initDataUnsafe.user.id);
           // console.log(user.error)
-          if (!user) {
+          if (user.error) {
             await createUser({
               telegram_id: webApp.WebApp.initDataUnsafe.user.id,
               first_name: webApp.WebApp.initDataUnsafe.user.first_name,

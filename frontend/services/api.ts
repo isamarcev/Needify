@@ -25,15 +25,8 @@ export async function getUsers() {
 }
 
 export async function getUser(id: number) {
-  try {
-    const res = await fetch(`${BASE_URL}/v1/users/${id}`);
-    return res.json();
-  } catch (error) {
-    return {};
-  }
-
-
-  
+  const res = await fetch(`${BASE_URL}/v1/users/${id}`);
+  return res.json();
 
 }
 
