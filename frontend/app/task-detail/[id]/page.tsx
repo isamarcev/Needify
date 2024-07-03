@@ -89,7 +89,7 @@ export default function Page(props: IProps) {
   }, []);
 
   let bottom_button = null;
-  if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+  if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
     if (
       taskDetailData.poster_id ==
         telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
