@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { usePathname, useRouter } from 'next/navigation';
+import { getUser } from '@/services/api';
 
 export const TelegramContext = createContext<{
   telegram?: Telegram;
@@ -47,10 +48,22 @@ export const TelegramProvider = ({
 
   // Init user
   useEffect(() => {
-    if (telegram) {
-      console.log(telegram);
-      // createUser(telegram.WebApp.initData.user);
-    }
+    (async () => {
+      if (telegram) {
+        // TODO: use initData instead of initDataUnsafe with validation
+        const userId = telegram.WebApp.initDataUnsafe.user?.id;
+        console.log('userId: ', userId);
+
+        if (!userId) {
+          console.log('No user id from telegram');
+          return;
+        }
+
+        const userFromDB = await getUser(userId);
+        console.log('userFromDB: ', userFromDB);
+        // createUser(telegram.WebApp.initData.user);
+      }
+    })();
   }, [telegram]);
 
   return (

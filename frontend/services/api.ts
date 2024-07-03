@@ -6,6 +6,7 @@ import {
   ICreateTaskData,
   ICurrency,
   ITaskRaw,
+  IUserRaw,
 } from '@/services/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -21,7 +22,7 @@ export async function getUsers() {
   return res.json();
 }
 
-export async function getUser(id: number) {
+export async function getUser(id: number): Promise<IUserRaw> {
   const res = await fetch(`${BASE_URL}/v1/users/${id}`);
 
   if (!res.ok) {

@@ -89,3 +89,19 @@ export interface ICurrency {
   is_active: boolean;
   description: string;
 }
+
+export interface IUserRaw {
+  _id: string;
+  telegram_id: number;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  image?: string;
+  web3_wallet?: IWebWallet;
+  created: string;
+  updated?: string;
+}
+
+export interface IWebWallet {
+  address: string;
+}
