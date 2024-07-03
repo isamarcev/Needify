@@ -93,6 +93,12 @@ export interface getMessageParams {
   action_by_user: number;
 }
 
+export interface getConfirmMessageParams extends getMessageParams {
+  mark: number;
+  review: string;
+}
+
+
 export interface getChooseDoerMessageParams {
   task_id: number;
   action_by_user: number;

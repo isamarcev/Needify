@@ -7,6 +7,7 @@ import {
   CreateTaskParams,
   CreateUserParams,
   getMessageParams,
+  getConfirmMessageParams,
   getChooseDoerMessageParams
 } from '@/services/types';
 
@@ -170,7 +171,24 @@ export async function getRevokeMessage(params: getMessageParams) {
 }
 
 export async function getCompleteMessage(params: getMessageParams) {
-  const res = await fetch(`${BASE_URL}/v1/job-offer/message/revoke`, {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/complete`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get categories');
+  }
+
+  return res.json();
+}
+
+export async function getConfirmMessage(params: getConfirmMessageParams) {
+  const res = await fetch(`${BASE_URL}/v1/job-offer/message/confirm`, {
     method: 'POST',
     headers: {
       accept: 'application/json',

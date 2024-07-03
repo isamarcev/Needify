@@ -16,7 +16,7 @@ import { TonConnectButton } from '@tonconnect/ui-react';
 
 export default function Home() {
   const { telegramApp, isLoading } = useTelegram();
-  console.log(telegramApp)
+  console.log(telegramApp);
   const [currCategory, setCurrCategory] = useState('');
   const [categoriesOptions, setCategoriesOptions] = useState<IOption[]>([]);
   const [tasks, setTasks] = useState<ITaskShortCard[]>([]);
@@ -26,20 +26,24 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('ton-connect-connection-completed', async (event) => {
-      console.log('ton-connect-connection-completed', event);
-      const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
-      console.log('USER:')
-      console.log(user)
-      if (!user.web3_wallet) {
-        console.log(event.detail.wallet_address)
-        await addUserWallet(telegramApp.WebApp.initDataUnsafe.user.id, { address: event.detail.wallet_address });
-      }
-    });
+    window.addEventListener(
+      'ton-connect-connection-completed',
+      async (event) => {
+        console.log('ton-connect-connection-completed', event);
+        const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
+        console.log('USER:');
+        console.log(user);
+        if (!user.web3_wallet) {
+          console.log(event.detail.wallet_address);
+          await addUserWallet(telegramApp.WebApp.initDataUnsafe.user.id, {
+            address: event.detail.wallet_address,
+          });
+        }
+      },
+    );
     window.addEventListener('ton-connect-disconnection', (event) => {
       console.log('ton-connect-disconnection', event);
     });
-  
 
     (async () => {
       const tasksList = await getTasks({
@@ -65,7 +69,7 @@ export default function Home() {
     </Box>
   ) : (
     <main className={styles.main}>
-      <TonConnectButton style={{ float: "right" }}/>
+      <TonConnectButton style={{ float: 'right' }} />
       <Image
         className={styles.logo}
         src="./images/needify-text.svg"

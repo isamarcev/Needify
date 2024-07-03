@@ -187,7 +187,7 @@ class JobOfferContract(Contract):
     def get_get_job_message(self) -> MessageDTO:
         message = {
             "address": self.address.to_string(
-                is_user_friendly=False, is_test_only=True, is_bounceable=False
+                is_user_friendly=True, is_test_only=True, is_bounceable=False
             ),
             "amount": str(to_nano(config.TON_TRANSFER_AMOUNT, "ton")),
             "payload": base64.urlsafe_b64encode(self.create_get_job_message().to_boc()).decode(),

@@ -16,19 +16,19 @@ export interface ITaskDetail {
 }
 
 export interface IJobOffer {
-    vacancies: IDoer[] | null;
+  vacancies: IDoer[] | null;
 }
 
 export interface IDoer {
-    doer: string;
-    telegram_id: number;
+  doer: string;
+  telegram_id: number;
 }
 
 export enum EBottomButtonType {
-    REVOKE = 'REVOKE',
-    COMPLETE = 'COMPLETE',
-    GET_JOB = 'GET_JOB',
-    CONFIRM = 'CONFIRM',
+  REVOKE = 'REVOKE',
+  COMPLETE = 'COMPLETE',
+  GET_JOB = 'GET_JOB',
+  CONFIRM = 'CONFIRM',
 }
 
 export enum ECategory {

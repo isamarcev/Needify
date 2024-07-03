@@ -1,7 +1,7 @@
 import { useWatch } from 'react-hook-form-mui';
 import { Alert, Button, Stack } from '@mui/material';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
-import { createTask, getDeployMessage } from "@/services/api";
+import { createTask, getDeployMessage } from '@/services/api';
 import { useTelegram } from '@/providers/TelegramContext';
 
 export const SubComponent = () => {
@@ -17,7 +17,7 @@ export const SubComponent = () => {
           color="primary"
           variant="contained"
           disabled={!fields.title}
-          onClick={async ()=> {
+          onClick={async () => {
             const created_task = await createTask({
               title: fields.title,
               description: fields.description,
@@ -35,7 +35,6 @@ export const SubComponent = () => {
 
             const result = await tonConnectUI.sendTransaction(deploy_message);
             console.log(result);
-
           }}
         >
           Submit
