@@ -18,6 +18,9 @@ export const SubComponent = () => {
           variant="contained"
           disabled={!fields.title}
           onClick={async () => {
+            if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+              return;
+            }
             const created_task = await createTask({
               title: fields.title,
               description: fields.description,

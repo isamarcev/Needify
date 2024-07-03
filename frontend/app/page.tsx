@@ -26,9 +26,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener(
-      'ton-connect-connection-completed',
-      async (event) => {
+    window.addEventListener('ton-connect-connection-completed', ((
+      event: CustomEvent,
+    ) => {
+      (async () => {
+        if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+          return;
+        }
         console.log('ton-connect-connection-completed', event);
         const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
         console.log('USER:');
@@ -39,8 +43,8 @@ export default function Home() {
             address: event.detail.wallet_address,
           });
         }
-      },
-    );
+      })();
+    }) as EventListener);
     window.addEventListener('ton-connect-disconnection', (event) => {
       console.log('ton-connect-disconnection', event);
     });
@@ -102,7 +106,7 @@ export default function Home() {
       </Box>
       <Box className={styles.cards}>
         {tasks.map((data) => (
-          <TaskCard key={data.id} {...data} />
+          <TaskCard key={data.task_id} {...data} />
         ))}
       </Box>
       <Link href="/create-task">

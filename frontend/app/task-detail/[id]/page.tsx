@@ -50,29 +50,30 @@ export default function Page(props: IProps) {
 
   async function getMessage(type: EBottomButtonType) {
     let message;
-    if (type == EBottomButtonType.REVOKE) {
-      message = await getRevokeMessage({
-        task_id: taskDetailData.task_id,
-        action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
-      });
-    } else if (type == EBottomButtonType.COMPLETE) {
-      message = await getCompleteMessage({
-        task_id: taskDetailData.task_id,
-        action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
-      });
-    } else if (type == EBottomButtonType.GET_JOB) {
-      message = await getGetJobMessage({
-        task_id: taskDetailData.task_id,
-        action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
-      });
-    } else if (type == EBottomButtonType.CONFIRM) {
-      message = await getConfirmMessage({
-        task_id: taskDetailData.task_id,
-        action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
-        mark: 5,
-        review: 'Good Job',
-      });
-    }
+    if (telegramApp?.WebApp?.initDataUnsafe?.user?.id)
+      if (type == EBottomButtonType.REVOKE) {
+        message = await getRevokeMessage({
+          task_id: taskDetailData.task_id,
+          action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
+        });
+      } else if (type == EBottomButtonType.COMPLETE) {
+        message = await getCompleteMessage({
+          task_id: taskDetailData.task_id,
+          action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
+        });
+      } else if (type == EBottomButtonType.GET_JOB) {
+        message = await getGetJobMessage({
+          task_id: taskDetailData.task_id,
+          action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
+        });
+      } else if (type == EBottomButtonType.CONFIRM) {
+        message = await getConfirmMessage({
+          task_id: taskDetailData.task_id,
+          action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
+          mark: 5,
+          review: 'Good Job',
+        });
+      }
 
     await tonConnectUI.sendTransaction(message);
   }
@@ -88,74 +89,81 @@ export default function Page(props: IProps) {
   }, []);
 
   let bottom_button = null;
-
-  if (
-    taskDetailData.poster_id == telegramApp.WebApp.initDataUnsafe.user.id &&
-    taskDetailData.status == ETaskStatus.PUBLISHED
-  ) {
-    bottom_button = (
-      <Button
-        variant="contained"
-        color="error"
-        onClick={async () => {
-          await getMessage(EBottomButtonType.REVOKE);
-        }}
-      >
-        Revoke
-      </Button>
-    );
-  } else if (
-    taskDetailData.doer_id == telegramApp.WebApp.initDataUnsafe.user.id &&
-    taskDetailData.status == ETaskStatus.IN_PROGRESS
-  ) {
-    bottom_button = (
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={async () => {
-          await getMessage(EBottomButtonType.COMPLETE);
-        }}
-      >
-        Complete
-      </Button>
-    );
-  } else if (
-    taskDetailData.poster_id == telegramApp.WebApp.initDataUnsafe.user.id &&
-    taskDetailData.status == ETaskStatus.COMPLETED
-  ) {
-    bottom_button = (
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={async () => {
-          await getMessage(EBottomButtonType.CONFIRM);
-        }}
-      >
-        Confirm
-      </Button>
-    );
-  } else if (
-    taskDetailData.poster_id != telegramApp.WebApp.initDataUnsafe.user.id &&
-    taskDetailData.status == ETaskStatus.PUBLISHED
-  ) {
-    bottom_button = (
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={async () => {
-          await getMessage(EBottomButtonType.GET_JOB);
-        }}
-      >
-        Get Job
-      </Button>
-    );
-    if (taskDetailData.job_offer) {
-      if (taskDetailData.job_offer.vacancies) {
-        let doers_id = taskDetailData.job_offer.vacancies.map(
-          (item) => item.telegram_id,
-        );
-        if (doers_id.includes(telegramApp.WebApp.initDataUnsafe.user.id)) {
-          bottom_button = null;
+  if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+    if (
+      taskDetailData.poster_id ==
+        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+      taskDetailData.status == ETaskStatus.PUBLISHED
+    ) {
+      bottom_button = (
+        <Button
+          variant="contained"
+          color="error"
+          onClick={async () => {
+            await getMessage(EBottomButtonType.REVOKE);
+          }}
+        >
+          Revoke
+        </Button>
+      );
+    } else if (
+      taskDetailData.doer_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+      taskDetailData.status == ETaskStatus.IN_PROGRESS
+    ) {
+      bottom_button = (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={async () => {
+            await getMessage(EBottomButtonType.COMPLETE);
+          }}
+        >
+          Complete
+        </Button>
+      );
+    } else if (
+      taskDetailData.poster_id ==
+        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+      taskDetailData.status == ETaskStatus.COMPLETED
+    ) {
+      bottom_button = (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={async () => {
+            await getMessage(EBottomButtonType.CONFIRM);
+          }}
+        >
+          Confirm
+        </Button>
+      );
+    } else if (
+      taskDetailData.poster_id !=
+        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+      taskDetailData.status == ETaskStatus.PUBLISHED
+    ) {
+      bottom_button = (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={async () => {
+            await getMessage(EBottomButtonType.GET_JOB);
+          }}
+        >
+          Get Job
+        </Button>
+      );
+      if (taskDetailData.job_offer) {
+        if (taskDetailData.job_offer.vacancies) {
+          let doers_id = taskDetailData.job_offer.vacancies.map(
+            (item) => item.telegram_id,
+          );
+          if (telegramApp?.WebApp?.initDataUnsafe?.user?.id)
+            if (
+              doers_id.includes(telegramApp?.WebApp?.initDataUnsafe?.user?.id)
+            ) {
+              bottom_button = null;
+            }
         }
       }
     }
@@ -171,9 +179,7 @@ export default function Page(props: IProps) {
     </ImageList>
   ) : null;
 
-  return !taskDetailData.title ? (
-    <Typography variant="h1">Loading...</Typography>
-  ) : (
+  return !taskDetailData.title ? null : (
     <main className={styles.taskDetail}>
       <Typography className={styles.taskNumber} variant="body1">
         Task #: {props.params.id}
@@ -221,16 +227,18 @@ export default function Page(props: IProps) {
                     className="choose-doer-button"
                     disabled={
                       taskDetailData.poster_id !=
-                      telegramApp.WebApp.initDataUnsafe.user.id
+                      telegramApp?.WebApp?.initDataUnsafe?.user?.id
                     }
                     onClick={async () => {
-                      const message = await getChooseDoerMessage({
-                        task_id: taskDetailData.task_id,
-                        doer: item.doer,
-                        action_by_user:
-                          telegramApp.WebApp.initDataUnsafe.user.id,
-                      });
-                      await tonConnectUI.sendTransaction(message);
+                      if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+                        const message = await getChooseDoerMessage({
+                          task_id: taskDetailData.task_id,
+                          doer: item.doer,
+                          action_by_user:
+                            telegramApp.WebApp.initDataUnsafe.user.id,
+                        });
+                        await tonConnectUI.sendTransaction(message);
+                      }
                     }}
                   >
                     Choose

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { IUserTasks } from './types';
 import { tasksRawToShortCards } from '@/helpers';
 import { useTelegram } from '@/providers/TelegramContext';
+import { ITaskShortCard } from '@/widgets/TaskCard/types';
 
 export default function Page() {
   // console.log(cardsFullData)
@@ -23,8 +24,11 @@ export default function Page() {
   useEffect(() => {
     if (loading && !isLoading) {
       (async () => {
+        if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+          return;
+        }
         let cardsFullData = await getUserTasks(
-          telegramApp?.WebApp.initDataUnsafe.user.id,
+          telegramApp.WebApp.initDataUnsafe.user.id,
         );
         cardsFullData.published_tasks = tasksRawToShortCards(
           cardsFullData.published_tasks,
@@ -52,7 +56,7 @@ export default function Page() {
       </Typography>
       <Box className={styles.cards}>
         {cardsFullData.published_tasks.map((data) => (
-          <TaskCard key={data.id} {...data} />
+          <TaskCard key={data.task_id} {...data} />
         ))}
       </Box>
       <Typography className={styles.subtitle} variant="h2">
@@ -60,7 +64,7 @@ export default function Page() {
       </Typography>
       <Box className={styles.cards}>
         {cardsFullData.picked_up_tasks.map((data) => (
-          <TaskCard key={data.id} {...data} />
+          <TaskCard key={data.task_id} {...data} />
         ))}
       </Box>
     </InnerPage>
