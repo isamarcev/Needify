@@ -1,6 +1,10 @@
-# The Open Times
+# The Needify
 
-The Open Times is a platform that helps people help each other and exchange their TIME for more efficient economic growth.
+Needify is a decentralized marketplace for needs and experts. Needify is connecting those in need with those who can provide solutions.
+
+# Problem Description
+Current solutions are limited by traditional centralized systems and high transaction fees, hindering efficient exchange of expertise and experience.
+
 
 ## Requirements 
 - Docker

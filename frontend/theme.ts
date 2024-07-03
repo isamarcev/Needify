@@ -26,7 +26,7 @@ const theme = extendTheme({
       color: '#FFFFFF',
     },
     body2: {
-      color: '#FFFFFF',
+      color: 'white',
     },
   },
   colorSchemes: {
@@ -44,6 +44,7 @@ const theme = extendTheme({
         },
         background: {
           paper: '#3b3d3e',
+          default: '#3b3d3e',
         },
       },
       //@ts-expect-error

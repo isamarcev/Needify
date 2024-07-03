@@ -32,7 +32,9 @@ python-json-logger = "^2.0.7"
 gunicorn = "^22.0.0"
 pyyaml = "^6.0.1"
 ruff = "^0.4.7"
-
+telebot = "^0.0.5"
+poetry-plugin-export = "^1.8.0"
+faker = "^25.8.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -90,6 +92,9 @@ ignore = [
     "UP035",
     "UP007",
     "I001"
+]
+"./src/apps/category/examples.py" = [
+    "E501",
 ]
 
 

@@ -1,6 +1,7 @@
 import logging
 import random
-from abc import ABC, abstractmethod
+
+from pytoniq_core import Address
 
 from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
@@ -21,33 +22,12 @@ from src.apps.utils.exceptions import JsonHTTPException
 from src.apps.wallets.manager import WalletManager
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
+from src.apps.notificator.manager import NotificatorManager
 
 logger = logging.getLogger("root")
 
 
-class BaseTaskManager(ABC):
-    @abstractmethod
-    async def get_tasks(self):
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def get_task(self, task_id: str):
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def create_task(self, *args, **kwargs):
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def update_task(self, *args, **kwargs):
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def delete_task(self, *args, **kwargs):
-        raise NotImplementedError()
-
-
-class TaskManager(BaseTaskManager):
+class TaskManager:
     def __init__(
         self,
         task_repository: BaseMongoRepository,
@@ -55,6 +35,7 @@ class TaskManager(BaseTaskManager):
         wallet_manager: WalletManager,
         currency_manager: CurrencyManager,
         user_manager: UserManager,
+        notificator_manager: NotificatorManager,
     ):
         self.repository = task_repository
         self.category_manager = category_manager
@@ -62,16 +43,20 @@ class TaskManager(BaseTaskManager):
         self.currency_manager = currency_manager
         self.user_manager = user_manager
         self.publisher = None
+        self.notificator_manager = notificator_manager
 
     async def get_tasks(
-        self, category: str = None, status: TaskStatusEnum = TaskStatusEnum.PUBLISHED
+        self, category: str | None = None, status: TaskStatusEnum | None = None
     ) -> list[TaskSchema]:
         if category and not await self.category_manager.get(category_title=category):
             raise CategoryNotFoundException()
         filter_ = {}
         if category:
             filter_["category"] = category
-        return await self.repository.get_list(by_filter=filter_)
+        if status:
+            filter_["status"] = status
+        result = await self.repository.get_list(by_filter=filter_)
+        return [TaskSchema(**task) for task in result]
 
     async def get_by_task_id(self, task_id: int) -> TaskSchema | None:
         result = await self.repository.get_by_filter({"task_id": task_id})
@@ -128,9 +113,21 @@ class TaskManager(BaseTaskManager):
                 error_name="BAD_REQUEST",
             )
         # await self.category_manager.get(data_to_create.category)
+        similar_task = await self.repository.get_by_filter(
+            {
+                "title": data_to_create.title,
+                "poster_id": data_to_create.poster_id,
+                "price": data_to_create.price,
+            }
+        )
+        if similar_task:
+            raise TaskValidationJsonException(
+                "Task with same title and price already exists. Check your tasks."
+            )
         native_currency = await self.currency_manager.get_native_currency()
         task_currency: CurrencySchema = await self.currency_manager.get(data_to_create.currency)
         if not task_currency:
+            logging.error(f"Currency {data_to_create.currency} not found")
             raise TaskValidationJsonException(f"Currency {data_to_create.currency} not found")
 
         # Check poster balance
@@ -151,6 +148,10 @@ class TaskManager(BaseTaskManager):
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
+        if 'status' in data_to_update:
+            await self.notificator_manager.send_notification(task.poster_id, task_id, task.title, data_to_update['status'])
+            
+        task = await self.repository.get_by_filter({"task_id": task_id})
         result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None
 
@@ -182,6 +183,18 @@ class TaskManager(BaseTaskManager):
 
     async def delete_task(self, task_id: str):
         return await self.repository.delete(task_id)
+
+    async def get_task_by_job_offer_address(self, job_offer_address: Address) -> TaskSchema | None:
+        tasks = await self.get_tasks()
+        for task in tasks:
+            if task.job_offer is not None:
+                job_offer_address_task = task.job_offer.job_offer_address
+                if job_offer_address_task == job_offer_address.to_str(False):
+                    return task
+        result = await self.repository.get_by_filter(
+            {"job_offer.job_offer_address": job_offer_address.to_str()}
+        )
+        return TaskSchema(**result) if result else None
 
     async def get_user_tasks(self, user_id: int) -> UserHistoryResponseSchema:
         published_tasks = await self.repository.get_list(

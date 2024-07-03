@@ -3,6 +3,7 @@ from datetime import datetime
 
 from pymongo import ASCENDING, IndexModel
 from pymongo.errors import DuplicateKeyError
+from pytoniq_core import Address
 
 from src.apps.users.database import BaseUserDatabase
 from src.apps.users.events import UserEventsEnum
@@ -82,6 +83,8 @@ class UserManager(BaseUserManager):
                 error_description="User already has a wallet",
                 error_name="BAD_REQUEST",
             )
+        system_address = Address(web3_wallet_data.address).to_str(False)
+        web3_wallet_data.address = system_address
         dict_to_update = {"web3_wallet": web3_wallet_data.dict()}
         dict_to_update.update({"updated": datetime.now()})
         result = await self.repository.update_user(user.telegram_id, dict_to_update)
@@ -95,6 +98,10 @@ class UserManager(BaseUserManager):
                 error_description="User not found",
                 error_name="NOT_FOUND",
             )
+        return UserSchema(**user) if user else None
+
+    async def get_wallet_owner(self, wallet_address: str) -> UserSchema | None:
+        user = await self.repository.get_user_by_filter({"web3_wallet.address": wallet_address})
         return UserSchema(**user) if user else None
 
     async def get_user_by_telegram_id(

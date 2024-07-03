@@ -34,6 +34,11 @@ loggers:
     handlers: [ debug, console ]
     propagate: no
 
+  root.error:
+    level: ERROR
+    handlers: [ error ]
+    propagate: no
+
   uvicorn.access:
     level: WARNING
     handlers: [ debug, console ]
@@ -43,6 +48,11 @@ loggers:
     level: INFO
     handlers: [ debug, console ]
     formatter: simple
+    propagate: no
+
+  LiteClient:
+    level: ERROR
+    handlers: [ debug, console ]
     propagate: no
 
   multipart.multipart:

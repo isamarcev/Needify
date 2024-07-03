@@ -1,20 +1,34 @@
+import { ETaskStatus } from '@/services/types';
+
 export interface ITaskDetail {
-  id: number;
+  task_id: number;
   title: string;
   description: string;
-  price: string;
+  price: number;
   status: ETaskStatus;
   deadline: string;
-  doer: string;
+  poster_id: number;
+  doer_id: number | null;
   category: ECategory;
+  currency: ECurrency;
   images: string[];
+  job_offer: IJobOffer | null;
 }
 
-export enum ETaskStatus {
-  Created = 'Created',
-  Waiting = 'Waiting for the Doer',
-  InProgress = 'In progress',
-  ConfirmedByDoer = 'Confirmed by Doer',
+export interface IJobOffer {
+    vacancies: IDoer[] | null;
+}
+
+export interface IDoer {
+    doer: string;
+    telegram_id: number;
+}
+
+export enum EBottomButtonType {
+    REVOKE = 'REVOKE',
+    COMPLETE = 'COMPLETE',
+    GET_JOB = 'GET_JOB',
+    CONFIRM = 'CONFIRM',
 }
 
 export enum ECategory {
@@ -28,8 +42,5 @@ export enum ECategory {
 }
 
 export enum ECurrency {
-  TON = 'TON',
-  USDT = 'USDT',
-  NOT = 'NOT',
-  ETH = 'ETH',
+  TUSDT = 'TUSDT',
 }

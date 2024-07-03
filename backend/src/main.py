@@ -1,11 +1,11 @@
 import asyncio
-import json
 import logging
 
 from dependency_injector.wiring import inject
 from fastapi import APIRouter, FastAPI
 from pytoniq import LiteClient
 
+from src.apps.scanner.service import BlockScanner
 from src.core.config import config
 from src.core.database import async_mongo, setup_database
 from src.core.dependencies import CoreContainer
@@ -45,19 +45,31 @@ def app_factory():
 async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
-    core_container.ton_lib_client()
+    # core_container.ton_lib_client()
+    config_ = core_container.config
+    if config_.UPDATE_LAST_SCANNED_BLOCK:
+        logging.info("Resetting last scanned block")
+        local_storage = core_container.local_storage()
+        await local_storage.reset_last_scanned_block()
 
     lite_client: LiteClient = core_container.lite_client()
     await lite_client.connect()
 
-    message_hub = core_container.message_hub()
-    asyncio.create_task(message_hub.consume())
-    openapi_data = fastapi_app.openapi()
-    # Change "openapi.json" to desired filename
-    with open("openapi.json", "w") as file:
-        json.dump(openapi_data, file)
+    # setup categories
+    category_manager = core_container.category_container.category_manager()
+    await category_manager.on_startup()
+
+    # CLOSE KAFKA NOW
+    # message_hub = core_container.message_hub()
+    # asyncio.create_task(message_hub.consume())
+    # openapi_data = fastapi_app.openapi()
+    # # Change "openapi.json" to desired filename
+    # with open("openapi.json", "w") as file:
+    #     json.dump(openapi_data, file)
 
     await setup_database(async_mongo)
+    scanner_service: BlockScanner = await core_container.scanner_service()
+    asyncio.create_task(scanner_service.run())
 
 
 @fastapi_app.on_event("shutdown")

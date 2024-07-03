@@ -21,7 +21,8 @@ load_dotenv(BASE_DIR / ".env")
 
 
 class BaseConfig(BaseSettings):
-    # BOT_TOKEN: str
+    BOT_TOKEN: str
+    WEB_APP_URL: str
     REDIS_URL: str
     MONGO_DB_URL: str
     MONGO_DB_NAME: str
@@ -33,11 +34,9 @@ class BaseConfig(BaseSettings):
 
     AMOUNT_TON_TO_DEPLOY: float = 0.05
     NATIVE_JETTON_CONTENT_URL: str
-    LITESERVER_INDEX: int = 2
+    LITESERVER_INDEX: int = 3
     TON_CENTER_URL: str
     TON_CENTER_API_KEY: str
-
-    JETTON_USDT_ADDRESS: str
 
     NATIVE_CURRENCY_PRICE_TO_DEPLOY: float = 100
 
@@ -52,6 +51,11 @@ class BaseConfig(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: list[str]
 
     MANIFEST_URL: str
+
+    UPDATE_LAST_SCANNED_BLOCK: bool = False
+
+    VIDEO_PREVIEW_URL: str
+    ADMIN_TELEGRAM_ID: int
 
     class Config:
         env_file = ".env"

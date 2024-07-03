@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { usePathname, useRouter } from 'next/navigation';
+import { createUser, getUser } from '@/services/api';
 
 export const TelegramContext = createContext<{
   telegramApp?: Telegram;
@@ -25,8 +26,11 @@ export const TelegramProvider = ({
     if (app) {
       app.WebApp.ready();
       app.WebApp.expand();
+      app.WebApp.setHeaderColor('#000');
+      app.WebApp.setBackgroundColor('#000');
       setWebApp(app);
       setLoading(false);
+      console.log(webApp)
     }
   }, [pathname]);
 
@@ -40,6 +44,23 @@ export const TelegramProvider = ({
       }
     }
   }, [webApp, pathname, router]);
+
+  useEffect(() => {
+      (async () => {
+        if (webApp?.WebApp.initDataUnsafe?.user) {
+          const user = await getUser(webApp.WebApp.initDataUnsafe.user.id);
+          console.log(user.error)
+          if (user.error) {
+            await createUser({
+              telegram_id: webApp.WebApp.initDataUnsafe.user.id,
+              first_name: webApp.WebApp.initDataUnsafe.user.first_name,
+              username: webApp.WebApp.initDataUnsafe.user.username,
+              last_name: webApp.WebApp.initDataUnsafe.user.last_name,
+            });
+          }
+        }
+      })();
+  }, [webApp]);
 
   return (
     <TelegramContext.Provider value={{ telegramApp: webApp, isLoading }}>
