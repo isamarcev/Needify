@@ -19,17 +19,17 @@ services:
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
     networks:
       - the_needify_default
-
-  nginx:
-    build:
-      context: deploy/nginx/
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - base_api
-    networks:
-        - the_needify_default
+#
+#  nginx:
+#    build:
+#      context: deploy/nginx/
+#      dockerfile: Dockerfile
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - base_api
+#    networks:
+#        - the_needify_default
 
 
 networks:
