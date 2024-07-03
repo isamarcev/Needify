@@ -26,7 +26,7 @@ const theme = extendTheme({
       color: '#FFFFFF',
     },
     body2: {
-      color: '#FFFFFF',
+      color: 'white',
     },
   },
   colorSchemes: {

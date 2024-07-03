@@ -35,7 +35,7 @@ class BlockScanner:
             return master_blk
         if last_scanned_block < master_blk.seqno:
             master_blk, _ = await self.lite_client.lookup_block(
-                wc=-1, shard=-9223372036854775808, seqno=last_scanned_block + 1
+                wc=-1, shard=-9223372036854775808, seqno=last_scanned_block + 4
             )
             return master_blk
         return None
@@ -65,10 +65,13 @@ class BlockScanner:
                         await self.handle_block(shard, master_blk.seqno)
                     except Exception as e:
                         logging.error(f"Error handling block: {e}")
-                await self.local_storage.set_last_scanned_block(master_blk.seqno)
+                        import traceback
+                        logging.error(traceback.format_exc())
+                        # raise e
+                await self.local_storage.set_last_scanned_block(master_blk.seqno - 3)
             except Exception as e:
-                logging.info(f"Error scanning: {e}")
-
+                # logging.info(f"Error scanning: {e}")
+                raise e
     @staticmethod
     def mc_info_to_tl_blk(info: dict):
         return BlockIdExt.from_dict(info["last"])

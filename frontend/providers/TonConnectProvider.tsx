@@ -10,7 +10,7 @@ export function TonConnectProvider({
 }) {
   return (
     <TonConnectUIProvider
-      manifestUrl={`${MANIFEST_URL}/tonconnect-manifest.json`}
+      manifestUrl={`https://raw.githubusercontent.com/isamarcev/CryptoWallet/TEMPORARY/web3_wallet_logo.json`}
     >
       {children}
     </TonConnectUIProvider>
