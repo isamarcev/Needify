@@ -9,6 +9,7 @@ class NotificatorContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         modules=[
             "src.apps.notificator.router",
+            "src.apps.job_offer.router",
         ],
     )
 

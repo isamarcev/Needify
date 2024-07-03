@@ -1,5 +1,8 @@
 version: '3.8'
 
+volumes:
+    redis_data:
+
 services:
   python:
     build:
@@ -7,7 +10,9 @@ services:
     volumes:
       - ./logs:/usr/src/the_times/logs
     command: python bot.py
+    networks:
+      - the_needify_bot
 
 networks:
-  default:
-    name: crypto
+    the_needify_bot:
+      name: needify_bot
