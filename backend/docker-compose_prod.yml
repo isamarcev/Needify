@@ -19,8 +19,8 @@ services:
     command: [ "sh", "deploy/entrypoints/run_microservice.sh" ]
     networks:
       - the_needify_default
-    ports:
-      - "8000:8000"
+#    ports:
+#      - "8000:8000"
 #
 #  nginx:
 #    build:
