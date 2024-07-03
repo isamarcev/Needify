@@ -46,8 +46,8 @@ async def startup_event():
     await setup_containers()
     core_container = fastapi_app.core_container
     # core_container.ton_lib_client()
-    config = core_container.config
-    if config.UPDATE_LAST_SCANNED_BLOCK:
+    config_ = core_container.config
+    if config_.UPDATE_LAST_SCANNED_BLOCK:
         logging.info("Resetting last scanned block")
         local_storage = core_container.local_storage()
         await local_storage.reset_last_scanned_block()
