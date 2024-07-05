@@ -33,8 +33,10 @@ class UserContainer(containers.DeclarativeContainer):
         ],
     )
 
-    producer = providers.Dependency()
+    notificator_manager = providers.Dependency()
 
+    producer = providers.Dependency()
+    currency_manager = providers.Dependency()
     user_database = providers.Factory(
         MongoDBUserRepository,
         mongo_conn=config.MONGO_DB_URL,
@@ -43,5 +45,9 @@ class UserContainer(containers.DeclarativeContainer):
     )
 
     user_manager = providers.Singleton(
-        UserManager, user_repository=user_database, producer=producer
+        UserManager,
+        user_repository=user_database,
+        producer=producer,
+        currency_manager=currency_manager,
+        notificator_manager=notificator_manager,
     )

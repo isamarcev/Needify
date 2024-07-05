@@ -83,12 +83,12 @@ async def get_native_currency(
 # @inject
 # async def mint_tokens(
 #     mint_data: MintTokenSchema,
-#     currency_manager: CurrencyManager = Depends(
-#         Provide[CurrencyContainer.currency_manager]
-#     ),
+#     currency_manager: CurrencyManager = Depends(Provide[CurrencyContainer.currency_manager]),
 # ):
 #     result = await currency_manager.mint_tokens(mint_data)
 #     return {"message": result}
+
+
 #
 #
 # @currency_router.post("/burn-tokens")

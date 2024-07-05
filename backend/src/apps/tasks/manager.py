@@ -7,6 +7,7 @@ from src.apps.category.exceptions import CategoryNotFoundException
 from src.apps.category.manager import CategoryManager
 from src.apps.currency.manager import CurrencyManager
 from src.apps.currency.schemas import CurrencySchema
+from src.apps.notificator.manager import NotificatorManager
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.exceptions import TaskNotFoundJsonException, TaskValidationJsonException
 from src.apps.tasks.rules import ChangeStatusTaskRule
@@ -22,7 +23,6 @@ from src.apps.utils.exceptions import JsonHTTPException
 from src.apps.wallets.manager import WalletManager
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
-from src.apps.notificator.manager import NotificatorManager
 
 logger = logging.getLogger("root")
 
@@ -148,9 +148,11 @@ class TaskManager:
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
-        if 'status' in data_to_update:
-            await self.notificator_manager.send_notification(task.poster_id, task_id, task.title, data_to_update['status'])
-            
+        if "status" in data_to_update:
+            await self.notificator_manager.send_notification(
+                task.poster_id, task_id, task.title, data_to_update["status"]
+            )
+
         task = await self.repository.get_by_filter({"task_id": task_id})
         result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None
