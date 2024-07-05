@@ -1,3 +1,4 @@
+from pytoniq import LiteClient, WalletV4R2
 from tonsdk.contract.wallet import WalletContract, Wallets, WalletVersionEnum
 
 
@@ -30,3 +31,12 @@ def get_sdk_wallet_by_mnemonic(
         mnemonics=mnemonics, workchain=workchain, version=version, is_testnet=is_testnet
     )
     return wallet_info.get("wallet")
+
+
+async def get_pytoniq_wallet_by_mnemonic(
+    mnemonics: list[str],
+    workchain: int,
+    lite_client: LiteClient,
+) -> WalletV4R2:
+    wallet = await WalletV4R2.from_mnemonic(lite_client, mnemonics=mnemonics, wc=workchain)
+    return wallet

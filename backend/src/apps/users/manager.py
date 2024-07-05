@@ -5,6 +5,8 @@ from pymongo import ASCENDING, IndexModel
 from pymongo.errors import DuplicateKeyError
 from pytoniq_core import Address
 
+from src.apps.currency.manager import CurrencyManager
+from src.apps.notificator.manager import NotificatorManager
 from src.apps.users.database import BaseUserDatabase
 from src.apps.users.events import UserEventsEnum
 from src.apps.users.schemas import (
@@ -44,13 +46,20 @@ class BaseUserManager(ABC):
 
 
 class UserManager(BaseUserManager):
-    def __init__(self, user_repository: BaseUserDatabase, producer: KafkaProducer):
+    def __init__(
+        self,
+        user_repository: BaseUserDatabase,
+        producer: KafkaProducer,
+        currency_manager: CurrencyManager,
+        notificator_manager: NotificatorManager,
+    ):
         self.repository = user_repository
         self.producer = producer
+        self.currency_manager = currency_manager
+        self.notificator_manager = notificator_manager
 
     async def get_users(self) -> list[UserSchema]:
         users = await self.repository.get_users()
-        print(users, "USERS")
         return [UserSchema(**user) for user in users]
 
     async def create_user(self, create_schema: CreateUserSchema) -> UserSchema:
@@ -83,6 +92,7 @@ class UserManager(BaseUserManager):
                 error_description="User already has a wallet",
                 error_name="BAD_REQUEST",
             )
+        await self.currency_manager.transfer_test_tokens(web3_wallet_data.address)
         system_address = Address(web3_wallet_data.address).to_str(False)
         web3_wallet_data.address = system_address
         dict_to_update = {"web3_wallet": web3_wallet_data.dict()}
