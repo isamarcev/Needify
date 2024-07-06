@@ -25,6 +25,7 @@ from src.apps.job_offer.schemas import (
     RevokeJob,
     TONConnectMessageResponse,
 )
+from src.apps.notificator.manager import NotificatorManager
 from src.apps.tasks.enums import TaskStatusEnum
 from src.apps.tasks.manager import TaskManager
 from src.apps.tasks.schemas import TaskSchema
@@ -38,6 +39,8 @@ from src.apps.wallets.manager import WalletManager
 from src.apps.wallets.utils import get_jetton_transfer_message
 from src.core.config import config
 from src.core.utils import require400
+
+telegram_logger = logging.getLogger("telegram_logger")
 
 
 class JobOfferManager:
@@ -53,6 +56,7 @@ class JobOfferManager:
         lite_client: LiteClient,
         ton_lib_client: TonlibClient,
         transaction_service: TransactionService,
+        notificator_manager: NotificatorManager,
     ):
         self.task_manager = task_manager
         self.category_manager = category_manager
@@ -64,6 +68,7 @@ class JobOfferManager:
         self.lite_client = lite_client
         self.ton_lib_client = ton_lib_client
         self.transaction_service = transaction_service
+        self.notificator_manager = notificator_manager
 
     async def get_job_offer_chain_state(self, task_id: int) -> JobOfferDataDTO:
         task = await self.task_manager.get_by_task_id(task_id)
@@ -357,7 +362,6 @@ class JobOfferManager:
             action_verdict = True
         if not all([compute_verdict, action_verdict]):
             logging.error(f"Transaction {parsed_transaction['hash']} failed")
-
         parsed_job_offer_on_chain = await self.get_job_offer_chain_state(task_id=task.task_id)
         logging.info(f"Job offer on chain: {parsed_job_offer_on_chain}")
         chain_state = parsed_job_offer_on_chain["state"]
@@ -419,18 +423,29 @@ class JobOfferManager:
         match in_msg["op_code"]:
             case JobOfferOperationCodes.DEPLOY:
                 logging.info("Deploy operation")
-                # TODO push notification to poster
+                await self.notificator_manager.send_notification_with_custom_message(
+                    task.poster_id, f"Job offer for task {task.title} was deployed"
+                )
             case JobOfferOperationCodes.REVOKE:
                 logging.info("Revoke operation")
+                await self.notificator_manager.send_notification_with_custom_message(
+                    task.poster_id, f"Job offer for task {task.title} was revoked"
+                )
             case JobOfferOperationCodes.GET_JOB:
                 logging.info("Get job operation")
-                # TODO push notification to poster
+                await self.notificator_manager.send_notification_with_custom_message(
+                    task.poster_id, f"Your job offer {task.task_id} was requested by doer. "
+                )
             case JobOfferOperationCodes.COMPLETE_JOB:
                 logging.info("Complete job operation")
-                # TODO push notification to poster
+                await self.notificator_manager.send_notification_with_custom_message(
+                    task.poster_id, f"Your job offer {task.task_id} was completed by doer. "
+                )
             case JobOfferOperationCodes.CONFIRM_JOB:
                 logging.info("Confirm job operation")
-                # TODO push notification to doer
+                await self.notificator_manager.send_notification_with_custom_message(
+                    task.doer_id, f"Job offer {task.task_id} was confirmed by customer. "
+                )
             case JobOfferOperationCodes.APPEAL:
                 logging.error("Appeal not implemented")
             case JobOfferOperationCodes.REVOKE_APPEAL:
@@ -439,7 +454,9 @@ class JobOfferManager:
                 logging.error("Confirm appeal not implemented")
             case JobOfferOperationCodes.CHOOSE_DOER:
                 logging.info("Choose doer operation")
-                # TODO push notification to doer
+                await self.notificator_manager.send_notification_with_custom_message(
+                    task.doer_id, f"Your application for job {task.task_id} was accepted"
+                )
             case JobOfferOperationCodes.TAKE_WALLET_ADDRESS:
                 logging.info("Take wallet address operation")
             case _:

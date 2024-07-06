@@ -119,6 +119,7 @@ class CoreContainer(containers.DeclarativeContainer):
         config=config,
         lite_client=lite_client,
         ton_lib_client=ton_lib_client,
+        notificator_manager=notificator_container.notificator_manager,
     )
 
     kafka_consumer = providers.Singleton(

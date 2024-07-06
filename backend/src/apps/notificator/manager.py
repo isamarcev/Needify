@@ -1,3 +1,4 @@
+import logging
 import urllib.parse
 
 from telebot.async_telebot import AsyncTeleBot, types
@@ -11,15 +12,23 @@ class NotificatorManager:
     async def send_notification(
         self, user_telegram_id: int, task_id: int, task_title: str, new_task_status: str
     ):
-        text = f"📋 Your task: <b>{task_title}</b>\n has new status <b>{new_task_status}</b>"
-        kb = types.InlineKeyboardMarkup(row_width=1)
-        kb.add(
-            types.InlineKeyboardButton(
-                "Open Task",
-                web_app=types.WebAppInfo(
-                    urllib.parse.urljoin(self.config["WEB_APP_URL"], f"task-detail/{task_id}")
-                ),
+        try:
+            text = f"📋 Your task: <b>{task_title}</b>\n has new status <b>{new_task_status}</b>"
+            kb = types.InlineKeyboardMarkup(row_width=1)
+            kb.add(
+                types.InlineKeyboardButton(
+                    "Open Task",
+                    web_app=types.WebAppInfo(
+                        urllib.parse.urljoin(self.config["WEB_APP_URL"], f"task-detail/{task_id}")
+                    ),
+                )
             )
-        )
+            await self.bot.send_message(user_telegram_id, text, reply_markup=kb, parse_mode="HTML")
+        except Exception as e:
+            logging.error(f"Error sending notification: {e}")
 
-        await self.bot.send_message(user_telegram_id, text, reply_markup=kb, parse_mode="HTML")
+    async def send_notification_with_custom_message(self, user_telegram_id: int, message: str):
+        try:
+            await self.bot.send_message(user_telegram_id, message, parse_mode="HTML")
+        except Exception as e:
+            logging.error(f"Error sending notification: {e}")
