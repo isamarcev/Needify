@@ -2,11 +2,9 @@ import urllib.parse
 
 from telebot.async_telebot import AsyncTeleBot, types
 
-from src.core.config import BaseConfig
-
 
 class NotificatorManager:
-    def __init__(self, bot: AsyncTeleBot, config: BaseConfig):
+    def __init__(self, bot: AsyncTeleBot, config: dict):
         self.bot = bot
         self.config = config
 
