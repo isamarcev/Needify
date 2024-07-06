@@ -16,7 +16,7 @@ export const categoriesRawToOptions = (
 export const tasksRawToShortCards = (tasksRaw: ITaskRaw[]): ITaskShortCard[] =>
   tasksRaw.map(({ task_id, title, deadline, price }) => {
     return {
-      id: task_id,
+      task_id: task_id,
       title,
       deadline: format(deadline, 'PP'),
       price,

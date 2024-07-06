@@ -4,9 +4,9 @@ import { Paper, Typography } from '@mui/material';
 import styles from './taskCard.module.css';
 import Link from 'next/link';
 
-export const TaskCard: FC<ITaskShortCard> = ({ id, title, ...rest }) => {
+export const TaskCard: FC<ITaskShortCard> = ({ task_id, title, ...rest }) => {
   return (
-    <Link href={`/task-detail/${id}`}>
+    <Link href={`/task-detail/${task_id}`}>
       <Paper className={styles.taskCardWrapper} elevation={3}>
         <Typography variant="h3">{title}</Typography>
         <div className={styles.cardDataWrapper}>

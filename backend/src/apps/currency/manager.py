@@ -1,7 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
 
-from pytoniq import LiteClient
+from pytoniq import LiteClient, WalletV4R2
+from pytoniq_core import Address, Cell
 from pytonlib import TonlibClient
 from tonsdk.utils import to_nano
 from TonTools.Contracts.Jetton import Jetton, JettonWallet
@@ -14,8 +15,9 @@ from src.apps.currency.exceptions import (
 from src.apps.currency.jetton_metadata import NEED_JETTON_METADATA
 from src.apps.currency.mint_bodies import create_state_init_jetton, increase_supply
 from src.apps.currency.schemas import CreateCurrencySchema, CurrencySchema, MintTokenSchema
+from src.apps.currency.utils import get_jetton_transfer_payload
 from src.apps.utils.exceptions import JsonHTTPException
-from src.apps.utils.wallet import get_sdk_wallet_by_mnemonic
+from src.apps.utils.wallet import get_pytoniq_wallet_by_mnemonic, get_sdk_wallet_by_mnemonic
 from src.core.config import config
 from src.core.repository import BaseMongoRepository
 
@@ -114,21 +116,65 @@ class CurrencyManager(BaseCurrencyManager):
         )
         return int(data["stack"][0][1], 16)
 
+    async def transfer_test_tokens(self, destination_address: str):
+        currencies = await self.get_currencies()
+        if not currencies:
+            raise CurrencyNotFoundJsonException("No currencies found")
+        main_hd_wallet: WalletV4R2 = await get_pytoniq_wallet_by_mnemonic(
+            config.hd_wallet_mnemonic_list,
+            config.WORKCHAIN,
+            lite_client=self.lite_client,
+        )
+        jetton_currency: CurrencySchema = currencies[0]
+        native_master = await self.get_native_currency()
+
+        jetton_amount = 1000 * 10**jetton_currency.decimals
+        native_amount = 1000 * 10**native_master.decimals
+
+        jetton_wallet = await self.get_jetton_wallet(
+            jetton_currency.address, config.HD_WALLET_ADDRESS
+        )
+        jetton_transfer_payload: Cell = get_jetton_transfer_payload(
+            jettons_amount=jetton_amount,
+            recipient_address=destination_address,
+            forward_amount=to_nano(config.TON_TRANSFER_AMOUNT, "ton"),
+        )
+        native_wallet = await self.get_jetton_wallet(
+            native_master.address, config.HD_WALLET_ADDRESS
+        )
+        native_transfer_payload: Cell = get_jetton_transfer_payload(
+            jettons_amount=native_amount,
+            recipient_address=destination_address,
+            forward_amount=to_nano(config.JETTON_TRANSFER_FORWARD_FEE, "ton"),
+        )
+        seqno = await self.get_seqno(config.HD_WALLET_ADDRESS)
+
+        query_jetton = main_hd_wallet.create_wallet_internal_message(
+            destination=Address(jetton_wallet.address),
+            value=to_nano(config.TON_TRANSFER_AMOUNT * 2, "ton"),
+            body=jetton_transfer_payload,
+        )
+        query_native = main_hd_wallet.create_wallet_internal_message(
+            destination=Address(native_wallet.address),
+            value=to_nano(config.TON_TRANSFER_AMOUNT * 2, "ton"),
+            body=native_transfer_payload,
+        )
+        transfer_msg = main_hd_wallet.raw_create_transfer_msg(
+            main_hd_wallet.private_key,
+            seqno=seqno,
+            wallet_id=main_hd_wallet.wallet_id,
+            messages=[query_jetton, query_native],
+        )
+        result = await main_hd_wallet.send_external(
+            state_init=main_hd_wallet.state_init, body=transfer_msg
+        )
+        logger.info(f"Transfer result: {result}")
+        return result
+
     async def mint_tokens(self, mint_data: MintTokenSchema):
         jetton_master = await self.get_currency_by_address(mint_data.address)
         if jetton_master is None or not jetton_master.is_active:
             raise CurrencyAddressNotFoundJsonException(mint_data.address)
-        # if jetton_master.symbol == jUSDT_content.get("symbol"):
-        #     body = increase_supply(
-        #         to_nano(mint_data.amount, "ton"),
-        #         destination=mint_data.destination,
-        #         minter_class=jUSDTMinter,
-        #         wallet_class=jUSDTWallet,
-        #     )
-        #     state_init, jetton_address = create_state_init_jetton(
-        #         minter_class=jUSDTMinter, wallet_class=jUSDTWallet
-        #     )
-        # elif jetton_master.symbol == config.NATIVE_SYMBOL:
         body = increase_supply(to_nano(mint_data.amount, "ton"), destination=mint_data.destination)
         state_init, jetton_address = create_state_init_jetton()
         # else:

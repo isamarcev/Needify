@@ -32,6 +32,7 @@ class CoreContainer(containers.DeclarativeContainer):
             "src.apps.scanner.router",
             "src.apps.job_offer.router",
             "src.apps.tasks.router",
+            "src.apps.users.router",
         ]
     )
 
@@ -51,19 +52,24 @@ class CoreContainer(containers.DeclarativeContainer):
         get_ton_lib_client,
     )
 
+    bot = providers.Singleton(
+        AsyncTeleBot,
+        token=config.BOT_TOKEN,
+    )
+
+    notificator_container = providers.Container(
+        NotificatorContainer,
+        config=config,
+        bot=bot,
+    )
+
     ton_connect_manager = providers.Container(
         TONConnectContainer,
         config=config,
     )
-
-    user_container = providers.Container(
-        UserContainer,
-        config=config,
-        producer=producer,
-    )
     lite_client = providers.Singleton(
         get_lite_client,
-        liteserver_index=3,
+        liteserver_index=0,
     )
     currency_container = providers.Container(
         CurrencyContainer,
@@ -71,6 +77,13 @@ class CoreContainer(containers.DeclarativeContainer):
         ton_lib_client=ton_lib_client,
         config=config,
         lite_client=lite_client,
+    )
+    user_container = providers.Container(
+        UserContainer,
+        config=config,
+        producer=producer,
+        currency_manager=currency_container.currency_manager,
+        notificator_manager=notificator_container.notificator_manager,
     )
 
     wallet_container = providers.Container(
@@ -83,17 +96,6 @@ class CoreContainer(containers.DeclarativeContainer):
     category_container = providers.Container(
         CategoryContainer,
         config=config,
-    )
-
-    bot = providers.Singleton(
-        AsyncTeleBot,
-        token=config.BOT_TOKEN,
-    )
-
-    notificator_container = providers.Container(
-        NotificatorContainer,
-        config=config,
-        bot=bot,
     )
 
     task_container = providers.Container(
@@ -117,6 +119,7 @@ class CoreContainer(containers.DeclarativeContainer):
         config=config,
         lite_client=lite_client,
         ton_lib_client=ton_lib_client,
+        notificator_manager=notificator_container.notificator_manager,
     )
 
     kafka_consumer = providers.Singleton(
@@ -159,5 +162,3 @@ class CoreContainer(containers.DeclarativeContainer):
         consumer=kafka_consumer,
         handlers=handlers,
     )
-
-

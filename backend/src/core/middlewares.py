@@ -33,8 +33,9 @@ async def catch_exceptions_middleware(request: Request, call_next):
 def setup_middlewares(app: FastAPI):
     app.middleware("http")(catch_exceptions_middleware)
     app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"])
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )

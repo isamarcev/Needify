@@ -5,3 +5,7 @@ interface IProps {
     id: number;
   };
 }
+
+export default function Page(props: IProps) {
+  return null;
+}

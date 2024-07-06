@@ -40,6 +40,11 @@ class JobOfferSchema(BaseModel):
     vacancies: List[VacancySchema] = []
     mark: int | None = None
     review: str | None = None
+    job_offer_url: str
+
+    def __init__(self, **data):
+        data["job_offer_url"] = f"https://testnet.tonviewer.com/{data.get('job_offer_address')}"
+        super().__init__(**data)
 
 
 class TaskSchema(BaseModel):
