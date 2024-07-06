@@ -148,11 +148,6 @@ class TaskManager:
         task = await self.get_by_task_id(task_id)
         if not task:
             raise TaskNotFoundJsonException(task_id)
-        if "status" in data_to_update:
-            await self.notificator_manager.send_notification(
-                task.poster_id, task_id, task.title, data_to_update["status"]
-            )
-
         task = await self.repository.get_by_filter({"task_id": task_id})
         result = await self.repository.update(task["_id"], data_to_update)
         return TaskSchema(**result) if result else None

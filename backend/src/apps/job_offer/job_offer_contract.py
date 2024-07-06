@@ -290,13 +290,21 @@ class JobOfferContract(Contract):
         # Price
         price = int(price[1], 16)
         # Job Offer jetton wallet
-        jetton_wallet_address = read_address(
-            Cell.one_from_boc(b64str_to_bytes(jetton_wallet[1]["bytes"]))
-        ).to_string(True, True, config.IS_TESTNET)
+        try:
+            jetton_wallet_address = read_address(
+                Cell.one_from_boc(b64str_to_bytes(jetton_wallet[1]["bytes"]))
+            ).to_string(True, True, config.IS_TESTNET)
+        except Exception as e:
+            logging.error(f"Error getting jetton wallet address: {e}")
+            jetton_wallet_address = None
         # Job Offer native wallet
-        native_wallet_address = read_address(
-            Cell.one_from_boc(b64str_to_bytes(native_wallet[1]["bytes"]))
-        ).to_string(True, True, config.IS_TESTNET)
+        try:
+            native_wallet_address = read_address(
+                Cell.one_from_boc(b64str_to_bytes(native_wallet[1]["bytes"]))
+            ).to_string(True, True, config.IS_TESTNET)
+        except Exception as e:
+            logging.error(f"Error getting native wallet address: {e}")
+            native_wallet_address = None
         # Balance
         balance = int(balance[1], 16)
         # Poster address

@@ -34,6 +34,8 @@ class JobOfferContainer(containers.DeclarativeContainer):
         TransactionService,
     )
 
+    notificator_manager = providers.Dependency()
+
     job_offer_manager = providers.Factory(
         JobOfferManager,
         category_manager=category_manager,
@@ -46,4 +48,5 @@ class JobOfferContainer(containers.DeclarativeContainer):
         lite_client=lite_client,
         ton_lib_client=ton_lib_client,
         transaction_service=transaction_service,
+        notificator_manager=notificator_manager,
     )
