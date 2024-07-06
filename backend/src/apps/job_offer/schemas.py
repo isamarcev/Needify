@@ -37,12 +37,12 @@ class AppealJob(JobOfferMessageSchema):
 
 
 class JobOfferMessageResponseSchema(BaseModel):
-    valid_until: int
+    validUntil: int
     messages: List[TONConnectMessageSchema]
 
 
 class TONConnectMessageResponse(BaseModel):
-    valid_until: int
+    validUntil: int
     messages: List[TONConnectMessageSchema]
 
 
