@@ -67,6 +67,7 @@ class BlockScanner:
                     except Exception as e:
                         logging.error(f"Error handling block: {e}")
                         import traceback
+
                         logging.error(traceback.format_exc())
                         # raise e
                 await self.local_storage.set_last_scanned_block(master_blk.seqno)

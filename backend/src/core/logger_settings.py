@@ -1,11 +1,39 @@
+import asyncio
 import logging.config
 
 import yaml
 from colorlog import ColoredFormatter
 from gunicorn import glogging
 from pythonjsonlogger import jsonlogger
+from telebot.async_telebot import AsyncTeleBot
 
-from src.core.config import BASE_DIR, CONTEXT_ID, LOG_DIR
+from src.core.config import BASE_DIR, CONTEXT_ID, LOG_DIR, config
+
+
+class TelegramHandler(logging.Handler):
+    def _resolve_message(self, record: logging.LogRecord) -> str:
+        if issubclass(record.msg.__class__, Exception):
+            message = record.msg.__class__.__name__ + ": " + str(record.msg)
+        else:
+            # Try to get error from record.exc_info
+            if record.exc_info and record.exc_info[1] is not None:
+                exc = record.exc_info[1]
+                message = exc.__class__.__name__ + ": " + str(exc)
+            else:
+                message = record.msg
+
+        return message
+
+    def emit(self, record):
+        bot = AsyncTeleBot(token=config.BOT_TOKEN)
+        text = self._resolve_message(record)
+        try:
+            loop = asyncio.get_running_loop()
+            asyncio.run_coroutine_threadsafe(
+                bot.send_message(chat_id=config.ADMIN_TELEGRAM_ID, text=text), loop=loop
+            )
+        except Exception as e:
+            print(f"Failed to send log: {e}")
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):

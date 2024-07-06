@@ -10,6 +10,10 @@ formatters:
     format: "[%(asctime)s] - [%(levelname)8s] - [%(name)7s] - [%(context_id)s] - %(message)s"
 
 handlers:
+  telegram:
+    class: src.core.logger_settings.TelegramHandler
+    level: INFO
+    formatter: simple
   console:
     class: logging.StreamHandler
     level: INFO
@@ -29,6 +33,10 @@ handlers:
     encoding: utf8
 
 loggers:
+  telegram_logger:
+    level: INFO
+    handlers: [ telegram ]
+    propagate: no
   root:
     level: INFO
     handlers: [ debug, console ]
@@ -70,4 +78,5 @@ loggers:
     level: INFO
     handlers: [ debug, error, console ]
     propagate: yes
+
 
