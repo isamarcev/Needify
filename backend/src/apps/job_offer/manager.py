@@ -188,7 +188,7 @@ class JobOfferManager:
             forward_amount=to_nano(config.JETTON_TRANSFER_FORWARD_FEE, "ton"),
         )
         response = TONConnectMessageResponse(
-            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            validUntil=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[
                 job_offer_deploy_message,
                 native_currency_transfer_message,
@@ -244,7 +244,7 @@ class JobOfferManager:
         job_offer = await self.job_offer_factory.get_job_offer_contract(task, nat_curr, task_curr)
         job_offer_get_job_message = job_offer.get_get_job_message()
         response = TONConnectMessageResponse(
-            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            validUntil=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[job_offer_get_job_message],
         )
         await self.try_ton_connect(task, response)
@@ -262,7 +262,7 @@ class JobOfferManager:
         )
         job_offer_choose_doer_message = job_offer.get_choose_doer_message(data.doer)
         response = TONConnectMessageResponse(
-            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            validUntil=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[job_offer_choose_doer_message],
         )
         await self.try_ton_connect(task, response)
@@ -280,7 +280,7 @@ class JobOfferManager:
         )
         job_offer_complete_message = job_offer.get_complete_job_message()
         response = TONConnectMessageResponse(
-            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            validUntil=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[job_offer_complete_message],
         )
         await self.try_ton_connect(task, response)
@@ -301,7 +301,7 @@ class JobOfferManager:
             mark=data.mark, review=data.review
         )
         response = TONConnectMessageResponse(
-            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            validUntil=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[job_offer_confirm_message],
         )
         await self.try_ton_connect(task, response)
@@ -320,7 +320,7 @@ class JobOfferManager:
         )
         job_offer_revoke_message = job_offer.get_revoke_message()
         response = TONConnectMessageResponse(
-            valid_until=int(time.time() + config.TON_CONNECT_VALID_TIME),
+            validUntil=int(time.time() + config.TON_CONNECT_VALID_TIME),
             messages=[job_offer_revoke_message],
         )
         await self.try_ton_connect(task, response)
