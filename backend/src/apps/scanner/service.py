@@ -58,15 +58,15 @@ class BlockScanner:
                 if master_blk is None:
                     await asyncio.sleep(2)
                     continue
-                logging.info(f"Master block scanning: {master_blk.seqno}")
                 shards = await self.lite_client.get_all_shards_info(master_blk)
                 for shard in shards:
                     try:
-                        await self.handle_block(shard, master_blk.seqno)
+                        is_our_shard = await self.handle_block(shard, master_blk.seqno)
+                        if is_our_shard:
+                            logging.info(f"Scanned block {master_blk.seqno=}")
                     except Exception as e:
                         logging.error(f"Error handling block: {e}")
                         import traceback
-
                         logging.error(traceback.format_exc())
                         # raise e
                 await self.local_storage.set_last_scanned_block(master_blk.seqno)
@@ -96,3 +96,4 @@ class BlockScanner:
                     tx, task_, masterchain_seqno
                 )
                 logging.info(f"Detected task for job offer address: 0:{tx.account_addr_hex}")
+                return True
