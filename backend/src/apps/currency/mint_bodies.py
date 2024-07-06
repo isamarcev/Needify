@@ -1,7 +1,7 @@
 from typing import Type
 
 from tonsdk.contract.token.ft import JettonMinter, JettonWallet
-from tonsdk.utils import Address, to_nano
+from tonsdk.utils import Address
 
 from src.core.config import config
 
@@ -35,7 +35,7 @@ def increase_supply(
 
     body = minter.create_mint_body(
         destination=Address(destination or config.HD_WALLET_ADDRESS),
-        jetton_amount=to_nano(amount_to_supply, "ton"),
+        jetton_amount=amount_to_supply,
     )
     return body
 
