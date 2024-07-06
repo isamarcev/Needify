@@ -16,7 +16,7 @@ def get_welcome_message():
         "Thank you for joining us, and let's make this journey unforgettable together! 🙌. "
         f"Link to application: {env_config.telegram.WEB_APP_URL} \n",
     )
-    return text
+    return text[0]
 
 
 def get_welcome_keyboard():

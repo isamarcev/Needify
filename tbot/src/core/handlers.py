@@ -76,8 +76,8 @@ async def command_start(message: Message, state: FSMContext) -> None:
             else:
                 await user_manager.add_user(user=message.from_user)
                 await message.answer(
-                    get_welcome_message(),
-                    keyboard=get_welcome_keyboard(),
+                    text=get_welcome_message(),
+                    reply_markup=get_welcome_keyboard(),
                 )
                 await message_for_testing_purpose(message)
                 return
