@@ -45,7 +45,7 @@ class BaseConfig(BaseSettings):
     JETTON_TRANSFER_FORWARD_FEE: float = 0.2
 
     # TIME
-    TON_CONNECT_VALID_TIME: int = 3600
+    TON_CONNECT_VALID_TIME: int = 360
 
     # KAFKA
     KAFKA_BOOTSTRAP_SERVERS: list[str]
