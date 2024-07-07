@@ -4,7 +4,7 @@ const logEvent = (scope: string): ((event: Event) => void) => {
   scope = scope.startsWith('ton-connect-ui-') ? 'TonConnectUI' : 'TonConnect';
 
   return (event: Event): void => {
-    if (!(event instanceof CustomEvent<UserActionEvent | SdkActionEvent>)) {
+    if (!(event instanceof CustomEvent)) {
       return;
     }
     const detail: UserActionEvent | SdkActionEvent = event.detail;
