@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import linkIcon from '@/public/images/link-icon.svg';
 import {
   getChooseDoerMessage,
   getCompleteMessage,
@@ -198,6 +199,13 @@ export default function Page({ params: { id } }: IProps) {
             {job_offer?.job_offer_address
               ? `${job_offer.job_offer_address.slice(0, 6)}...${job_offer.job_offer_address.slice(-6)}`
               : '-'}
+            <Image
+              src={linkIcon}
+              alt="linkIcon"
+              width={16}
+              height={16}
+              className={styles.linkIcon}
+            />
           </Link>
         </Typography>
         <Typography variant="h3">Deadline</Typography>
