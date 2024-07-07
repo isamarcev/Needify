@@ -38,10 +38,10 @@ export default function Home() {
         }
         const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
         if (user.web3_wallet) {
-          if (user.web3_wallet.address !== address) {
-            tonConnectUI.disconnect();
-            telegramApp.WebApp.showAlert('You are trying to connect with another wallet');
-          }
+          // if (user.web3_wallet.address !== address) {
+          //   tonConnectUI.disconnect();
+          //   telegramApp.WebApp.showAlert('You are trying to connect with another wallet');
+          // }
         }
         else {
           await addUserWallet(telegramApp.WebApp.initDataUnsafe.user.id, {

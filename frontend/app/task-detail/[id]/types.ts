@@ -1,5 +1,11 @@
 import { ETaskStatus } from '@/services/types';
 
+export interface ITaskDetailProps {
+  params: {
+    id: number;
+  };
+}
+
 export interface ITaskDetail {
   task_id: number;
   title: string;
@@ -16,6 +22,8 @@ export interface ITaskDetail {
 }
 
 export interface IJobOffer {
+  job_offer_address: string;
+  job_offer_url: string;
   vacancies: IDoer[] | null;
 }
 
