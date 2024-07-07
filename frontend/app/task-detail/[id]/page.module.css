@@ -1,19 +1,40 @@
 .taskDetail {
-    padding: 16px;
-}
-
-.taskNumber {
-    margin-bottom: 8px;
+  display: flex;
+  flex-flow: column;
+  padding: 16px;
+  row-gap: 24px;
 }
 
 .title {
-    margin-bottom: 12px;
+  text-align: center;
 }
 
-.taskTitle {
-    margin-bottom: 4px;
+.traitsWrapper {
+  display: grid;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-row-gap: 12px;
 }
 
-.taskDescription {
-    margin-bottom: 8px;
+.offersWrapper {
+  display: flex;
+  flex-flow: column;
+  border-radius: 16px;
+  row-gap: 12px;
+}
+
+.offerItem {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  column-gap: 12px;
+}
+
+.offerButton {
+  &[disabled] {
+    opacity: 0.5;
+    background-color: var(--mui-palette-primary-main);
+  }
 }
