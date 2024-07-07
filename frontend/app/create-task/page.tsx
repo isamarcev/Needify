@@ -60,7 +60,7 @@ export default function Page() {
             options={getOptionsFromEnum(ECategory)}
             required
           />
-          <TextFieldElement name="price" label="Price" type="number" required/>
+          <TextFieldElement name="price" label="Price" type="number" required />
           <SelectElement
             label="Currency"
             name="currency"

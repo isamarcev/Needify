@@ -1,6 +1,6 @@
-import {UserActionEvent, SdkActionEvent} from "@tonconnect/ui-react";
+import { UserActionEvent, SdkActionEvent } from '@tonconnect/ui-react';
 
-const logEvent = (scope: string): (event: Event) => void => {
+const logEvent = (scope: string): ((event: Event) => void) => {
   scope = scope.startsWith('ton-connect-ui-') ? 'TonConnectUI' : 'TonConnect';
 
   return (event: Event): void => {
@@ -9,7 +9,7 @@ const logEvent = (scope: string): (event: Event) => void => {
     }
     const detail: UserActionEvent | SdkActionEvent = event.detail;
     console.log(`${scope} Event: ${detail.type}`, detail);
-  }
+  };
 };
 
 const tonConnectUiPrefix = 'ton-connect-ui-';
@@ -26,7 +26,7 @@ const tonConnectUiEvents = [
   'transaction-signed',
   'transaction-signing-failed',
   'disconnection',
-].map(event => `${tonConnectUiPrefix}${event}`)
+].map((event) => `${tonConnectUiPrefix}${event}`);
 
 const tonConnectPrefix = 'ton-connect-';
 const tonConnectEvents = [
@@ -42,12 +42,9 @@ const tonConnectEvents = [
   'transaction-signed',
   'transaction-signing-failed',
   'disconnection',
-].map(event => `${tonConnectPrefix}${event}`)
+].map((event) => `${tonConnectPrefix}${event}`);
 
-const events = [
-  ...tonConnectUiEvents,
-  ...tonConnectEvents
-];
+const events = [...tonConnectUiEvents, ...tonConnectEvents];
 
 for (const event of events) {
   try {

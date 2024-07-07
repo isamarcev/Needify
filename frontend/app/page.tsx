@@ -12,7 +12,11 @@ import { getTasks, getUser, addUserWallet, createUser } from '@/services/api';
 import { IOption } from '@/components/Selector/types';
 import { ITaskShortCard } from '@/widgets/TaskCard/types';
 import { ETaskStatus } from '@/services/types';
-import { TonConnectButton, useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
+import {
+  TonConnectButton,
+  useTonConnectUI,
+  useTonAddress,
+} from '@tonconnect/ui-react';
 
 export default function Home() {
   const { telegramApp, isLoading } = useTelegram();
@@ -24,38 +28,39 @@ export default function Home() {
   const address = useTonAddress(true);
 
   useEffect(() => {
-  tonConnectUI.onStatusChange((wallet) => {
-    console.log(wallet);
-    if (wallet) {
-      if (wallet.account.chain !== '-3') {
-        tonConnectUI.disconnect();
-        telegramApp?.WebApp.showAlert('Connect wallet in TESTNET not in mainnet.');
-        return;
-      }
-      (async () => {
-        if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+    tonConnectUI.onStatusChange((wallet) => {
+      console.log(wallet);
+      if (wallet) {
+        if (wallet.account.chain !== '-3') {
+          tonConnectUI.disconnect();
+          telegramApp?.WebApp.showAlert(
+            'Connect wallet in TESTNET not in mainnet.',
+          );
           return;
         }
-        const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
-        if (user.web3_wallet) {
-          // if (user.web3_wallet.address !== address) {
-          //   tonConnectUI.disconnect();
-          //   telegramApp.WebApp.showAlert('You are trying to connect with another wallet');
-          // }
-        }
-        else {
-          await addUserWallet(telegramApp.WebApp.initDataUnsafe.user.id, {
-            address: wallet.account.address,
-          });
-        }
-      })();
-    }
-  });
+        (async () => {
+          if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+            return;
+          }
+          const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
+          if (user.web3_wallet) {
+            // if (user.web3_wallet.address !== address) {
+            //   tonConnectUI.disconnect();
+            //   telegramApp.WebApp.showAlert('You are trying to connect with another wallet');
+            // }
+          } else {
+            await addUserWallet(telegramApp.WebApp.initDataUnsafe.user.id, {
+              address: wallet.account.address,
+            });
+          }
+        })();
+      }
+    });
   }, [isLoading]);
   const handleCategoryChange = useCallback((value: string) => {
     setCurrCategory(value);
   }, []);
-  
+
   useEffect(() => {
     (async () => {
       const tasksList = await getTasks({

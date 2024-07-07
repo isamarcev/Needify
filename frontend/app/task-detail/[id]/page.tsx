@@ -41,7 +41,7 @@ export default function Page({ params: { id } }: IProps) {
   const [taskDetailData, setTaskDetailData] = useState<ITaskDetail>(
     {} as ITaskDetail,
   );
-  const wallet  = useTonAddress();
+  const wallet = useTonAddress();
 
   const {
     title,
@@ -87,8 +87,7 @@ export default function Page({ params: { id } }: IProps) {
           mark: 5,
           review: 'Good Job',
         });
-      }
-      else if (type == EBottomButtonType.DEPLOY) {
+      } else if (type == EBottomButtonType.DEPLOY) {
         message = await getDeployMessage({
           task_id: taskDetailData.task_id,
           action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
@@ -103,11 +102,11 @@ export default function Page({ params: { id } }: IProps) {
   useEffect(() => {
     let MainButtonOnClick = async () => {
       tonConnectUI.openModal();
-    }
+    };
     let MainButtonParams = {
       text: 'Connect Wallet',
       color: telegramApp?.WebApp.themeParams.button_color,
-    }
+    };
     if (wallet) {
       if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
         if (
@@ -118,22 +117,22 @@ export default function Page({ params: { id } }: IProps) {
           MainButtonParams = {
             text: 'Revoke',
             color: telegramApp.WebApp.themeParams.destructive_text_color,
-          }
+          };
           MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.REVOKE);
-          }
-          
+          };
         } else if (
-          taskDetailData.doer_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          taskDetailData.doer_id ==
+            telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
           taskDetailData.status == ETaskStatus.IN_PROGRESS
         ) {
           MainButtonParams = {
             text: 'Complete',
             color: telegramApp.WebApp.themeParams.button_color,
-          }
+          };
           MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.COMPLETE);
-          }
+          };
         } else if (
           taskDetailData.poster_id ==
             telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
@@ -142,10 +141,10 @@ export default function Page({ params: { id } }: IProps) {
           MainButtonParams = {
             text: 'Confirm',
             color: telegramApp.WebApp.themeParams.button_color,
-          }
+          };
           MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.CONFIRM);
-          }
+          };
         } else if (
           taskDetailData.poster_id !=
             telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
@@ -154,35 +153,36 @@ export default function Page({ params: { id } }: IProps) {
           MainButtonParams = {
             text: 'Get Job',
             color: telegramApp.WebApp.themeParams.button_color,
-          }
+          };
           MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.GET_JOB);
-          }
-        }
-        else if (
-          taskDetailData.poster_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-          (taskDetailData.status == ETaskStatus.PRE_CREATED || taskDetailData.status == ETaskStatus.PRE_DEPLOYING)
+          };
+        } else if (
+          taskDetailData.poster_id ==
+            telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          (taskDetailData.status == ETaskStatus.PRE_CREATED ||
+            taskDetailData.status == ETaskStatus.PRE_DEPLOYING)
         ) {
           MainButtonParams = {
             text: 'Deploy',
             color: telegramApp.WebApp.themeParams.button_color,
-          }
+          };
           MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.DEPLOY);
-          }
+          };
         }
+      }
     }
-  }
-  console.log(MainButtonParams);
-  console.log(MainButtonOnClick);
-  telegramApp?.WebApp.MainButton.onClick(MainButtonOnClick);
-  telegramApp?.WebApp.MainButton.setParams(MainButtonParams);
-  telegramApp?.WebApp.MainButton.show();
-  return () => {
-    telegramApp?.WebApp.MainButton.offClick(MainButtonOnClick);
-    telegramApp?.WebApp.MainButton.hide();
-  }
-}, [wallet, telegramApp, taskDetailData]);
+    console.log(MainButtonParams);
+    console.log(MainButtonOnClick);
+    telegramApp?.WebApp.MainButton.onClick(MainButtonOnClick);
+    telegramApp?.WebApp.MainButton.setParams(MainButtonParams);
+    telegramApp?.WebApp.MainButton.show();
+    return () => {
+      telegramApp?.WebApp.MainButton.offClick(MainButtonOnClick);
+      telegramApp?.WebApp.MainButton.hide();
+    };
+  }, [wallet, telegramApp, taskDetailData]);
 
   let images = taskDetailData.images ? (
     <ImageList>
