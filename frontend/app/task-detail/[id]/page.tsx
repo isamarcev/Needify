@@ -2,34 +2,30 @@
 
 import styles from './page.module.css';
 import {
+  Button,
   ImageList,
   ImageListItem,
-  Typography,
-  Button,
-  Box,
   List,
-  ListItem,
   ListItemText,
-  ListItemButton,
+  Paper,
+  Typography,
 } from '@mui/material';
-// import { taskDetailData } from '@/tests/mockData';
 import { useEffect, useState } from 'react';
+import linkIcon from '@/public/images/link-icon.svg';
 import {
-  getTask,
-  getRevokeMessage,
-  getCompleteMessage,
-  getGetJobMessage,
   getChooseDoerMessage,
+  getCompleteMessage,
   getConfirmMessage,
+  getGetJobMessage,
+  getRevokeMessage,
+  getTask,
 } from '@/services/api';
-import { ITaskDetail, EBottomButtonType } from './types';
+import { EBottomButtonType, ITaskDetail } from './types';
 import { ETaskStatus } from '@/services/types';
-import {
-  TonConnect,
-  useTonAddress,
-  useTonConnectUI,
-} from '@tonconnect/ui-react';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 import { useTelegram } from '@/providers/TelegramContext';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface IProps {
   params: {
@@ -37,36 +33,51 @@ interface IProps {
   };
 }
 
-export default function Page(props: IProps) {
-  // function handleClick({ target }) {
-  //   if (!document.fullscreenEnabled) {
-  //     target.requestFullscreen().catch((err) => console.log(err));
-  //   } else {
-  //     document.exitFullscreen().catch((err) => console.log(err));
-  //   }
-  // }
-  const [tonConnectUI, setOptions] = useTonConnectUI();
-  const { telegramApp, isLoading } = useTelegram();
+export default function Page({ params: { id } }: IProps) {
+  const [tonConnectUI] = useTonConnectUI();
+  const [taskDetailData, setTaskDetailData] = useState<ITaskDetail>(
+    {} as ITaskDetail,
+  );
+  const { telegramApp } = useTelegram();
+
+  const {
+    title,
+    currency,
+    price,
+    status,
+    deadline,
+    description,
+    job_offer,
+    poster_id,
+    task_id,
+  } = taskDetailData;
+
+  useEffect(() => {
+    (async () => {
+      const taskDetailData = await getTask(id);
+      setTaskDetailData(taskDetailData);
+    })();
+  }, [id]);
 
   async function getMessage(type: EBottomButtonType) {
     let message;
-    if (telegramApp?.WebApp?.initDataUnsafe?.user?.id)
-      if (type == EBottomButtonType.REVOKE) {
+    if (telegramApp?.WebApp.initDataUnsafe.user?.id)
+      if (type === EBottomButtonType.REVOKE) {
         message = await getRevokeMessage({
           task_id: taskDetailData.task_id,
           action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
         });
-      } else if (type == EBottomButtonType.COMPLETE) {
+      } else if (type === EBottomButtonType.COMPLETE) {
         message = await getCompleteMessage({
           task_id: taskDetailData.task_id,
           action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
         });
-      } else if (type == EBottomButtonType.GET_JOB) {
+      } else if (type === EBottomButtonType.GET_JOB) {
         message = await getGetJobMessage({
           task_id: taskDetailData.task_id,
           action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
         });
-      } else if (type == EBottomButtonType.CONFIRM) {
+      } else if (type === EBottomButtonType.CONFIRM) {
         message = await getConfirmMessage({
           task_id: taskDetailData.task_id,
           action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
@@ -78,22 +89,13 @@ export default function Page(props: IProps) {
     await tonConnectUI.sendTransaction(message);
   }
 
-  const [taskDetailData, setTaskDetailData] = useState<ITaskDetail>(
-    {} as ITaskDetail,
-  );
-  useEffect(() => {
-    (async () => {
-      const taskDetailData = await getTask(props.params.id);
-      setTaskDetailData(taskDetailData);
-    })();
-  }, []);
-
   let bottom_button = null;
-  if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+  if (telegramApp?.WebApp.initDataUnsafe.user?.id) {
+    console.log('tut');
     if (
-      taskDetailData.poster_id ==
-        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.PUBLISHED
+      taskDetailData.poster_id ===
+        telegramApp?.WebApp.initDataUnsafe.user?.id &&
+      taskDetailData.status === ETaskStatus.PUBLISHED
     ) {
       bottom_button = (
         <Button
@@ -107,8 +109,8 @@ export default function Page(props: IProps) {
         </Button>
       );
     } else if (
-      taskDetailData.doer_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.IN_PROGRESS
+      taskDetailData.doer_id === telegramApp?.WebApp.initDataUnsafe.user?.id &&
+      taskDetailData.status === ETaskStatus.IN_PROGRESS
     ) {
       bottom_button = (
         <Button
@@ -122,9 +124,9 @@ export default function Page(props: IProps) {
         </Button>
       );
     } else if (
-      taskDetailData.poster_id ==
-        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.COMPLETED
+      taskDetailData.poster_id ===
+        telegramApp?.WebApp.initDataUnsafe.user?.id &&
+      taskDetailData.status === ETaskStatus.COMPLETED
     ) {
       bottom_button = (
         <Button
@@ -138,9 +140,9 @@ export default function Page(props: IProps) {
         </Button>
       );
     } else if (
-      taskDetailData.poster_id !=
-        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.PUBLISHED
+      taskDetailData.poster_id !==
+        telegramApp?.WebApp.initDataUnsafe.user?.id &&
+      taskDetailData.status === ETaskStatus.PUBLISHED
     ) {
       bottom_button = (
         <Button
@@ -158,9 +160,9 @@ export default function Page(props: IProps) {
           let doers_id = taskDetailData.job_offer.vacancies.map(
             (item) => item.telegram_id,
           );
-          if (telegramApp?.WebApp?.initDataUnsafe?.user?.id)
+          if (telegramApp?.WebApp.initDataUnsafe.user?.id)
             if (
-              doers_id.includes(telegramApp?.WebApp?.initDataUnsafe?.user?.id)
+              doers_id.includes(telegramApp?.WebApp.initDataUnsafe.user?.id)
             ) {
               bottom_button = null;
             }
@@ -173,88 +175,82 @@ export default function Page(props: IProps) {
     <ImageList>
       {taskDetailData.images.map((item) => (
         <ImageListItem key={item}>
-          <img src={item} width={200} height={200} loading="lazy" alt="" />
+          <Image src={item} width={200} height={200} loading="lazy" alt="" />
         </ImageListItem>
       ))}
     </ImageList>
   ) : null;
 
-  return !taskDetailData.title ? null : (
+  return !title ? null : (
     <main className={styles.taskDetail}>
-      <Typography className={styles.taskNumber} variant="body1">
-        Task #: {props.params.id}
+      <Typography className={styles.title} variant="h1">
+        {title}
       </Typography>
-      <Typography className={styles.title} variant="h2">
-        {taskDetailData.title}
+      <Paper className={styles.traitsWrapper} elevation={3}>
+        <Typography variant="h3">Task #</Typography>
+        <Typography variant="body1">{id}</Typography>
+        <Typography variant="h3">Price</Typography>
+        <Typography variant="body1">{`${price} ${currency}`}</Typography>
+        <Typography variant="h3">Status</Typography>
+        <Typography variant="body1">{status}</Typography>
+        <Typography variant="h3">TON Explorer</Typography>
+        <Typography variant="body1">
+          <Link href={job_offer?.job_offer_url ?? ''} target="_blank">
+            {job_offer?.job_offer_address
+              ? `${job_offer.job_offer_address.slice(0, 6)}...${job_offer.job_offer_address.slice(-6)}`
+              : '-'}
+            <Image
+              src={linkIcon}
+              alt="linkIcon"
+              width={16}
+              height={16}
+              className={styles.linkIcon}
+            />
+          </Link>
+        </Typography>
+        <Typography variant="h3">Deadline</Typography>
+        <Typography variant="body1">
+          {new Date(deadline).toLocaleDateString()}
+        </Typography>
+      </Paper>
+      <Typography variant="body1">{description}</Typography>
+      <Typography variant="h2" align="center">
+        Offers
       </Typography>
-      <Typography className={styles.taskTitle} variant="h3">
-        Description
-      </Typography>
-      <Typography className={styles.taskDescription} variant="body1">
-        {taskDetailData.description}
-      </Typography>
-      <Typography className={styles.taskTitle} variant="h3">
-        Price
-      </Typography>
-      <Typography className={styles.taskDescription} variant="body1">
-        {taskDetailData.price}
-      </Typography>
-      <Typography className={styles.taskTitle} variant="h3">
-        Status
-      </Typography>
-      <Typography className={styles.taskDescription} variant="body1">
-        {taskDetailData.status}
-      </Typography>
-      <Typography className={styles.taskTitle} variant="h3">
-        Deadline
-      </Typography>
-      <Typography className={styles.taskDescription} variant="body1">
-        {taskDetailData.deadline}
-      </Typography>
-      <Typography className={styles.taskTitle} variant="h3">
-        Vacancies
-      </Typography>
-      <List>
-        {taskDetailData.job_offer
-          ? taskDetailData.job_offer.vacancies
-            ? taskDetailData.job_offer.vacancies.map((item) => (
-                <ListItem key={item.doer}>
-                  <ListItemText primary={item.doer} />
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    className="choose-doer-button"
-                    disabled={
-                      taskDetailData.poster_id !=
-                      telegramApp?.WebApp?.initDataUnsafe?.user?.id
-                    }
-                    onClick={async () => {
-                      if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
-                        const message = await getChooseDoerMessage({
-                          task_id: taskDetailData.task_id,
-                          doer: item.doer,
-                          action_by_user:
-                            telegramApp.WebApp.initDataUnsafe.user.id,
-                        });
-                        await tonConnectUI.sendTransaction(message);
-                      }
-                    }}
-                  >
-                    Choose
-                  </Button>
-                </ListItem>
-              ))
-            : null
-          : null}
+      <List className={styles.offersWrapper}>
+        {job_offer?.vacancies?.length ? (
+          job_offer.vacancies.map(({ doer }) => (
+            <Paper key={doer} className={styles.offerItem}>
+              <ListItemText
+                primary={`${doer.slice(0, 6)}...${doer.slice(-6)}`}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                className={styles.offerButton}
+                disabled={
+                  poster_id !== telegramApp?.WebApp.initDataUnsafe.user?.id
+                }
+                onClick={async () => {
+                  if (telegramApp?.WebApp.initDataUnsafe.user?.id) {
+                    const message = await getChooseDoerMessage({
+                      task_id: task_id,
+                      doer,
+                      action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
+                    });
+                    await tonConnectUI.sendTransaction(message);
+                  }
+                }}
+              >
+                Choose
+              </Button>
+            </Paper>
+          ))
+        ) : (
+          <Typography variant="body1">No offers yet</Typography>
+        )}
       </List>
-      {/* <ImageList className={styles.taskDescription} cols={2}  >
-        {taskDetailData.images.map((item) => (
-          <ImageListItem key={item}>
-            <img src={item} width={200} height={200} loading="lazy" alt="" />
-          </ImageListItem>
-        ))}
-      </ImageList> */}
       {images}
       {bottom_button}
     </main>
