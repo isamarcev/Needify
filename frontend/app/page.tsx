@@ -12,7 +12,7 @@ import { getTasks, getUser, addUserWallet, createUser } from '@/services/api';
 import { IOption } from '@/components/Selector/types';
 import { ITaskShortCard } from '@/widgets/TaskCard/types';
 import { ETaskStatus } from '@/services/types';
-import { TonConnectButton } from '@tonconnect/ui-react';
+import { TonConnectButton, useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
 
 export default function Home() {
   const { telegramApp, isLoading } = useTelegram();
@@ -20,35 +20,43 @@ export default function Home() {
   const [currCategory, setCurrCategory] = useState('');
   const [categoriesOptions, setCategoriesOptions] = useState<IOption[]>([]);
   const [tasks, setTasks] = useState<ITaskShortCard[]>([]);
-
-  const handleCategoryChange = useCallback((value: string) => {
-    setCurrCategory(value);
-  }, []);
+  const [tonConnectUI] = useTonConnectUI();
+  const address = useTonAddress(true);
 
   useEffect(() => {
-    window.addEventListener('ton-connect-connection-completed', ((
-      event: CustomEvent,
-    ) => {
+  tonConnectUI.onStatusChange((wallet) => {
+    console.log(wallet);
+    if (wallet) {
+      if (wallet.account.chain !== '-3') {
+        tonConnectUI.disconnect();
+        telegramApp?.WebApp.showAlert('Connect wallet in TESTNET not in mainnet.');
+        return;
+      }
       (async () => {
         if (!telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
           return;
         }
-        console.log('ton-connect-connection-completed', event);
         const user = await getUser(telegramApp.WebApp.initDataUnsafe.user.id);
-        console.log('USER:');
-        console.log(user);
-        if (!user.web3_wallet) {
-          console.log(event.detail.wallet_address);
+        if (user.web3_wallet) {
+          if (user.web3_wallet.address !== address) {
+            tonConnectUI.disconnect();
+            telegramApp.WebApp.showAlert('You are trying to connect with another wallet');
+          }
+        }
+        else {
           await addUserWallet(telegramApp.WebApp.initDataUnsafe.user.id, {
-            address: event.detail.wallet_address,
+            address: wallet.account.address,
           });
         }
       })();
-    }) as EventListener);
-    window.addEventListener('ton-connect-disconnection', (event) => {
-      console.log('ton-connect-disconnection', event);
-    });
-
+    }
+  });
+  }, [isLoading]);
+  const handleCategoryChange = useCallback((value: string) => {
+    setCurrCategory(value);
+  }, []);
+  
+  useEffect(() => {
     (async () => {
       const tasksList = await getTasks({
         category: currCategory,

@@ -3,7 +3,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { usePathname, useRouter } from 'next/navigation';
-import { createUser, getUser } from '@/services/api';
+import { createUser, getUser, addUserWallet } from '@/services/api';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 export const TelegramContext = createContext<{
   telegramApp?: Telegram;
@@ -19,6 +20,8 @@ export const TelegramProvider = ({
   const [isLoading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const [tonConnectUI] = useTonConnectUI();
+  // const wallet = tonConnectUI.onStatusChange
 
   useEffect(() => {
     const app = window.Telegram;
@@ -61,6 +64,44 @@ export const TelegramProvider = ({
         }
       })();
   }, [webApp]);
+
+  // useEffect(() => {
+  //   window.addEventListener('ton-connect-connection-completed', ((
+  //     event: CustomEvent,
+  //   ) => {
+  //     if (event.detail.custom_data.chain_id !== "-3") {
+  //       tonConnectUI.disconnect();
+  //       webApp?.WebApp.showAlert('You are trying to connect with mainnet. Please connect with TESTNET.');
+  //       return;
+  //     }
+  //     (async () => {
+  //       if (!webApp?.WebApp?.initDataUnsafe?.user?.id) {
+  //         return;
+  //       }
+  //       console.log('ton-connect-connection-completed', event);
+  //       const user = await getUser(webApp.WebApp.initDataUnsafe.user.id);
+  //       console.log('USER:');
+  //       console.log(user);
+  //       if (user.web3_wallet) {
+  //         if (user.web3_wallet.address !== event.detail.wallet_address) {
+  //           tonConnectUI.disconnect();
+  //           webApp.WebApp.showAlert('You are trying to connect with another wallet');
+  //         }
+  //       }
+  //       else {
+  //         console.log(event.detail.wallet_address);
+  //         await addUserWallet(webApp.WebApp.initDataUnsafe.user.id, {
+  //           address: event.detail.wallet_address,
+  //         });
+  //       }
+  //     })();
+  //   }) as EventListener);
+  //   window.addEventListener('ton-connect-disconnection', (event) => {
+  //     console.log('ton-connect-disconnection', event);
+  //   });
+  // }, []);
+
+
 
   return (
     <TelegramContext.Provider value={{ telegramApp: webApp, isLoading }}>

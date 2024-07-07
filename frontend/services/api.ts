@@ -128,9 +128,9 @@ export async function createTask(params: CreateTaskParams) {
     body: JSON.stringify(params),
   });
 
-  if (!res.ok) {
-    throw new Error('Failed to create task');
-  }
+  // if (!res.ok) {
+  //   throw new Error('Failed to create task');
+  // }
 
   return res.json();
 }

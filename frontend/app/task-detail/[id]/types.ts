@@ -29,6 +29,7 @@ export enum EBottomButtonType {
   COMPLETE = 'COMPLETE',
   GET_JOB = 'GET_JOB',
   CONFIRM = 'CONFIRM',
+  DEPLOY = 'DEPLOY',
 }
 
 export enum ECategory {

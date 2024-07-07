@@ -38,6 +38,7 @@ export default function Page() {
             name="description"
             label="Description"
             rows={3}
+            required
           />
           <TextFieldElement
             className={styles.wholeLine}
@@ -57,17 +58,20 @@ export default function Page() {
             label="Category"
             name="category"
             options={getOptionsFromEnum(ECategory)}
+            required
           />
-          <TextFieldElement name="price" label="Price" type="number" />
+          <TextFieldElement name="price" label="Price" type="number" required/>
           <SelectElement
             label="Currency"
             name="currency"
             options={getOptionsFromEnum(ECurrency)}
+            required
           />
           <DatePickerElement
             className={styles.wholeLine}
             name="deadline"
             label="Deadline"
+            required
           />
         </div>
         <SubComponent />

@@ -1,6 +1,7 @@
 'use client';
 
 import styles from './page.module.css';
+// import '../../trackers';
 import {
   ImageList,
   ImageListItem,
@@ -21,6 +22,7 @@ import {
   getGetJobMessage,
   getChooseDoerMessage,
   getConfirmMessage,
+  getDeployMessage,
 } from '@/services/api';
 import { ITaskDetail, EBottomButtonType } from './types';
 import { ETaskStatus } from '@/services/types';
@@ -38,15 +40,12 @@ interface IProps {
 }
 
 export default function Page(props: IProps) {
-  // function handleClick({ target }) {
-  //   if (!document.fullscreenEnabled) {
-  //     target.requestFullscreen().catch((err) => console.log(err));
-  //   } else {
-  //     document.exitFullscreen().catch((err) => console.log(err));
-  //   }
-  // }
-  const [tonConnectUI, setOptions] = useTonConnectUI();
+  const [tonConnectUI] = useTonConnectUI();
   const { telegramApp, isLoading } = useTelegram();
+  const [taskDetailData, setTaskDetailData] = useState<ITaskDetail>(
+    {} as ITaskDetail,
+  );
+  const wallet  = useTonAddress();
 
   async function getMessage(type: EBottomButtonType) {
     let message;
@@ -74,13 +73,17 @@ export default function Page(props: IProps) {
           review: 'Good Job',
         });
       }
-
+      else if (type == EBottomButtonType.DEPLOY) {
+        message = await getDeployMessage({
+          task_id: taskDetailData.task_id,
+          action_by_user: telegramApp.WebApp.initDataUnsafe.user.id,
+        });
+      }
+    console.log(message);
     await tonConnectUI.sendTransaction(message);
   }
 
-  const [taskDetailData, setTaskDetailData] = useState<ITaskDetail>(
-    {} as ITaskDetail,
-  );
+
   useEffect(() => {
     (async () => {
       const taskDetailData = await getTask(props.params.id);
@@ -88,86 +91,95 @@ export default function Page(props: IProps) {
     })();
   }, []);
 
-  let bottom_button = null;
-  if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
-    if (
-      taskDetailData.poster_id ==
-        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.PUBLISHED
-    ) {
-      bottom_button = (
-        <Button
-          variant="contained"
-          color="error"
-          onClick={async () => {
+  telegramApp?.WebApp.MainButton.show();
+
+  useEffect(() => {
+    let MainButtonOnClick = () => {};
+    let MainButtonParams = {}
+    if (wallet) {
+      if (telegramApp?.WebApp?.initDataUnsafe?.user?.id) {
+        if (
+          taskDetailData.poster_id ==
+            telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          taskDetailData.status == ETaskStatus.PUBLISHED
+        ) {
+          MainButtonParams = {
+            text: 'Revoke',
+            color: telegramApp.WebApp.themeParams.destructive_text_color,
+          }
+          MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.REVOKE);
-          }}
-        >
-          Revoke
-        </Button>
-      );
-    } else if (
-      taskDetailData.doer_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.IN_PROGRESS
-    ) {
-      bottom_button = (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={async () => {
+          }
+          
+        } else if (
+          taskDetailData.doer_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          taskDetailData.status == ETaskStatus.IN_PROGRESS
+        ) {
+          MainButtonParams = {
+            text: 'Complete',
+            color: telegramApp.WebApp.themeParams.button_color,
+          }
+          MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.COMPLETE);
-          }}
-        >
-          Complete
-        </Button>
-      );
-    } else if (
-      taskDetailData.poster_id ==
-        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.COMPLETED
-    ) {
-      bottom_button = (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={async () => {
+          }
+        } else if (
+          taskDetailData.poster_id ==
+            telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          taskDetailData.status == ETaskStatus.COMPLETED
+        ) {
+          MainButtonParams = {
+            text: 'Confirm',
+            color: telegramApp.WebApp.themeParams.button_color,
+          }
+          MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.CONFIRM);
-          }}
-        >
-          Confirm
-        </Button>
-      );
-    } else if (
-      taskDetailData.poster_id !=
-        telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
-      taskDetailData.status == ETaskStatus.PUBLISHED
-    ) {
-      bottom_button = (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={async () => {
+          }
+        } else if (
+          taskDetailData.poster_id !=
+            telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          taskDetailData.status == ETaskStatus.PUBLISHED
+        ) {
+          MainButtonParams = {
+            text: 'Get Job',
+            color: telegramApp.WebApp.themeParams.button_color,
+          }
+          MainButtonOnClick = async () => {
             await getMessage(EBottomButtonType.GET_JOB);
-          }}
-        >
-          Get Job
-        </Button>
-      );
-      if (taskDetailData.job_offer) {
-        if (taskDetailData.job_offer.vacancies) {
-          let doers_id = taskDetailData.job_offer.vacancies.map(
-            (item) => item.telegram_id,
-          );
-          if (telegramApp?.WebApp?.initDataUnsafe?.user?.id)
-            if (
-              doers_id.includes(telegramApp?.WebApp?.initDataUnsafe?.user?.id)
-            ) {
-              bottom_button = null;
-            }
+          }
         }
+        else if (
+          taskDetailData.poster_id == telegramApp?.WebApp?.initDataUnsafe?.user?.id &&
+          (taskDetailData.status == ETaskStatus.PRE_CREATED || taskDetailData.status == ETaskStatus.PRE_DEPLOYING)
+        ) {
+          MainButtonParams = {
+            text: 'Deploy',
+            color: telegramApp.WebApp.themeParams.button_color,
+          }
+          MainButtonOnClick = async () => {
+            await getMessage(EBottomButtonType.DEPLOY);
+          }
+        }
+    }
+    else {
+      MainButtonParams = {
+        text: 'Connect Wallet',
+        color: telegramApp?.WebApp.themeParams.button_color,
+      }
+      MainButtonOnClick = async () => {
+        tonConnectUI.openModal();
       }
     }
+    console.log(MainButtonParams);
+    console.log(MainButtonOnClick);
+    telegramApp?.WebApp.MainButton.onClick(MainButtonOnClick);
+    telegramApp?.WebApp.MainButton.setParams(MainButtonParams);
+    telegramApp?.WebApp.MainButton.show();
+    return () => {
+      telegramApp?.WebApp.MainButton.offClick(MainButtonOnClick);
+      telegramApp?.WebApp.MainButton.hide();
+    }
   }
+}, [wallet, telegramApp, taskDetailData]);
 
   let images = taskDetailData.images ? (
     <ImageList>
@@ -256,7 +268,6 @@ export default function Page(props: IProps) {
         ))}
       </ImageList> */}
       {images}
-      {bottom_button}
     </main>
   );
 }
