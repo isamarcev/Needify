@@ -35,7 +35,7 @@ handlers:
 loggers:
   telegram_logger:
     level: INFO
-    handlers: [ telegram ]
+    handlers: [ telegram, debug ]
     propagate: no
   root:
     level: INFO
