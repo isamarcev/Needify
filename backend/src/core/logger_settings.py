@@ -1,5 +1,6 @@
 import asyncio
 import logging.config
+import os
 
 import yaml
 from colorlog import ColoredFormatter
@@ -53,7 +54,12 @@ class CustomFormatter(logging.Formatter):
         # We set request id, so we can use it in the formatter to show it in the log records.
         # Also, this fields will be added to the graylog extra fields and will be searchable.
         context_id = CONTEXT_ID.get()
+        pathname = record.pathname
 
+        shortened_path = os.path.join(
+            os.path.basename(os.path.dirname(pathname)), os.path.basename(pathname)
+        )
+        record.shortened_path = shortened_path
         if context_id:
             record.context_id = context_id
             record.short_context_id = context_id[:3] + "..." + context_id[-3:]

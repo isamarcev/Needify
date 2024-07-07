@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
@@ -165,21 +166,23 @@ async def redirect(
     return RedirectResponse(url=configuration["VIDEO_PREVIEW_URL"])
 
 
-# @job_offer_router.post(
-#     "/message/get-job-offer-chain-state",
-#     # response_model=JobOfferMessageResponseSchema,
-#     responses={
-#         status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
-#         status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
-#         # status.HTTP_200_OK: {"model": JobOfferMessageResponseSchema},
-#     },
-# )
-# @inject
-# async def get_job_offer_chain_state(
-#     data: JobOfferMessageSchema,
-#     job_offer_manager: JobOfferManager = Depends(Provide[JobOfferContainer.job_offer_manager]),
-# ) -> Any:
-#     return await job_offer_manager.get_job_offer_chain_state(task_id=data.task_id)
+@job_offer_router.post(
+    "/message/get-job-offer-chain-state",
+    # response_model=JobOfferMessageResponseSchema,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": BaseErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": BaseErrorResponse},
+        # status.HTTP_200_OK: {"model": JobOfferMessageResponseSchema},
+    },
+)
+@inject
+async def get_job_offer_chain_state(
+    data: JobOfferMessageSchema,
+    job_offer_manager: JobOfferManager = Depends(Provide["job_offer_container.job_offer_manager"]),
+) -> Any:
+    return await job_offer_manager.get_job_offer_chain_state(task_id=data.task_id)
+
+
 #
 #
 # @job_offer_router.get(

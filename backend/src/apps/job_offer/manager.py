@@ -365,8 +365,9 @@ class JobOfferManager:
         parsed_job_offer_on_chain = await self.get_job_offer_chain_state(task_id=task.task_id)
         logging.info(f"Job offer on chain: {parsed_job_offer_on_chain}")
         chain_state = parsed_job_offer_on_chain["state"]
-        logging.info(f"Chain state: {chain_state}")
-
+        logging.info(f"Chain state: {chain_state} {JobOfferChainStates(chain_state)}")
+        op_code = in_msg["op_code"]
+        logging.info(f"Operation code: {op_code}, {JobOfferOperationCodes(op_code)}")
         match chain_state:
             case JobOfferChainStates.PUBLISHED:
                 if in_msg["op_code"] == JobOfferOperationCodes.GET_JOB:
