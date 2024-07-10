@@ -4,7 +4,7 @@ disable_existing_loggers: true
 formatters:
   simple:
     class: src.core.logger_settings.CustomColoredFormatter
-    format: "%(log_color)s[%(asctime)s] - [%(levelname)8s] - [%(name)7s] - [%(short_context_id)s] - %(message)s"
+    format: "%(log_color)s[%(asctime)s] - [%(levelname)8s] - [%(name)7s] - [%(short_context_id)s] - %(message)s - [%(shortened_path)s:%(lineno)d]"
   file:
     class: src.core.logger_settings.CustomFormatter
     format: "[%(asctime)s] - [%(levelname)8s] - [%(name)7s] - [%(context_id)s] - %(message)s"
@@ -35,7 +35,7 @@ handlers:
 loggers:
   telegram_logger:
     level: INFO
-    handlers: [ telegram ]
+    handlers: [ telegram, debug ]
     propagate: no
   root:
     level: INFO

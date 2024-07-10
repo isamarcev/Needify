@@ -72,6 +72,8 @@ class CurrencyManager(BaseCurrencyManager):
                 jetton_master_address, owner
             )
             jetton_wallet_state = await self.lite_client.get_account_state(res)
+            logger.info(f"Jetton Wallet state: {jetton_wallet_state}")
+            logger.info(f"Jetton Wallet Address: {res}")
             if jetton_wallet_state.state.type_ != "active":
                 raise CurrencyNotFoundJsonException(jetton_master_address)
             logger.info(f"Jetton Wallet state: {jetton_wallet_state}")
