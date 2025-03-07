@@ -1,14 +1,14 @@
 import {
   AddUserWalletParams,
-  EditUserParams,
-  ETaskStatus,
-  ICategoryRaw,
-  ITaskRaw,
   CreateTaskParams,
   CreateUserParams,
-  getMessageParams,
+  EditUserParams,
+  ETaskStatus,
+  getChooseDoerMessageParams,
   getConfirmMessageParams,
-  getChooseDoerMessageParams
+  getMessageParams,
+  ICategoryRaw,
+  ITaskRaw,
 } from '@/services/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -31,10 +31,6 @@ export async function getUser(id: number) {
   } catch (error) {
     return {};
   }
-
-
-  
-
 }
 
 export async function createUser(params: CreateUserParams) {
@@ -115,7 +111,6 @@ export async function getTask(id: number) {
 }
 
 export async function getUserTasks(id: number) {
-
   const res = await fetch(`${BASE_URL}/v1/task/${id}/tasks`);
 
   if (!res.ok) {
